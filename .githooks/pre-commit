@@ -1,0 +1,33 @@
+#!/bin/bash
+# MultiCardz™ Pre-commit Hook
+# Runs smart test selection for maximum speed while ensuring quality
+
+set -e
+
+echo "🔍 MultiCardz™ Pre-commit Hook - Running Smart Tests"
+echo "=================================================="
+
+# Check if test_runner.py exists
+if [ ! -f "test_runner.py" ]; then
+    echo "❌ test_runner.py not found"
+    exit 1
+fi
+
+# Run smart tests with all optimizations
+echo "🧠 Running smart test selection..."
+uv run python test_runner.py all --smart --time --parallel --no-cache
+
+# Check exit code
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "✅ All smart tests passed! Commit proceeding..."
+    echo "=================================================="
+    exit 0
+else
+    echo ""
+    echo "❌ Tests failed! Commit blocked."
+    echo "   Fix failing tests before committing."
+    echo "   Run 'uv run python test_runner.py all --smart' to debug."
+    echo "=================================================="
+    exit 1
+fi
