@@ -29,7 +29,11 @@
       "Bash(unset VIRTUAL_ENV)",
       "Bash(export VIRTUAL_ENV=/Users/adam/dev/multicardz/.venv)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh auth switch:*)",
+      "Bash(pkill:*)",
+      "Bash(timeout 30 uv run pytest --co -q)"
     ],
     "deny": [],
     "ask": []
