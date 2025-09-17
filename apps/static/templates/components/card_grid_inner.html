@@ -1,0 +1,44 @@
+<!-- Card Grid Inner Content - Just the cards without wrapper div -->
+{% for card in cards %}
+<div class="card-item"
+     data-card-id="{{ card.id }}"
+     {% if card.draggable %}draggable="true"{% endif %}>
+    <div class="card-content">
+        <div class="card-header">
+            <h4 class="card-title">{{ card.title }}</h4>
+            {% if card.subtitle %}
+            <div class="card-subtitle">{{ card.subtitle }}</div>
+            {% endif %}
+        </div>
+        {% if card.content %}
+        <div class="card-body">
+            <p class="card-description">{{ card.content }}</p>
+        </div>
+        {% endif %}
+        <div class="card-footer">
+            <div class="card-tags-accordion">
+                <input type="checkbox" id="tags-{{ card.id }}" class="card-tags-toggle">
+                <label for="tags-{{ card.id }}" class="card-tags-label">
+                    tags ({{ card.tags|length }})
+                    <span class="card-tags-arrow">▼</span>
+                </label>
+                <div class="card-tags">
+                    {% for tag in card.tags %}
+                    <span class="card-tag" data-tag="{{ tag }}">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if card.metadata %}
+            <div class="card-metadata">
+                {% for key, value in card.metadata.items() %}
+                <span class="metadata-item">{{ key }}: {{ value }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% if not cards %}
+<p>drag a tag to a zone to see the cards that have that tag</p>
+{% endif %}

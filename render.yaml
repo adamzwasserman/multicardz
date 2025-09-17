@@ -1,0 +1,41 @@
+# Render deployment configuration for MultiCardz™
+# Optimized for high-performance set operations
+
+services:
+  - type: web
+    name: multicardz-web
+    env: python
+    plan: pro  # Recommended minimum for 1M card performance
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      # Pre-compile Python bytecode for faster startup
+      python -m compileall .
+    startCommand: |
+      # Apply Render optimizations on startup
+      python -c "from render_performance_config import apply_render_optimizations; apply_render_optimizations()"
+      # Start your web server (adjust as needed)
+      gunicorn --workers 2 --threads 4 --timeout 120 app:app
+
+    # Environment variables for optimal performance
+    envVars:
+      - key: PYTHONOPTIMIZE
+        value: 2  # Enable Python optimizations
+      - key: PYTHONUNBUFFERED
+        value: 1  # Ensure log output
+      - key: MULTICARDZ_PERFORMANCE_MODE
+        value: render
+      - key: MULTICARDZ_MAX_CARDS
+        value: 1000000  # Adjust based on plan
+      - key: MULTICARDZ_CACHE_SIZE
+        value: 200  # Adjust based on available memory
+
+    # Health check for performance monitoring
+    healthCheckPath: /health
+
+    # Scaling configuration
+    numInstances: 1  # Increase for higher throughput
+
+    # Resource limits (automatically set by plan)
+    # Pro plan: 2 vCPUs, 4GB RAM
+    # Pro Plus plan: 4 vCPUs, 8GB RAM (recommended for 1M cards)

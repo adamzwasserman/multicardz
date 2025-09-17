@@ -1,0 +1,15 @@
+<div class="toggle-container" id="{{ toggle_id }}-container">
+    <label class="toggle-label">
+        <span class="toggle-left-label">{{ toggle_label or 'Toggle' }}</span>
+        <input
+            type="checkbox"
+            id="{{ toggle_id }}"
+            class="toggle-checkbox"
+            {% if toggle_state %}checked{% endif %}
+            hx-post="{{ toggle_endpoint }}"
+            hx-target="#{{ container_id }}"
+            hx-swap="outerHTML"
+        />
+        <span class="toggle-right-label">{{ toggle_label or 'Toggle' }}</span>
+    </label>
+</div>

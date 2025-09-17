@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MultiCardz WASM Interface</title>
+    <link rel="stylesheet" href="/static/css/wasm-interface.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="/static/wasm/multicardz.js"></script>
+    <script src="/static/js/wasm-loader.js"></script>
+</head>
+<body data-workspace="{{ workspace_id }}">
+    <div id="wasm-status" hx-get="/api/v2/wasm/status" hx-trigger="load">
+        <span>Loading WASM...</span>
+    </div>
+    <div id="checkbox-controls">
+        <input type="checkbox" id="all-cards-checkbox"
+               hx-post="/api/v2/wasm/checkbox/dispatch"
+               hx-vals='{"checkbox_id": "all-cards", "workspace_id": "default"}'
+               hx-trigger="change">
+    </div>
+    <div id="filter-zone" class="drop-zone"
+         hx-post="/api/v2/wasm/tags/filter"
+         hx-trigger="drop">
+        <h3>Filter Zone</h3>
+    </div>
+</body>
+</html>

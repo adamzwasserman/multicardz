@@ -1,0 +1,29 @@
+<div class="{{ container_class }}-section">
+    <div class="{{ container_class }}-label-row">
+        <span class="{{ container_class }}-label">{{ zone_label }}</span>
+    </div>
+    <div
+        id="{{ zone_id }}-tags"
+        class="{{ container_class }}-tags"
+        data-zone-id="{{ zone_id }}"
+        data-semantic="{{ zone_type }}"
+        data-zone-class="drop-zone"
+    >
+        <!-- Tags will be dropped here -->
+    </div>
+    <div
+        id="{{ zone_id }}"
+        class="dropzone {{ dropzone_class or (container_class + '-dropzone') }} zone"
+        data-zone-id="{{ zone_id }}"
+        data-semantic="{{ zone_type }}"
+        data-zone-class="drop-zone"
+        hx-post="{{ endpoint }}"
+        hx-target="#card-display-zone"
+        hx-swap="innerHTML"
+        hx-trigger="drop"
+    >
+        <div class="{{ container_class }}-controls">
+            <span class="{{ container_class }}-prompt" data-role="prompt">{{ prompt_text }}</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+<!-- Development Controls Component Template -->
+{% if development_mode or debug_enabled %}
+<div class="dev-controls" data-dev-panel="true">
+    <div class="dev-controls-header">
+        <h4>Development Controls</h4>
+        <button class="dev-toggle">Hide</button>
+    </div>
+    <div class="dev-controls-content">
+        <button class="debug-zones" onclick="debugZones()">Debug Zones</button>
+        <button class="clear-state" onclick="clearState()">Clear State</button>
+        {% if wasm_enabled %}
+        <button class="debug-wasm" onclick="debugWasm()">Debug WASM</button>
+        <button class="reload-wasm" onclick="reloadWasm()">Reload WASM</button>
+        {% endif %}
+        <button class="inspect-state" onclick="inspectState()">Inspect State</button>
+        <button class="performance-monitor" onclick="togglePerformanceMonitor()">Performance</button>
+    </div>
+</div>
+{% endif %}

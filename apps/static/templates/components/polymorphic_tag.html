@@ -1,0 +1,10 @@
+<!-- Polymorphic Tag Template - Creates all tag types -->
+<span class="tag tag-{{ tag_type }}"
+      data-tag="{{ tag_data }}"
+      {% if tag_type == 'group' %}data-group="{{ tag_id }}"{% endif %}
+      {% if tag_type == 'system' %}data-type="system-tag"{% endif %}
+      draggable="true"
+      id="tag-{{ tag_data }}"
+      {% if onclick_action %}onclick="{{ onclick_action }}"{% endif %}>
+    {{ tag_display }}
+</span>

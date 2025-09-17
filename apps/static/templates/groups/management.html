@@ -1,0 +1,141 @@
+<div id="group-management" hx-get="/groups" hx-trigger="load">
+    {% if mode == "list" %}
+    <div class="group-list">
+        {% for group in groups %}
+        <div class="group-item" id="group-{{ group.id }}">
+            <h3>{{ group.name }}</h3>
+            <p>{{ group.description }}</p>
+            <div class="group-tags">
+                {% for tag in group.tags %}
+                <span class="tag">{{ tag }}</span>
+                {% endfor %}
+            </div>
+            <div class="group-actions">
+                <button hx-get="/groups/{{ group.id }}/edit"
+                        hx-target="#group-{{ group.id }}"
+                        class="btn btn-secondary">Edit</button>
+                <button hx-delete="/groups/{{ group.id }}"
+                        hx-confirm="Delete this group?"
+                        hx-target="#group-{{ group.id }}"
+                        hx-swap="outerHTML"
+                        class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+        {% endfor %}
+
+        <button hx-get="/groups/create-form"
+                hx-target="#create-group-area"
+                class="btn btn-primary">Create New Group</button>
+    </div>
+
+    <div id="create-group-area"></div>
+
+    {% elif mode == "create_form" %}
+    <form hx-post="/groups/create" hx-target="#group-management" class="group-form">
+        <div class="form-group">
+            <input type="text" name="name" placeholder="Group Name" required class="form-control">
+        </div>
+        <div class="form-group">
+            <textarea name="description" placeholder="Description" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <input type="text" name="tags" placeholder="Tags (comma-separated)" class="form-control">
+        </div>
+        <div class="form-group">
+            <input type="color" name="color" value="#007bff" class="form-control">
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Group</button>
+            <button type="button" hx-get="/groups" hx-target="#group-management" class="btn btn-secondary">Cancel</button>
+        </div>
+    </form>
+
+    {% elif mode == "edit_form" %}
+    <form hx-put="/groups/{{ group.id }}" hx-target="#group-{{ group.id }}" class="group-form">
+        <div class="form-group">
+            <input type="text" name="name" value="{{ group.name }}" required class="form-control">
+        </div>
+        <div class="form-group">
+            <textarea name="description" class="form-control">{{ group.description }}</textarea>
+        </div>
+        <div class="form-group">
+            <input type="text" name="tags" value="{{ group.tags|join(',') }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <input type="color" name="color" value="{{ group.color or '#007bff' }}" class="form-control">
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Group</button>
+            <button type="button" hx-get="/groups" hx-target="#group-management" class="btn btn-secondary">Cancel</button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<style>
+.group-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+.group-actions {
+    margin-top: 10px;
+}
+
+.group-actions button {
+    margin-right: 10px;
+}
+
+.group-tags .tag {
+    background: #007bff;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 3px;
+    margin-right: 5px;
+    font-size: 0.8em;
+}
+
+.group-form {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+</style>

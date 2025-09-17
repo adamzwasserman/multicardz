@@ -1,0 +1,22 @@
+<!-- Tag Groups Component Template -->
+<div class="tag-groups-container">
+    <h3>{{ section_title | default('Tag Groups') }}</h3>
+    <div class="tag-groups">
+        {% for group in tag_groups %}
+        <div class="tag-group" data-group="{{ group.id }}"
+             {% if group.expandable %}data-expandable="true"{% endif %}>
+            <div class="group-header">
+                {{ group.name }}
+                {% if group.expandable %}
+                <span class="expand-toggle">▼</span>
+                {% endif %}
+            </div>
+            <div class="group-members {% if not group.expanded %}group-members-hidden{% endif %}">
+                {% for member in group.members %}
+                <span class="tag-member" data-tag="{{ member }}">{{ member }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

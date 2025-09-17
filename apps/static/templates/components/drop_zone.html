@@ -1,0 +1,20 @@
+<!-- Drop Zone Component Template -->
+<div class="zone {{ zone_type }}-zone"
+     data-zone="{{ zone_name }}"
+     data-zone-type="{{ zone_type }}"
+     {% if zone_config %}data-zone-config="{{ zone_config | tojson }}"{% endif %}>
+    <div class="zone-header">
+        {{ zone_display_name | default(zone_name | title) }}
+        {% if show_count and zone_count is defined %}
+        <span class="zone-count">{{ zone_count }}</span>
+        {% endif %}
+    </div>
+    <div class="zone-content">
+        {% if zone_content %}
+            {{ zone_content | safe }}
+        {% endif %}
+        {% if show_drop_hint %}
+        <div class="drop-hint">{{ drop_hint_text | default('Drop items here') }}</div>
+        {% endif %}
+    </div>
+</div>

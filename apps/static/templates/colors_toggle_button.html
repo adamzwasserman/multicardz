@@ -1,0 +1,13 @@
+<div class="colors-toggle-container">
+    <label class="colors-label">
+        <input
+            type="checkbox"
+            id="colors-toggle"
+            class="colors-checkbox"
+            hx-post="/api/colors/toggle"
+            hx-target="#colors-toggle-container"
+            hx-swap="outerHTML"
+        />
+        <span>Colors</span>
+    </label>
+</div>

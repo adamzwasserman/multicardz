@@ -1,0 +1,15 @@
+<!-- Spatial Grid Component Template -->
+<div class="spatial-container">
+    <div class="spatial-grid">
+        {% for zone in zones %}
+        <div class="zone {{ zone.type }}-zone" data-zone="{{ zone.name }}">
+            <div class="zone-header">{{ zone.display_name }}</div>
+            <div class="zone-content">
+                {% if zone.content %}
+                    {{ zone.content | safe }}
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

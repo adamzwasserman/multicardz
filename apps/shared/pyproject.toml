@@ -1,0 +1,39 @@
+[project]
+name = "multicardz-shared"
+version = "0.1.0"
+description = "MultiCardz Shared - Common utilities and set theory operations"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.0.0",
+    "frozendict>=2.3.0", # For immutable dictionaries
+    "typing-extensions>=4.0.0", # For advanced type hints
+    "typos>=1.36.2",
+    "cryptography>=46.0.0",
+    "orjson>=3.11.3",
+    "pyroaring>=1.0.2",
+    "granian>=2.5.3",
+    "sonic-client>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.13.0",
+    "mypy>=1.0.0",
+    "pytest>=7.4.3",
+    "pytest-bdd>=7.0.0",
+    "pytest-cov>=4.1.0",
+    "hypothesis>=6.0.0",  # Property-based testing
+]
+
+[tool.ruff]
+extend = "../../pyproject.toml"
+
+[tool.mypy]
+extend = "../../pyproject.toml"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

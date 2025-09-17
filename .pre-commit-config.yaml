@@ -1,0 +1,72 @@
+repos:
+  # Ruff for Python linting and formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+
+  # MyPy type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.13.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [pydantic>=2.0.0]
+
+  # Custom architectural validators
+  - repo: local
+    hooks:
+      - id: validate-no-classes
+        name: Architectural Purity - No Classes
+        entry: python scripts/validate_no_classes.py
+        language: system
+        files: '\.py$'
+        exclude: '^(tests/|apps/shared/models/)'
+
+      - id: validate-set-theory
+        name: Architectural Purity - Set Theory Only
+        entry: python scripts/validate_set_theory.py
+        language: system
+        files: '\.py$'
+
+      - id: validate-javascript
+        name: Architectural Purity - Minimal JavaScript
+        entry: python scripts/validate_javascript.py
+        language: system
+        files: '\.(js|ts)$'
+
+      - id: validate-immutability
+        name: Architectural Purity - Immutability
+        entry: python scripts/validate_immutability.py
+        language: system
+        files: '\.py$'
+
+      - id: validate-imports
+        name: Architectural Purity - Import Control
+        entry: python scripts/validate_imports.py
+        language: system
+        files: '\.py$'
+
+      - id: validate-two-tier
+        name: Architectural Purity - Two-Tier Cards
+        entry: python scripts/validate_two_tier.py
+        language: system
+        files: '\.py$'
+
+      - id: test-end-to-end
+        name: End-to-End Tests (Parallel)
+        entry: bash -c "unset VIRTUAL_ENV && export UV_PROJECT_ENVIRONMENT=.venv && uv run pytest tests/step_definitions/ tests/test_card_models_bdd.py tests/test_models_bdd.py tests/test_card_service_integration.py tests/test_end_to_end_workflow.py -n auto --tb=line --maxfail=5 -q"
+        language: system
+        pass_filenames: false
+        always_run: true

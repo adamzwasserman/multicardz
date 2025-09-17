@@ -1,0 +1,14 @@
+<!-- Tag Cloud Component Template -->
+<div class="tag-cloud-container">
+    <h3>{{ section_title | default('Available Tags') }}</h3>
+    <div class="tag-cloud">
+        {% for tag in tags %}
+        <span class="tag-item" data-tag="{{ tag.name }}" draggable="true">
+            {% if show_colors %}
+            <span class="tag-dot tag-dot-color" data-color="{{ tag.color }}"></span>
+            {% endif %}
+            {{ tag.name }}
+        </span>
+        {% endfor %}
+    </div>
+</div>

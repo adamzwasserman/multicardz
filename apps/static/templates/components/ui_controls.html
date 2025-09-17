@@ -1,0 +1,19 @@
+<!-- UI Controls Component Template -->
+{% if development_mode or debug_enabled %}
+<div class="ui-controls" data-ui-panel="true">
+    <div class="ui-controls-header">
+        <h4>UI Controls</h4>
+        <button class="ui-toggle">Hide</button>
+    </div>
+    <div class="ui-controls-content">
+        <button class="debug-zones" onclick="debugZones()">Debug Zones</button>
+        <button class="clear-state" onclick="clearState()">Clear State</button>
+        {% if wasm_enabled %}
+        <button class="debug-wasm" onclick="debugWasm()">Debug WASM</button>
+        <button class="reload-wasm" onclick="reloadWasm()">Reload WASM</button>
+        {% endif %}
+        <button class="inspect-state" onclick="inspectState()">Inspect State</button>
+        <button class="performance-monitor" onclick="togglePerformanceMonitor()">Performance</button>
+    </div>
+</div>
+{% endif %}

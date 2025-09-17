@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/adam/dev/cardz/docs/Architecture/**)",
+      "Read(//Users/adam/dev/cardz/.claude/agents/**)",
+      "Read(//Users/adam/dev/cardz/docs/patents/**)",
+      "Read(//Users/adam/dev/cardz/docs/standards/**)",
+      "Read(//Users/adam/dev/cardz/packages/user-site/static/css/**)",
+      "Read(//Users/adam/dev/cardz/.claude/**)",
+      "Read(//Users/adam/dev/cardz/packages/shared/**)",
+      "Bash(uv sync:*)",
+      "Bash(uv add:*)",
+      "Bash(uv remove:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(find:*)",
+      "Bash(atlas version:*)",
+      "Bash(uv run:*)",
+      "Bash(python:*)",
+      "Bash(chmod:*)",
+      "Bash(export PYTHON_JIT=1)",
+      "Bash(export PYTHON_JIT_OPTIMIZE_LEVEL=3)",
+      "Bash(export PYTHON_JIT_THRESHOLD_HOT=50)",
+      "Bash(uv venv:*)",
+      "Bash(source:*)",
+      "Bash(uv pip install:*)",
+      "Bash(uv pip:*)",
+      "Bash(pip install:*)",
+      "Bash(timeout 180 uv run pytest -xvs)",
+      "Bash(unset VIRTUAL_ENV)",
+      "Bash(export VIRTUAL_ENV=/Users/adam/dev/multicardz/.venv)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
