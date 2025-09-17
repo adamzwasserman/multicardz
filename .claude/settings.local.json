@@ -33,7 +33,15 @@
       "Bash(git push:*)",
       "Bash(gh auth switch:*)",
       "Bash(pkill:*)",
-      "Bash(timeout 30 uv run pytest --co -q)"
+      "Bash(timeout 30 uv run pytest --co -q)",
+      "Bash(git ls-tree:*)",
+      "Bash(while read file)",
+      "Bash(do if ! git ls-files --error-unmatch \"$file\")",
+      "Bash(/dev/null)",
+      "Bash(then echo \"Untracked: $file\")",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

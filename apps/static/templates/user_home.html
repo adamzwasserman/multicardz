@@ -156,10 +156,6 @@
                 <input type="checkbox" id="showColors" onchange="updateCheckboxStateWithWasm('show_colors', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_show_colors', null, ['number'], [this.checked ? 1 : 0])">
                 <label for="showColors">show colors on tags/card</label>
             </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="renderMode" onchange="updateCheckboxStateWithWasm('optimized_render_mode', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_render_mode', null, ['number'], [this.checked ? 1 : 0])">
-                <label for="renderMode">optimized render mode</label>
-            </div>
 
 
         </div>
