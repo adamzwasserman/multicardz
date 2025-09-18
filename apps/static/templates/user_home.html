@@ -8,16 +8,11 @@
         <textarea class="tags-in-play" id="tagsInPlay" placeholder="waiting for zone activity..." readonly rows="8">{"union":[],"intersection":[],"row":[],"column":[]}</textarea>
     </div>
     <div class="tag-management">
-        <div class="clouds-container horizontal" id="cloudsContainer" data-zone-type="tag-cloud" data-accepts="tags,group-tags"
-             ondragover="handleCloudDragOver(event)"
-             ondragleave="handleCloudDragLeave(event)"
-             ondrop="handleCloudTagDrop(event)">
+        <div class="clouds-container horizontal" id="cloudsContainer" data-zone-type="tag-cloud" data-accepts="tags,group-tags">
             <!-- User Tags Cloud -->
             <div class="cloud cloud-user"
                  data-cloud-type="user"
-                 ondragover="handleCloudDragOver(event)"
-                 ondragleave="handleCloudDragLeave(event)"
-                 ondrop="handleSmartCloudTagDrop(event)">
+>
                 <div class="cloud-title cloud-title-user">
                     user tags<span class="tag-count">({{ available_tags|length }})</span>
                 </div>
@@ -28,14 +23,14 @@
                           data-type="tag"
                           draggable="true"
                           id="tag-{{ tag }}"
-                          ondragstart="handleTagDragStart(event)">
+>
                         {{ tag }}
                     </span>
                     {% endfor %}
                 </div>
                 <div class="input-wrapper">
                     <input type="text" class="tag-input" placeholder="Add user tag..."
-                           onkeypress="if(event.key==='Enter'){callWasm('add_user_tag', null, ['string'], [this.value]); this.value=''}">
+>
                 </div>
             </div>
 
@@ -44,9 +39,7 @@
                 <!-- AI Tags Cloud (Hidden in simple view, shown in advanced view) -->
                 <div class="cloud cloud-ai" id="aiTagsCloud" style="display: none;"
                      data-cloud-type="ai"
-                     ondragover="handleCloudDragOver(event)"
-                     ondragleave="handleCloudDragLeave(event)"
-                     ondrop="handleSmartCloudTagDrop(event)">
+>
                     <div class="cloud-title cloud-title-ai">
                         ai tags<span class="tag-count">(3)</span>
                     </div>
@@ -55,35 +48,32 @@
                               data-tag="machine-learning"
                               data-type="ai-tag"
                               draggable="true"
-                              onclick="callWasm('remove_tag', null, ['string'], ['machine-learning'])">
+>
                             machine-learning
                         </span>
                         <span class="tag tag-ai"
                               data-tag="data-processing"
                               data-type="ai-tag"
                               draggable="true"
-                              onclick="callWasm('remove_tag', null, ['string'], ['data-processing'])">
+>
                             data-processing
                         </span>
                         <span class="tag tag-ai"
                               data-tag="automation"
                               data-type="ai-tag"
                               draggable="true"
-                              onclick="callWasm('remove_tag', null, ['string'], ['automation'])">
+>
                             automation
                         </span>
                     </div>
                     <div class="input-wrapper">
                         <input type="text" class="tag-input" placeholder="Add AI tag..."
-                               onkeypress="if(event.key==='Enter'){callWasm('add_ai_tag', null, ['string'], [this.value]); this.value=''}">
+>
                     </div>
                 </div>
 
                 <!-- Tag Groups Cloud -->
-                <div class="cloud cloud-group"
-                     ondragover="handleCloudDragOver(event)"
-                     ondragleave="handleCloudDragLeave(event)"
-                     ondrop="handleCloudTagDrop(event)">
+                <div class="cloud cloud-group">
                     <div class="cloud-title cloud-title-group">
                         tag groups<span class="tag-count">({{ groups|length }})</span>
                     </div>
@@ -93,22 +83,19 @@
                               data-group="{{ group.id }}"
                               data-type="group-tag"
                               draggable="true"
-                              onclick="callWasm('remove_group', null, ['string'], ['{{ group.id }}'])">
+>
                             {{ group.name }}
                         </span>
                         {% endfor %}
                     </div>
                     <div class="input-wrapper">
                         <input type="text" class="tag-input" placeholder="Add group..."
-                               onkeypress="if(event.key==='Enter'){callWasm('add_group', null, ['string'], [this.value]); this.value=''}">
+>
                     </div>
                 </div>
 
                 <!-- System Tags Cloud -->
-                <div class="cloud cloud-system"
-                     ondragover="handleCloudDragOver(event)"
-                     ondragleave="handleCloudDragLeave(event)"
-                     ondrop="handleCloudTagDrop(event)">
+                <div class="cloud cloud-system">
                     <div class="cloud-title cloud-title-system">
                         system tags<span class="tag-count">(2)</span>
                     </div>
@@ -145,15 +132,15 @@
             </div>
 
             <div class="checkbox-group">
-                <input type="checkbox" id="startWithAllCards" onchange="updateCheckboxStateWithWasm('start_with_all_cards', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_start_with_all_cards', null, ['number'], [this.checked ? 1 : 0])">
+                <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('start_with_all_cards', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_start_with_all_cards', null, ['number'], [this.checked ? 1 : 0])">
                 <label for="startWithAllCards">start with all cards visible</label>
             </div>
             <div class="checkbox-group">
-                <input type="checkbox" id="startWithCardsExpanded" onchange="updateCheckboxStateWithWasm('start_with_cards_expanded', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_start_with_cards_expanded', null, ['number'], [this.checked ? 1 : 0])">
+                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('start_with_cards_expanded', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_start_with_cards_expanded', null, ['number'], [this.checked ? 1 : 0])">
                 <label for="startWithCardsExpanded">start with cards expanded</label>
             </div>
             <div class="checkbox-group">
-                <input type="checkbox" id="showColors" onchange="updateCheckboxStateWithWasm('show_colors', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_show_colors', null, ['number'], [this.checked ? 1 : 0])">
+                <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('show_colors', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_show_colors', null, ['number'], [this.checked ? 1 : 0])">
                 <label for="showColors">show colors on tags/card</label>
             </div>
 
@@ -182,9 +169,7 @@
                      id="union_tags"
                      data-zone-type="union"
                      data-accepts="tags,group-tags"
-                     ondragover="handleZoneDragOver(event)"
-                     ondragleave="handleZoneDragLeave(event)"
-                     ondrop="handleTagDrop(event)">
+>
                     <span class="zone-label">Select (ANY matches)</span>
                     <div class="tag-collection" id="union-tags-container"></div>
                 </div>
@@ -199,9 +184,7 @@
                      id="intersection_tags"
                      data-zone-type="intersection"
                      data-accepts="tags,group-tags"
-                     ondragover="handleZoneDragOver(event)"
-                     ondragleave="handleZoneDragLeave(event)"
-                     ondrop="handleTagDrop(event)">
+>
                     <span class="zone-label">Filter (ALL required)</span>
                     <div class="tag-collection" id="intersection-tags-container"></div>
                 </div>

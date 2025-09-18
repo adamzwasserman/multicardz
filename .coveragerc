@@ -1,0 +1,15 @@
+[run]
+source = apps
+omit =
+    */old_core.py
+    */legacy/*
+    */test_*
+    */__pycache__/*
+
+[report]
+precision = 0
+show_missing = True
+skip_covered = False
+
+[html]
+directory = htmlcov

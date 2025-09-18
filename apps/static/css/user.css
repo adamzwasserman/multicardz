@@ -2294,3 +2294,170 @@ body.font-berkeley-mono {
     padding: 0.5rem 1rem;
     white-space: nowrap;
 }
+
+/* ========================================
+   DRAG-DROP VISUAL STATES
+   ======================================== */
+
+/* Multi-select visual states */
+.tag.selected {
+    outline: 2px solid var(--color-action-primary);
+    outline-offset: 2px;
+    background-color: var(--color-action-light);
+}
+
+.tag.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    transform: rotate(2deg);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Zone drag-over states */
+.drop-zone.drag-over,
+[data-zone-type].drag-over {
+    background-color: var(--color-success-light);
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 2px var(--color-success-light);
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
+
+/* Multi-tag drop count badge */
+[data-drop-count]::after {
+    content: attr(data-drop-count);
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--color-action-primary);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    border: 2px solid white;
+    z-index: 10;
+}
+
+/* Cloud drag-over states */
+.cloud.drag-over {
+    background-color: var(--color-action-light);
+    border-color: var(--color-action-primary);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
+
+/* Accessibility improvements */
+[aria-grabbed="true"] {
+    cursor: grabbing;
+    opacity: 0.8;
+}
+
+[aria-selected="true"] {
+    background-color: var(--color-action-light);
+    border-color: var(--color-action-primary);
+}
+
+/* Zone role styling */
+[role="region"][data-zone-type] {
+    position: relative;
+}
+
+[role="region"][data-zone-type]:focus-within {
+    outline: 2px dotted var(--color-action-primary);
+    outline-offset: 4px;
+}
+
+/* Tag cursor states */
+.tag[draggable="true"] {
+    cursor: grab;
+}
+
+.tag[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Visual feedback for valid drop targets */
+.tag-collection {
+    min-height: 2rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.tag-collection:empty::before {
+    content: "Drop tags here";
+    color: var(--color-text-secondary);
+    font-style: italic;
+    font-size: 0.85rem;
+}
+
+/* Animation for tag movement */
+.tag {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Group tag indicators */
+.tag-group {
+    position: relative;
+    background: linear-gradient(135deg, var(--color-success-light), var(--color-success));
+}
+
+.tag-group::before {
+    content: '⊕';
+    margin-right: 4px;
+    font-weight: bold;
+}
+
+/* Zone visual enhancements */
+.zone-label {
+    user-select: none;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+}
+
+/* Smooth transitions for all interactive elements */
+.drop-zone,
+.tag,
+.cloud {
+    transition: all 0.2s ease;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .tag.selected {
+        outline-width: 3px;
+        background-color: ButtonHighlight;
+        color: ButtonText;
+    }
+
+    [data-zone-type].drag-over {
+        outline: 3px solid Highlight;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .tag,
+    .drop-zone,
+    .cloud,
+    .tag-collection {
+        transition: none;
+    }
+
+    .tag.dragging {
+        transform: none;
+    }
+
+    [data-zone-type].drag-over {
+        transform: none;
+    }
+}

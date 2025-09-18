@@ -41,7 +41,11 @@
       "Bash(then echo \"Untracked: $file\")",
       "Bash(fi)",
       "Bash(done)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(cat:*)",
+      "Bash(timeout 5s uv run python -m apps.user.main)",
+      "Bash(git config:*)",
+      "Bash(timeout 30 uv run pytest tests/ --collect-only)"
     ],
     "deny": [],
     "ask": []

@@ -468,7 +468,21 @@ def execute_regular_operation(
     cards: CardSet, operation_type: str, tag_names: frozenset[str]
 ) -> CardSet:
     """Regular single-threaded operation for small datasets."""
+
+    # Early short-circuit detection for intersection operations
     if operation_type == "intersection":
+        # Check if any of the required tags exist in the dataset
+        all_existing_tags = set()
+        for card in cards:
+            all_existing_tags.update(card.tags)
+            # Early exit optimization: if we found all required tags, no need to continue scanning
+            if tag_names.issubset(all_existing_tags):
+                break
+
+        # If any required tag doesn't exist in the entire dataset, return empty set immediately
+        if not tag_names.issubset(all_existing_tags):
+            return frozenset()
+
         return frozenset(card for card in cards if tag_names.issubset(card.tags))
     elif operation_type == "union":
         return frozenset(card for card in cards if not tag_names.isdisjoint(card.tags))

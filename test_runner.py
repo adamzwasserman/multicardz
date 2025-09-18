@@ -20,12 +20,14 @@ Modifiers:
     --smart                                 # Only run tests affected by git changes
     --parallel                              # Force parallel execution (default for 'all')
     --no-cache                              # Disable pytest cache for clean runs
+    --coverage                              # Generate test coverage report
 
 Examples:
     python test_runner.py frontend --time         # Frontend tests with timing
     python test_runner.py all --profile          # All tests with profiling (parallel)
     python test_runner.py smart                  # Only changed-file tests
     python test_runner.py backend --time --profile  # Backend with time + profile
+    python test_runner.py all --coverage           # All tests with coverage report
     python test_runner.py all --smart            # Optimized for pre-commit hooks
 """
 
@@ -162,7 +164,9 @@ def run_frontend_tests(show_timing: bool = False, use_smart: bool = False,
 
     tests = [
         (["uv", "run", "python", "tests/api/test_drag_drop_api.py"], "API endpoint tests"),
-        (["uv", "run", "python", "tests/playwright/test_static_html.py"], "Static HTML tests")
+        (["uv", "run", "python", "tests/playwright/test_static_html.py"], "Static HTML tests"),
+        (["uv", "run", "python", "tests/playwright/test_comprehensive_drag_drop.py"], "Comprehensive drag-drop tests"),
+        (["uv", "run", "python", "tests/playwright/test_responsive_resizing.py"], "Responsive & resizing tests")
     ]
 
     results = []
@@ -188,7 +192,8 @@ def run_frontend_tests(show_timing: bool = False, use_smart: bool = False,
 
 def run_backend_tests(test_type: str = "all", show_timing: bool = False,
                      use_smart: bool = False, changed_files: Set[str] = None,
-                     use_parallel: bool = False, no_cache: bool = False) -> Tuple[bool, List[TestResult]]:
+                     use_parallel: bool = False, no_cache: bool = False,
+                     use_coverage: bool = False) -> Tuple[bool, List[TestResult]]:
     """Run backend set operations tests with optimizations."""
     print("⚙️ Backend Set Operations Tests")
     print("=" * 40)
@@ -219,6 +224,15 @@ def run_backend_tests(test_type: str = "all", show_timing: bool = False,
     if no_cache:
         speed_flags.append("--cache-clear")
 
+    if use_coverage:
+        speed_flags.extend([
+            "--cov=apps",              # Cover the apps directory
+            "--cov-report=html",       # Generate HTML report
+            "--cov-report=term-missing", # Show missing lines in terminal
+            "--cov-report=json",       # Generate JSON report for CI
+        ])
+        print("📊 Coverage reporting enabled")
+
     if use_parallel:
         # Try to detect CPU count and use parallel execution
         try:
@@ -229,13 +243,13 @@ def run_backend_tests(test_type: str = "all", show_timing: bool = False,
         except:
             print("⚠️  Parallel execution not available (install pytest-xdist)")
 
-    # Map test types to specific paths/patterns
+    # Map test types to specific paths/patterns (exclude frontend tests)
     test_commands = {
-        "all": base_cmd + ["tests/"] + speed_flags + ["-v"],
+        "all": base_cmd + ["tests/", "--ignore=tests/api", "--ignore=tests/playwright"] + speed_flags + ["-v"],
         "performance": base_cmd + ["tests/test_set_operations_performance.py"] + speed_flags + ["-v"],
         "stress": base_cmd + ["tests/test_set_operations_performance.py", "-k", "stress"] + speed_flags + ["-v"],
         "bdd": base_cmd + ["tests/test_*_bdd.py"] + speed_flags + ["-v"],
-        "quick": base_cmd + ["tests/", "-x"] + speed_flags
+        "quick": base_cmd + ["tests/", "--ignore=tests/api", "--ignore=tests/playwright", "-x"] + speed_flags
     }
 
     cmd = test_commands.get(test_type, test_commands["all"])
@@ -257,12 +271,18 @@ def show_manual_tests():
 
     print("\n🎭 Playwright Browser Tests:")
     print("   1. Start server: uv run python tests/integration/test_server.py")
-    print("   2. Run tests: uv run python tests/playwright/test_real_mouse_interactions.py")
-    print("   3. Run replay: uv run python tests/playwright/test_real_mouse_interactions.py replay")
+    print("   2. Comprehensive test: uv run python tests/playwright/test_comprehensive_drag_drop.py")
+    print("   3. Responsive test: uv run python tests/playwright/test_responsive_resizing.py")
+    print("   4. Legacy test: uv run python tests/playwright/test_real_mouse_interactions.py")
+    print("   5. Run replay: uv run python tests/playwright/test_real_mouse_interactions.py replay")
 
     print("\n📸 Test Artifacts:")
     print("   - tests/artifacts/final_state.png (screenshots)")
     print("   - tests/artifacts/multicardz_test_recording.json (replayable actions)")
+    print("   - tests/artifacts/comprehensive_test_final.png (comprehensive test screenshot)")
+    print("   - tests/artifacts/comprehensive_test_report.json (detailed test report)")
+    print("   - tests/artifacts/responsive_*.png (responsive screenshots)")
+    print("   - tests/artifacts/responsive_test_report.json (responsive test report)")
 
 
 def show_help():
@@ -280,14 +300,14 @@ async def run_tests_parallel(show_timing: bool = False, use_smart: bool = False,
         return run_frontend_tests(show_timing, use_smart, changed_files)
 
     async def run_backend():
-        return run_backend_tests("quick", show_timing, use_smart, changed_files, use_parallel=True)
+        return run_backend_tests("quick", show_timing, use_smart, changed_files, use_parallel=True, use_coverage=False)
 
     # Run both test suites concurrently
     start_time = time.time()
 
     frontend_result, backend_result = await asyncio.gather(
         asyncio.to_thread(lambda: run_frontend_tests(show_timing, use_smart, changed_files)),
-        asyncio.to_thread(lambda: run_backend_tests("quick", show_timing, use_smart, changed_files, use_parallel=True))
+        asyncio.to_thread(lambda: run_backend_tests("quick", show_timing, use_smart, changed_files, use_parallel=True, use_coverage=False))
     )
 
     total_time = time.time() - start_time
@@ -322,7 +342,8 @@ def parse_args() -> Tuple[str, Dict[str, bool]]:
         "use_profile": "--profile" in args,
         "use_smart": "--smart" in args or test_type == "smart",
         "use_parallel": "--parallel" in args or test_type == "all",
-        "no_cache": "--no-cache" in args
+        "no_cache": "--no-cache" in args,
+        "use_coverage": "--coverage" in args
     }
 
     return test_type, modifiers
@@ -358,14 +379,16 @@ def main():
         elif test_type == "backend":
             success, _ = run_backend_tests(
                 "all", modifiers["show_timing"], modifiers["use_smart"],
-                changed_files, modifiers["use_parallel"], modifiers["no_cache"]
+                changed_files, modifiers["use_parallel"], modifiers["no_cache"],
+                modifiers["use_coverage"]
             )
             return success
 
         elif test_type in ["performance", "stress", "bdd", "quick"]:
             success, _ = run_backend_tests(
                 test_type, modifiers["show_timing"], modifiers["use_smart"],
-                changed_files, modifiers["use_parallel"], modifiers["no_cache"]
+                changed_files, modifiers["use_parallel"], modifiers["no_cache"],
+                modifiers["use_coverage"]
             )
             return success
 
@@ -382,7 +405,7 @@ def main():
                 print()
                 backend_ok, _ = run_backend_tests(
                     "quick", modifiers["show_timing"], modifiers["use_smart"],
-                    changed_files, False, modifiers["no_cache"]
+                    changed_files, False, modifiers["no_cache"], modifiers["use_coverage"]
                 )
 
                 if frontend_ok and backend_ok:

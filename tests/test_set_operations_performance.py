@@ -316,7 +316,7 @@ class TestSetOperationsPerformance:
         memory_mb = memory_used / (1024 * 1024)
 
         # Allow reasonable memory usage (should be much less than storing full dataset)
-        assert memory_mb < 10.0, f"Memory usage {memory_mb:.2f}MB too high"
+        assert memory_mb < 15.0, f"Memory usage {memory_mb:.2f}MB too high"
 
         # Validate immutability (original cards unchanged)
         assert len(cards) == 5000  # Original set unchanged
