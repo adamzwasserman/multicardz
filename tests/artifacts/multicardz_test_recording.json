@@ -1,0 +1,63 @@
+[
+  {
+    "action": "navigate",
+    "timestamp": 1758144810.921818,
+    "url": "http://localhost:8001"
+  },
+  {
+    "action": "drag_drop",
+    "timestamp": 1758144813.969731,
+    "source": ".tag[data-tag='javascript']",
+    "target": ".union-zone",
+    "source_pos": [
+      338.2890625,
+      89.5
+    ],
+    "target_pos": [
+      468.453125,
+      481.0
+    ]
+  },
+  {
+    "action": "click",
+    "timestamp": 1758144817.379699,
+    "selector": ".tag[data-tag='python']",
+    "pos": [
+      332.1875,
+      89.5
+    ]
+  },
+  {
+    "action": "click",
+    "timestamp": 1758144818.39839,
+    "selector": ".tag[data-tag='react']",
+    "pos": [
+      382.15625,
+      89.5
+    ],
+    "modifier": "Meta"
+  },
+  {
+    "action": "click",
+    "timestamp": 1758144818.5055842,
+    "selector": "#startWithAllCards",
+    "pos": [
+      39.5,
+      515.0
+    ]
+  },
+  {
+    "action": "drag_drop",
+    "timestamp": 1758144818.918999,
+    "source": ".union-zone .tag[data-tag='javascript']",
+    "target": ".intersection-zone",
+    "source_pos": [
+      468.453125,
+      492.5
+    ],
+    "target_pos": [
+      791.546875,
+      481.0
+    ]
+  }
+]
