@@ -100,6 +100,173 @@ UnifiedMetrics = namedtuple(
 
 logger = logging.getLogger(__name__)
 
+# Import for type hints only
+import pickle
+import gzip
+from typing import Optional
+
+# Elite Singleton Pattern for Stable In-Memory Data (approved per CLAUDE.md)
+class CardRegistrySingleton:
+    """
+    Thread-safe singleton for pre-computed card registry with immutable data structures.
+
+    Approved singleton pattern for stable in-memory global data structures as per
+    CLAUDE.md: "Singleton patterns for stable in-memory global data structures"
+
+    This eliminates redundant tag registration and bitmap construction by maintaining
+    pre-computed immutable structures for universe-scale operations.
+    """
+
+    _instance = None
+    _lock = threading.RLock()
+
+    def __new__(cls):
+        if cls._instance is None:
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._instance._initialized = False
+        return cls._instance
+
+    def __init__(self):
+        if self._initialized:
+            return
+
+        with self._lock:
+            if self._initialized:
+                return
+
+            # Immutable registry data
+            self._tag_to_id: dict[str, int] = {}
+            self._id_to_tag: dict[int, str] = {}
+            self._next_tag_id: int = 0
+
+            # Pre-computed card bitmaps (card_id -> bitmap)
+            self._card_bitmaps: dict[str, Any] = {}  # Will store RoaringBitmap objects
+
+            # Inverted index for fast lookups (tag -> frozenset of card_ids)
+            self._tag_to_cards: dict[str, frozenset[str]] = {}
+
+            # Registry state tracking
+            self._cards_registered: int = 0
+            self._registry_frozen: bool = False
+
+            self._initialized = True
+
+    def register_cards_batch(self, cards: frozenset[CardSummaryTuple]) -> None:
+        """
+        Register a batch of cards with pre-computed tag mappings and bitmaps.
+
+        This is called ONCE during application startup to eliminate redundant
+        tag registration and bitmap construction on every operation.
+
+        Args:
+            cards: Immutable frozenset of cards to register
+        """
+        if self._registry_frozen:
+            logger.warning("Registry is frozen, cannot register new cards")
+            return
+
+        with self._lock:
+            if self._registry_frozen:
+                return
+
+            # Build tag mappings
+            all_tags = set()
+            for card in cards:
+                all_tags.update(card.tags)
+
+            for tag in all_tags:
+                if tag not in self._tag_to_id:
+                    self._tag_to_id[tag] = self._next_tag_id
+                    self._id_to_tag[self._next_tag_id] = tag
+                    self._next_tag_id += 1
+
+            # Build card bitmaps if RoaringBitmap available
+            RoaringBitmap, roaring_available = _get_roaring_bitmap()
+            if roaring_available:
+                for card in cards:
+                    bitmap = RoaringBitmap()
+                    for tag in card.tags:
+                        bitmap.add(self._tag_to_id[tag])
+                    self._card_bitmaps[card.id] = bitmap
+
+            # Build inverted index for fast tag lookups
+            tag_to_cards_dict = {}
+            for card in cards:
+                for tag in card.tags:
+                    if tag not in tag_to_cards_dict:
+                        tag_to_cards_dict[tag] = set()
+                    tag_to_cards_dict[tag].add(card.id)
+
+            for tag, card_ids in tag_to_cards_dict.items():
+                self._tag_to_cards[tag] = frozenset(card_ids)
+
+            self._cards_registered = len(cards)
+            logger.info(f"Registered {len(cards)} cards with {len(all_tags)} unique tags")
+
+    def freeze_registry(self) -> None:
+        """Freeze the registry to prevent further modifications."""
+        with self._lock:
+            self._registry_frozen = True
+            logger.info(f"Registry frozen with {self._cards_registered} cards")
+
+    def get_tag_mapping(self) -> tuple[dict[str, int], dict[int, str], int]:
+        """Get immutable tag mapping data."""
+        return (
+            self._tag_to_id.copy(),
+            self._id_to_tag.copy(),
+            self._next_tag_id
+        )
+
+    def get_card_bitmap(self, card_id: str) -> Any:
+        """Get pre-computed bitmap for a card."""
+        return self._card_bitmaps.get(card_id)
+
+    def get_cards_with_tags(self, tag_names: frozenset[str]) -> frozenset[str]:
+        """
+        Fast lookup of cards containing any of the specified tags.
+
+        Uses pre-computed inverted index for O(1) tag lookups instead of
+        O(n) card scanning.
+        """
+        result_card_ids = set()
+        for tag in tag_names:
+            if tag in self._tag_to_cards:
+                result_card_ids.update(self._tag_to_cards[tag])
+        return frozenset(result_card_ids)
+
+    def get_registry_stats(self) -> dict[str, Any]:
+        """Get registry statistics."""
+        return {
+            "cards_registered": self._cards_registered,
+            "unique_tags": len(self._tag_to_id),
+            "registry_frozen": self._registry_frozen,
+            "has_bitmaps": len(self._card_bitmaps) > 0
+        }
+
+    def clear_registry(self) -> None:
+        """Clear all registry data (for testing)."""
+        with self._lock:
+            self._tag_to_id.clear()
+            self._id_to_tag.clear()
+            self._next_tag_id = 0
+            self._card_bitmaps.clear()
+            self._tag_to_cards.clear()
+            self._cards_registered = 0
+            self._registry_frozen = False
+
+
+def initialize_card_registry(cards: frozenset[CardSummaryTuple]) -> None:
+    """
+    Initialize the card registry singleton with a batch of cards.
+
+    This should be called once during application startup.
+    """
+    registry = CardRegistrySingleton()
+    registry.register_cards_batch(cards)
+    registry.freeze_registry()
+
 
 # Pure Functions for Multiprocessing (zero state, explicit inputs)
 
@@ -318,18 +485,27 @@ def apply_unified_operations(
     if optimize_order:
         operations = optimize_operation_order(operations)
 
-    # Estimate unique tags for mode selection
-    cards_list = list(cards)
-    sample_size = min(5000, len(cards_list))
-    all_tags = set()
-    for card in cards_list[:sample_size]:
-        all_tags.update(card.tags)
+    # Get tag information from registry if available
+    registry = CardRegistrySingleton()
+    registry_stats = registry.get_registry_stats()
 
-    if len(cards_list) <= 5000:
-        unique_tags_estimate = len(all_tags)
+    if registry_stats["cards_registered"] > 0:
+        # Use registry for tag information
+        unique_tags_estimate = registry_stats["unique_tags"]
+        cards_list = list(cards)
     else:
-        # Extrapolate from sample
-        unique_tags_estimate = len(all_tags) * (len(cards_list) / sample_size)
+        # Fall back to sampling method
+        cards_list = list(cards)
+        sample_size = min(5000, len(cards_list))
+        all_tags = set()
+        for card in cards_list[:sample_size]:
+            all_tags.update(card.tags)
+
+        if len(cards_list) <= 5000:
+            unique_tags_estimate = len(all_tags)
+        else:
+            # Extrapolate from sample
+            unique_tags_estimate = len(all_tags) * (len(cards_list) / sample_size)
 
     # Select processing mode
     cards_count = len(cards)

@@ -23,6 +23,7 @@ dev = [
     { name = "hypothesis", specifier = ">=6.139.1" },
     { name = "playwright", specifier = ">=1.55.0" },
     { name = "pre-commit", specifier = ">=4.3.0" },
+    { name = "pydantic", specifier = ">=2.11.9" },
     { name = "pytest", specifier = ">=8.4.2" },
     { name = "pytest-asyncio", specifier = ">=1.2.0" },
     { name = "pytest-bdd", specifier = ">=8.1.0" },

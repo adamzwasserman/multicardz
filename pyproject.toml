@@ -99,6 +99,7 @@ dev = [
     "hypothesis>=6.139.1",
     "playwright>=1.55.0",
     "pre-commit>=4.3.0",
+    "pydantic>=2.11.9",
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "pytest-bdd>=8.1.0",
