@@ -1,12 +1,12 @@
 [
   {
     "action": "navigate",
-    "timestamp": 1758479596.748235,
+    "timestamp": 1758479893.5362828,
     "url": "http://localhost:8011"
   },
   {
     "action": "drag_drop",
-    "timestamp": 1758479600.040357,
+    "timestamp": 1758479896.817922,
     "source": ".tag[data-tag='javascript']",
     "target": ".union-zone",
     "source_pos": [
@@ -20,7 +20,7 @@
   },
   {
     "action": "click",
-    "timestamp": 1758479603.450181,
+    "timestamp": 1758479900.2937868,
     "selector": ".tag[data-tag='python']",
     "pos": [
       337.125,
@@ -29,7 +29,7 @@
   },
   {
     "action": "click",
-    "timestamp": 1758479604.463926,
+    "timestamp": 1758479901.319079,
     "selector": ".tag[data-tag='react']",
     "pos": [
       392.734375,
@@ -39,7 +39,7 @@
   },
   {
     "action": "click",
-    "timestamp": 1758479604.5686579,
+    "timestamp": 1758479901.428354,
     "selector": "#startWithAllCards",
     "pos": [
       47.5,
@@ -48,7 +48,7 @@
   },
   {
     "action": "drag_drop",
-    "timestamp": 1758479604.981332,
+    "timestamp": 1758479901.851529,
     "source": ".union-zone .tag[data-tag='javascript']",
     "target": ".intersection-zone",
     "source_pos": [
