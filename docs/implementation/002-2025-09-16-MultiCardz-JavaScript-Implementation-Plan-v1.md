@@ -1836,7 +1836,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
    ```bash
    # Start development server
-   uvicorn packages.user_site.src.app:app --reload --port 8000
+   uvicorn packages.user_site.src.app:app --reload --port 8011
 
    # Run Python tests with coverage
    pytest tests/ -v --cov=packages --cov-report=term-missing

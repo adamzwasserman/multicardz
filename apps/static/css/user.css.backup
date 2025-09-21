@@ -1,21 +1,12 @@
 /* MultiCardz Spatial Interface CSS - 4×3 Grid System */
 
-/* Load optimized Dongle font for wordmark */
-@font-face {
-    font-family: 'Dongle';
-    src: url('/static/fonts/dongle-wordmark.woff2') format('woff2');
-    font-weight: 300 400 700;
-    font-display: swap;
-    unicode-range: U+0061-007A; /* lowercase a-z */
-}
-
 /* Base body styling */
 body {
     margin: 0;
     padding: 0;
     background: var(--color-muji-bg);
     color: var(--color-text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 400;
 }
 
@@ -97,6 +88,21 @@ body {
    ======================================== */
 
 /* Earth Tones Color Variables */
+.earth-tones {
+  --color-brand-primary: #dc2626;  /* Keep red accent */
+  --color-brand-hover: #ef4444;
+  --color-brand-accent: #fef2f2;
+
+  --color-action-primary: #0d6efd;  /* Keep Bootstrap blue */
+  --color-action-hover: #0b5ed7;
+  --color-action-light: #e8e4dc;
+
+  --color-muji-bg: #f5f2ed;  /* Warm beige background like image */
+  --color-muji-border: #e0dcd4;  /* Soft warm border */
+  --color-muji-text: #4a453f;  /* Dark warm brown text */
+  --color-muji-text-secondary: #6b645c;  /* Medium warm brown */
+  --color-muji-hover: #ebe7e0;  /* Light warm hover state */
+}
 
 /* Earth Tones Body and Base Interface */
 .earth-tones {
@@ -146,6 +152,9 @@ body {
 }
 
 .earth-tones .brand-link:hover,
+.earth-tones .nav-item a:hover {
+  color: #dc2626;  /* Red accent on hover */
+}
 
 .earth-tones .brand-link .brand-i {
   color: #4a453f;
@@ -161,6 +170,10 @@ body {
   border-color: var(--color-action-primary);
 }
 
+.earth-tones .cta-button:hover {
+  background: var(--color-action-primary) !important;
+  color: white !important;
+}
 
 /* Earth Tones Grid Areas */
 .earth-tones .tag-management {
@@ -198,9 +211,25 @@ body {
   color: #78716c;
 }
 
+.earth-tones .tag-dragging .drop-zone:hover {
+  border-color: var(--color-action-primary);
+  background: var(--color-action-light);
+}
 
+.earth-tones .drop-zone.drag-over {
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #57534e;
+}
 
+.earth-tones .control-area-container.drag-over {
+  background: var(--color-action-light);
+  border-color: var(--color-action-primary);
+}
 
+.earth-tones .control-area-container.drag-over::after {
+  color: var(--color-action-primary);
+}
 
 /* Earth Tones Zone Headers and Labels */
 .earth-tones .zone-header {
@@ -244,6 +273,10 @@ body {
   border: 1px solid #a8a29e; /* Same outline as system tags */
 }
 
+.earth-tones .card:hover {
+  background: #f0ede8; /* Slightly darker warm hover */
+  border-color: #78716c; /* Darker border on hover */
+}
 
 .earth-tones .card-title {
   color: #4a453f; /* Dark warm brown */
@@ -284,6 +317,11 @@ body {
   border-color: #6b645c;
 }
 
+.earth-tones .cloud.drag-over {
+  border-color: var(--color-action-primary);
+  background: var(--color-action-light);
+  box-shadow: 0 4px 8px rgba(30, 64, 175, 0.15);
+}
 
 /* Earth Tones Cloud Titles */
 .earth-tones .cloud-title-user,
@@ -341,24 +379,39 @@ body {
 }
 
 .earth-tones input:focus,
+.earth-tones select:focus {
+  border-color: #c4beb3 !important;  /* Warmer focus border */
+}
 
+.earth-tones button:hover {
+  background: #ebe7e0 !important;
+}
 
 .earth-tones .tag-input {
   border-color: #d6d3d1;
   background-color: rgba(255, 255, 255, 0.9);
 }
 
+.earth-tones .tag-input:focus {
+  border-color: #a8a29e;
+}
 
 .earth-tones .ai-button {
   background-color: #e7e5e4;
   border-color: #d6d3d1;
 }
 
+.earth-tones .ai-button:hover {
+  background-color: #d6d3d1;
+}
 
 .earth-tones .font-selector {
   border-color: #d6d3d1;
 }
 
+.earth-tones .font-selector:focus {
+  border-color: #a8a29e;
+}
 
 .earth-tones .checkbox-group {
   color: #78716c;
@@ -371,12 +424,21 @@ body {
 }
 
 /* Earth Tones Drag Handles */
+.earth-tones .zone-drag-handle:hover {
+  background: rgba(87, 83, 78, 0.1);
+}
 
+.earth-tones .zone-drag-handle:active {
+  background: rgba(87, 83, 78, 0.15);
+}
 
 .earth-tones .drag-grip {
   color: #a8a29e;
 }
 
+.earth-tones .zone-drag-handle:hover .drag-grip {
+  color: #78716c;
+}
 
 /* Navigation Header - Muji Minimalist Style */
 .main-navigation {
@@ -414,6 +476,10 @@ body {
     letter-spacing: 0;
 }
 
+.brand-link:hover {
+    color: var(--color-brand-primary);  /* Brand Red on hover */
+    transition: color 0.3s ease;
+}
 
 .brand-link .brand-i {
     color: var(--color-text-primary);
@@ -460,6 +526,9 @@ body {
     font-family: inherit;  /* Inherit the selected font from body */
 }
 
+.nav-item a:hover {
+    color: var(--color-brand-primary);  /* Brand Red for nav hover */
+}
 
 .cta-button {
     background: var(--color-muji-hover) !important;
@@ -474,6 +543,11 @@ body {
     font-family: inherit;  /* Inherit the selected font from body */
 }
 
+.cta-button:hover {
+    background: var(--color-action-primary) !important;  /* Bootstrap Blue for CTA hover */
+    color: white !important;
+    border: 1px solid var(--color-action-primary);
+}
 
 /* Responsive Navigation */
 @media (max-width: 768px) {
@@ -534,11 +608,14 @@ body {
 }
 
 /* Grid Area Assignments */
+.tag-management { grid-area: tag-management; }
 .universal-control { grid-area: universal-control; }
 .top-control { grid-area: top-control; }
 .ui-control { grid-area: ui-control; }
 .left-control { grid-area: left-control; }
+.card-display { grid-area: card-display; }
 .right-control { grid-area: right-control; }
+.bottom-control { grid-area: bottom-control; }
 
 /* Row 1: Tag Management Area (Middle Column Only) */
 .tag-management {
@@ -552,6 +629,12 @@ body {
 }
 
 /* Tag Clouds Container Layout */
+.clouds-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
 
 /* User Tag Cloud - Full Width */
 .cloud-user {
@@ -569,6 +652,10 @@ body {
 
 .cloud-ai,
 .cloud-group,
+.cloud-system {
+    flex: 1;
+    min-width: 0; /* Allow flex items to shrink below content size */
+}
 
 .tag-cloud {
     background: white;
@@ -604,9 +691,38 @@ body {
 }
 
 /* Tag Styling */
+.tag-item {
+    display: inline-flex;
+    align-items: center;
+    background-color: light-dark(var(--color-neutral-500), var(--color-neutral-300));  /* Better contrast in dark mode */
+    color: light-dark(white, var(--color-neutral-900));
+    padding: 0.4rem 0.8rem;
+    margin: 0.2rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: grab;
+    user-select: none;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
 
+.tag-item:hover {
+    background-color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+}
 
+.tag-item:active {
+    cursor: grabbing;
+    transform: translateY(0);
+}
 
+.tag-item.selected {
+    background-color: var(--color-action-primary);  /* Action Blue for selected state */
+    border-color: var(--color-action-accent);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+}
 
 .tag-item[draggable="true"] {
     cursor: grab;
@@ -618,6 +734,9 @@ body {
     border: 1px solid #7c3aed;
 }
 
+.group-tag:hover {
+    background-color: #7c3aed;
+}
 
 /* Row 2: Control Areas (All 3 Columns) */
 .universal-control, .top-control, .ui-control, .left-control, .right-control {
@@ -703,6 +822,16 @@ body {
 }
 
 /* Zone labels consistent styling */
+.zone-label {
+    color: #666;
+    font-size: 0.8rem;
+    font-weight: 300;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    text-align: center;
+}
 
 .card-display {
     background: light-dark(#fefefe, var(--color-neutral-100));
@@ -789,7 +918,20 @@ body {
 }
 
 /* Only highlight zones during actual drag operations, not on regular hover */
+.tag-dragging .drop-zone:hover {
+    border-color: var(--color-action-primary);  /* Action Blue for draggable zones */
+    background: var(--color-action-light);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
+}
 
+.drop-zone.dragging {
+    opacity: 0.7;
+    cursor: grabbing;
+    transform: rotate(2deg);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 
 /* Control area drop target styling */
 .control-area-container {
@@ -807,10 +949,30 @@ body {
     padding: 8px;
 }
 
+.control-area-container.drag-over {
+    background: var(--color-action-light);
+    border: 2px dashed var(--color-action-primary);
+    border-radius: 4px;
+}
 
+.control-area-container.drag-over::after {
+    content: "Drop zone here";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--color-action-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    pointer-events: none;
+}
 
 /* Drag handles now use light-dark() function for automatic theming */
 
+.drop-zone:hover {
+    border-color: var(--color-neutral-400);
+    background: var(--color-muji-hover);
+}
 
 /* Drag-Drop State Machine Visual Feedback */
 
@@ -850,6 +1012,11 @@ body {
 }
 
 /* Generic drag-over state (backward compatibility) */
+.drop-zone.drag-over {
+    border-color: var(--color-success);
+    background: var(--color-success-light);
+    color: var(--color-muji-text);
+}
 
 .drop-zone.invalid-target {
     border-color: #ccc;
@@ -877,6 +1044,14 @@ body {
 }
 
 /* Zone being dragged */
+.drop-zone.dragging {
+    opacity: 0.7;
+    cursor: grabbing;
+    transform: rotate(2deg);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: var(--color-action-primary) !important;
+}
 
 /* Animations for different states */
 @keyframes pulse-success {
@@ -960,11 +1135,23 @@ body {
 }
 
 /* Accessibility - Action Blue for focus states */
+.tag-item:focus {
+    outline: 2px solid var(--color-action-primary);
+    outline-offset: 2px;
+}
 
+.drop-zone:focus {
+    outline: 2px solid var(--color-action-primary);
+    outline-offset: 2px;
+}
 
 /* Focus-visible for keyboard navigation */
 .tag-item:focus-visible,
 .drop-zone:focus-visible,
+.cta-button:focus-visible {
+    outline: 3px solid var(--color-action-primary);
+    outline-offset: 2px;
+}
 
 /* Loading States - Brand moment */
 .loading {
@@ -1013,6 +1200,15 @@ body {
     align-items: flex-start;
 }
 
+.cloud {
+    background-color: light-dark(#fafafa, var(--color-neutral-100));
+    border: 1px solid light-dark(#e5e7eb, var(--color-neutral-300));
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 120px;
+    min-width: 200px;
+    flex: 1;
+}
 
 .cloud-user, .cloud-mixed {
     background-color: light-dark(#fefefe, var(--color-neutral-100));
@@ -1067,7 +1263,20 @@ body {
     flex-wrap: wrap;
 }
 
+.tag {
+    display: inline-block;
+    margin: 3px;
+    padding: 4px 8px;
+    font-size: 11px;
+    user-select: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
 
+.tag:hover {
+    opacity: 0.8;
+}
 
 .tag-user {
     background-color: light-dark(#ffffff, var(--color-neutral-200));
@@ -1082,6 +1291,12 @@ body {
     font-style: italic;
 }
 
+.tag-group {
+    background-color: transparent;
+    border: 1px dashed light-dark(#9ca3af, var(--color-neutral-400));
+    color: light-dark(#6b7280, var(--color-text-secondary));
+    border-radius: 4px;
+}
 
 .tag-system {
     background-color: light-dark(#e5e7eb, var(--color-neutral-300));
@@ -1110,6 +1325,9 @@ body {
     color: var(--color-text-primary);
 }
 
+.tag-input:focus {
+    border-color: #9ca3af;
+}
 
 .ai-button {
     font-size: 9px;
@@ -1122,6 +1340,9 @@ body {
     color: var(--color-text-primary);
 }
 
+.ai-button:hover {
+    background-color: light-dark(#d1d5db, var(--color-neutral-400));
+}
 
 /* CSS-only Font Dropdown */
 .font-dropdown-wrapper {
@@ -1143,7 +1364,14 @@ body {
     color: var(--color-text-primary);
 }
 
+.font-dropdown-current:hover {
+    border-color: #9ca3af;
+}
 
+.font-dropdown-current:focus {
+    border-color: #9ca3af;
+    outline: none;
+}
 
 /* Add dropdown arrow */
 .font-dropdown-current::after {
@@ -1175,6 +1403,9 @@ body {
 
 /* Show dropdown on hover and focus */
 .font-dropdown-wrapper:hover .font-dropdown-options,
+.font-dropdown-wrapper:focus-within .font-dropdown-options {
+    display: block;
+}
 
 .font-dropdown-option {
     display: block;
@@ -1189,6 +1420,9 @@ body {
     color: var(--color-text-primary);
 }
 
+.font-dropdown-option:hover {
+    background-color: light-dark(#f3f4f6, var(--color-neutral-300));
+}
 
 /* Font dropdown options inherit from body font classes */
 
@@ -1254,6 +1488,10 @@ body {
     user-select: none;
 }
 
+.theme-radio-item input[type="radio"]:checked + label {
+    color: light-dark(#333, #d4d4d4);
+    font-weight: 500;
+}
 
 .theme-label {
     display: block;
@@ -1275,6 +1513,9 @@ body {
     margin: 0;
 }
 
+.debug-group {
+    margin: 0;
+}
 
 .database-group {
     margin: 0;
@@ -1294,6 +1535,11 @@ body {
     min-width: 200px;
 }
 
+.database-selector:focus {
+    outline: none;
+    border-color: var(--color-action-primary);
+    box-shadow: 0 0 0 2px var(--color-action-light);
+}
 
 .database-info {
     font-size: 11px;
@@ -1330,6 +1576,9 @@ body {
     position: relative; /* For visual indicator positioning */
 }
 
+.card:hover {
+    background: light-dark(#f5f5f5, var(--color-neutral-300)); /* Subtle hover indication */
+}
 
 /* Pure CSS accordion checkbox styling */
 .card-accordion-toggle {
@@ -1350,7 +1599,16 @@ body {
     transition: all 0.2s ease;
 }
 
+.card-accordion-toggle:checked {
+    background: #007AFF; /* Blue circle when open */
+    border: 2px solid #007AFF;
+    background-clip: padding-box;
+    box-shadow: inset 0 0 0 2px white; /* White center */
+}
 
+.card-accordion-toggle:hover {
+    transform: translateX(-50%) translateY(50%) scale(1.1);
+}
 
 .card:last-child {
     margin-bottom: 0; /* Remove margin on last item */
@@ -1387,6 +1645,9 @@ body {
 }
 
 /* Show tags when individual card accordion is checked */
+.card-accordion-toggle:checked + .card-tags {
+    display: block;
+}
 
 .card-tag {
     display: inline-block;
@@ -1532,6 +1793,10 @@ body.font-berkeley-mono {
     resize: vertical;
 }
 
+.tags-in-play:focus {
+    border-color: light-dark(#9ca3af, var(--color-neutral-500));
+    background-color: light-dark(#ffffff, var(--color-neutral-300));
+}
 
 /* Dark Mode Styles removed - now using light-dark() function */
 
@@ -1556,7 +1821,14 @@ body.font-berkeley-mono {
     right: 8px;
 }
 
+.zone-drag-handle:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
 
+.zone-drag-handle:active {
+    cursor: grabbing;
+    background: rgba(0, 0, 0, 0.15);
+}
 
 .drag-grip {
     color: #aaa;
@@ -1567,6 +1839,9 @@ body.font-berkeley-mono {
     transition: color 0.2s ease;
 }
 
+.zone-drag-handle:hover .drag-grip {
+    color: #666;
+}
 
 /* Earth tones comprehensive interface styles moved to consolidated section above */
 
@@ -1753,8 +2028,28 @@ body.font-berkeley-mono {
     transition: opacity 0.2s ease;
 }
 
+.tag-item:hover::before {
+    opacity: 1;
+}
 
 /* Selected Tag Enhancement */
+.tag-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: var(--color-action-primary);
+    color: white;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    border: 2px solid var(--color-muji-bg);
+}
 
 /* ========================================
    FILTER ZONE - DUAL DROP ZONES
@@ -1796,6 +2091,11 @@ body.font-berkeley-mono {
 } */
 
 .union-zone:hover,
+.union-zone.drag-over {
+    border-color: #1976D2 !important;
+    background: rgba(33, 150, 243, 0.1);
+    border-style: solid !important;
+}
 
 /* .intersection-zone {
     border-color: #4CAF50 !important;
@@ -1803,8 +2103,22 @@ body.font-berkeley-mono {
 } */
 
 .intersection-zone:hover,
+.intersection-zone.drag-over {
+    border-color: #45a049 !important;
+    background: rgba(76, 175, 80, 0.1);
+    border-style: solid !important;
+}
 
+.filter-subzone:hover {
+    border-color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+    background: light-dark(var(--color-neutral-50), var(--color-neutral-300));
+}
 
+.filter-subzone.drag-over {
+    border-color: var(--color-success);
+    background: var(--color-success-light);
+    transform: scale(1.02);
+}
 
 .filter-subzone.fade-out {
     border-color: light-dark(var(--color-neutral-200), var(--color-neutral-300));
@@ -1834,11 +2148,32 @@ body.font-berkeley-mono {
 
 /* Disable highlighting on filter zone container - only subzones should highlight */
 .filter-zone-container.tag-drag-over,
+.filter-zone-container.drag-over {
+    border-color: var(--color-neutral-200) !important;
+    background: var(--color-neutral-50) !important;
+    animation: none !important;
+}
 
 /* Union and intersection zones act as individual drop zones */
+.filter-subzone.drop-zone:hover {
+    border-color: var(--color-action-primary);
+    background: var(--color-action-light);
+    transform: scale(1.02);
+}
 
 /* Cloud drag-over styles for receiving tags back from zones */
+.cloud.drag-over {
+    border-color: var(--color-action-primary);
+    background: var(--color-action-light);
+    transform: scale(1.02);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(30, 64, 175, 0.15);
+}
 
+.clouds-container.drag-over {
+    background: rgba(30, 64, 175, 0.05);
+    border-radius: 8px;
+}
 
 /* Cloud drag-over handled automatically via light-dark() */
 
@@ -1876,6 +2211,10 @@ body.font-berkeley-mono {
     transition: all 0.2s ease;
 }
 
+.filter-subzone .tag:hover {
+    background: light-dark(var(--color-neutral-200), var(--color-neutral-400));
+    border-color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
+}
 
 .union-zone .tag {
 }
@@ -1906,6 +2245,9 @@ body.font-berkeley-mono {
     font-family: inherit;
 }
 
+.projects-link:hover {
+    color: var(--color-brand-primary);
+}
 
 .project-menu-item {
     display: block;
@@ -1917,6 +2259,9 @@ body.font-berkeley-mono {
     cursor: pointer;
 }
 
+.project-menu-item:hover {
+    color: var(--color-brand-primary);
+}
 
 .project-menu-item.current-project {
     color: var(--color-action-primary);
@@ -1942,6 +2287,9 @@ body.font-berkeley-mono {
     z-index: 1000;
 }
 
+.projects-dropdown-content:hover .projects-submenu {
+    display: block;
+}
 
 .projects-submenu .project-menu-item {
     display: block;
@@ -1954,10 +2302,28 @@ body.font-berkeley-mono {
    ======================================== */
 
 /* Multi-select visual states */
+.tag.selected {
+    outline: 2px solid var(--color-action-primary);
+    outline-offset: 2px;
+    background-color: var(--color-action-light);
+}
 
+.tag.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    transform: rotate(2deg);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
 
 /* Zone drag-over states */
 .drop-zone.drag-over,
+[data-zone-type].drag-over {
+    background-color: var(--color-success-light);
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 2px var(--color-success-light);
+    transform: scale(1.02);
+    transition: all 0.2s ease;
+}
 
 /* Multi-tag drop count badge */
 [data-drop-count]::after {
@@ -1980,6 +2346,12 @@ body.font-berkeley-mono {
 }
 
 /* Cloud drag-over states */
+.cloud.drag-over {
+    background-color: var(--color-action-light);
+    border-color: var(--color-action-primary);
+    transform: scale(1.01);
+    transition: all 0.2s ease;
+}
 
 /* Accessibility improvements */
 [aria-grabbed="true"] {
@@ -1997,12 +2369,19 @@ body.font-berkeley-mono {
     position: relative;
 }
 
+[role="region"][data-zone-type]:focus-within {
+    outline: 2px dotted var(--color-action-primary);
+    outline-offset: 4px;
+}
 
 /* Tag cursor states */
 .tag[draggable="true"] {
     cursor: grab;
 }
 
+.tag[draggable="true"]:active {
+    cursor: grabbing;
+}
 
 /* Visual feedback for valid drop targets */
 .tag-collection {
@@ -2023,6 +2402,10 @@ body.font-berkeley-mono {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.tag:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
 /* Group tag indicators */
 .tag-group {
@@ -2079,305 +2462,4 @@ body.font-berkeley-mono {
     [data-zone-type].drag-over {
         transform: none;
     }
-}
-
-
-
-/* ========================================
-   INTERACTIVE STYLES
-   Applied only after user interaction
-   ======================================== */
-.earth-tones .nav-item a:hover {
-  color: #dc2626;  /* Red accent on hover */
-}
-.earth-tones .cta-button:hover {
-  background: var(--color-action-primary) !important;
-  color: white !important;
-}
-.earth-tones .tag-dragging .drop-zone:hover {
-  border-color: var(--color-action-primary);
-  background: var(--color-action-light);
-}
-.earth-tones .drop-zone.drag-over {
-  border-color: #dc2626;
-  background: #fef2f2;
-  color: #57534e;
-}
-.earth-tones .control-area-container.drag-over {
-  background: var(--color-action-light);
-  border-color: var(--color-action-primary);
-}
-.earth-tones .control-area-container.drag-over::after {
-  color: var(--color-action-primary);
-}
-.earth-tones .card:hover {
-  background: #f0ede8; /* Slightly darker warm hover */
-  border-color: #78716c; /* Darker border on hover */
-}
-.earth-tones .cloud.drag-over {
-  border-color: var(--color-action-primary);
-  background: var(--color-action-light);
-  box-shadow: 0 4px 8px rgba(30, 64, 175, 0.15);
-}
-.earth-tones select:focus {
-  border-color: #c4beb3 !important;  /* Warmer focus border */
-}
-.earth-tones button:hover {
-  background: #ebe7e0 !important;
-}
-.earth-tones .tag-input:focus {
-  border-color: #a8a29e;
-}
-.earth-tones .ai-button:hover {
-  background-color: #d6d3d1;
-}
-.earth-tones .font-selector:focus {
-  border-color: #a8a29e;
-}
-.earth-tones .zone-drag-handle:hover {
-  background: rgba(87, 83, 78, 0.1);
-}
-.earth-tones .zone-drag-handle:active {
-  background: rgba(87, 83, 78, 0.15);
-}
-.earth-tones .zone-drag-handle:hover .drag-grip {
-  color: #78716c;
-}
-.brand-link:hover {
-    color: var(--color-brand-primary);  /* Brand Red on hover */
-    transition: color 0.3s ease;
-}
-.nav-item a:hover {
-    color: var(--color-brand-primary);  /* Brand Red for nav hover */
-}
-.cta-button:hover {
-    background: var(--color-action-primary) !important;  /* Bootstrap Blue for CTA hover */
-    color: white !important;
-    border: 1px solid var(--color-action-primary);
-}
-.tag-item:hover {
-    background-color: light-dark(var(--color-neutral-600), var(--color-neutral-400));
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
-}
-.tag-item:active {
-    cursor: grabbing;
-    transform: translateY(0);
-}
-.tag-item.selected {
-    background-color: var(--color-action-primary);  /* Action Blue for selected state */
-    border-color: var(--color-action-accent);
-    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
-}
-.group-tag:hover {
-    background-color: #7c3aed;
-}
-.tag-dragging .drop-zone:hover {
-    border-color: var(--color-action-primary);  /* Action Blue for draggable zones */
-    background: var(--color-action-light);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(30, 64, 175, 0.1);
-}
-.control-area-container.drag-over {
-    background: var(--color-action-light);
-    border: 2px dashed var(--color-action-primary);
-    border-radius: 4px;
-}
-.control-area-container.drag-over::after {
-    content: "Drop zone here";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--color-action-primary);
-    font-size: 0.9rem;
-    font-weight: 500;
-    pointer-events: none;
-}
-.drop-zone:hover {
-    border-color: var(--color-neutral-400);
-    background: var(--color-muji-hover);
-}
-.drop-zone.drag-over {
-    border-color: var(--color-success);
-    background: var(--color-success-light);
-    color: var(--color-muji-text);
-}
-.drop-zone.dragging {
-    opacity: 0.7;
-    cursor: grabbing;
-    transform: rotate(2deg);
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    border-color: var(--color-action-primary) !important;
-}
-.tag-item:focus {
-    outline: 2px solid var(--color-action-primary);
-    outline-offset: 2px;
-}
-.drop-zone:focus {
-    outline: 2px solid var(--color-action-primary);
-    outline-offset: 2px;
-}
-.cta-button:focus-visible {
-    outline: 3px solid var(--color-action-primary);
-    outline-offset: 2px;
-}
-.tag-input:focus {
-    border-color: #9ca3af;
-}
-.ai-button:hover {
-    background-color: light-dark(#d1d5db, var(--color-neutral-400));
-}
-.font-dropdown-current:hover {
-    border-color: #9ca3af;
-}
-.font-dropdown-current:focus {
-    border-color: #9ca3af;
-    outline: none;
-}
-.font-dropdown-wrapper:focus-within .font-dropdown-options {
-    display: block;
-}
-.font-dropdown-option:hover {
-    background-color: light-dark(#f3f4f6, var(--color-neutral-300));
-}
-.theme-radio-item input[type="radio"]:checked + label {
-    color: light-dark(#333, #d4d4d4);
-    font-weight: 500;
-}
-.database-selector:focus {
-    outline: none;
-    border-color: var(--color-action-primary);
-    box-shadow: 0 0 0 2px var(--color-action-light);
-}
-.card:hover {
-    background: light-dark(#f5f5f5, var(--color-neutral-300)); /* Subtle hover indication */
-}
-.card-accordion-toggle:checked {
-    background: #007AFF; /* Blue circle when open */
-    border: 2px solid #007AFF;
-    background-clip: padding-box;
-    box-shadow: inset 0 0 0 2px white; /* White center */
-}
-.card-accordion-toggle:hover {
-    transform: translateX(-50%) translateY(50%) scale(1.1);
-}
-.card-accordion-toggle:checked + .card-tags {
-    display: block;
-}
-.tags-in-play:focus {
-    border-color: light-dark(#9ca3af, var(--color-neutral-500));
-    background-color: light-dark(#ffffff, var(--color-neutral-300));
-}
-.zone-drag-handle:hover {
-    background: rgba(0, 0, 0, 0.1);
-}
-.zone-drag-handle:active {
-    cursor: grabbing;
-    background: rgba(0, 0, 0, 0.15);
-}
-.zone-drag-handle:hover .drag-grip {
-    color: #666;
-}
-.tag-item:hover::before {
-    opacity: 1;
-}
-.tag-item.selected::after {
-    content: '✓';
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: var(--color-action-primary);
-    color: white;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: bold;
-    border: 2px solid var(--color-muji-bg);
-}
-.union-zone.drag-over {
-    border-color: #1976D2 !important;
-    background: rgba(33, 150, 243, 0.1);
-    border-style: solid !important;
-}
-.intersection-zone.drag-over {
-    border-color: #45a049 !important;
-    background: rgba(76, 175, 80, 0.1);
-    border-style: solid !important;
-}
-.filter-subzone:hover {
-    border-color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-    background: light-dark(var(--color-neutral-50), var(--color-neutral-300));
-}
-.filter-subzone.drag-over {
-    border-color: var(--color-success);
-    background: var(--color-success-light);
-    transform: scale(1.02);
-}
-.filter-zone-container.drag-over {
-    border-color: var(--color-neutral-200) !important;
-    background: var(--color-neutral-50) !important;
-    animation: none !important;
-}
-.filter-subzone.drop-zone:hover {
-    border-color: var(--color-action-primary);
-    background: var(--color-action-light);
-    transform: scale(1.02);
-}
-.clouds-container.drag-over {
-    background: rgba(30, 64, 175, 0.05);
-    border-radius: 8px;
-}
-.filter-subzone .tag:hover {
-    background: light-dark(var(--color-neutral-200), var(--color-neutral-400));
-    border-color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
-}
-.projects-link:hover {
-    color: var(--color-brand-primary);
-}
-.project-menu-item:hover {
-    color: var(--color-brand-primary);
-}
-.projects-dropdown-content:hover .projects-submenu {
-    display: block;
-}
-.tag.selected {
-    outline: 2px solid var(--color-action-primary);
-    outline-offset: 2px;
-    background-color: var(--color-action-light);
-}
-.tag.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
-    transform: rotate(2deg);
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-[data-zone-type].drag-over {
-    background-color: var(--color-success-light);
-    border-color: var(--color-success);
-    box-shadow: 0 0 0 2px var(--color-success-light);
-    transform: scale(1.02);
-    transition: all 0.2s ease;
-}
-.cloud.drag-over {
-    background-color: var(--color-action-light);
-    border-color: var(--color-action-primary);
-    transform: scale(1.01);
-    transition: all 0.2s ease;
-}
-[role="region"][data-zone-type]:focus-within {
-    outline: 2px dotted var(--color-action-primary);
-    outline-offset: 4px;
-}
-.tag[draggable="true"]:active {
-    cursor: grabbing;
-}
-.tag:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

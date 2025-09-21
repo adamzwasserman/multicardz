@@ -101,7 +101,7 @@ uv run playwright install chromium
 
 ### Manual Testing
 1. Start server: `uv run python tests/integration/test_server.py`
-2. Open browser: `http://localhost:8001`
+2. Open browser: `http://localhost:8011`
 3. Test drag-drop manually
 
 ## Test Results Status

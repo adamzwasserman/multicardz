@@ -98,7 +98,7 @@ class ResponsiveTestSuite:
             "timestamp": time.time()
         })
 
-    async def navigate_to_production_app(self, url="http://localhost:8001"):
+    async def navigate_to_production_app(self, url="http://localhost:8011"):
         """Navigate to the real MultiCardz production app."""
         print(f"🌐 Loading production app: {url}")
 

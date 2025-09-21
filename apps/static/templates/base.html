@@ -8,13 +8,10 @@
     <!-- Base template styles -->
     {% block head %}{% endblock %}
 
-    <!-- Google Fonts for Dongle -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
 
-    <!-- HTMX for dynamic content loading -->
-    <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js"></script>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
 
     <!-- CSS -->
     <link rel="stylesheet" href="/static/css/user.css">
@@ -54,10 +51,7 @@
     </div>
     {% endblock %}
 
-    <!-- JavaScript -->
-    <script src="/static/js/drag-drop.js"></script>
-    {% block extra_js %}{% endblock %}
-
+    <!-- Defer JavaScript loading until after LCP -->
     {% block scripts %}
     <script>
         // Initialize on DOM ready (drag-drop.js handles the rest)
@@ -134,19 +128,55 @@
             // Could implement performance monitoring here
         }
 
-        // Initialize the new drag-drop system
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof SpatialDragDrop !== 'undefined') {
-                dragDropSystem = new SpatialDragDrop();
-                console.log('MultiCardz™ drag-drop system initialized');
-            } else {
-                console.error('SpatialDragDrop class not found - ensure drag-drop.js is loaded');
-            }
-        });
+        // Delay loading heavy JavaScript until after LCP
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadDeferredScripts);
+        } else {
+            loadDeferredScripts();
+        }
 
-        // The SpatialDragDrop class handles all drag-drop functionality
+        function loadDeferredScripts() {
+            // Wait for LCP to be calculated before loading heavy scripts
+            if ('PerformanceObserver' in window) {
+                const observer = new PerformanceObserver((list) => {
+                    for (const entry of list.getEntries()) {
+                        if (entry.entryType === 'largest-contentful-paint') {
+                            observer.disconnect();
+                            loadScriptsAfterLCP();
+                        }
+                    }
+                });
+                observer.observe({entryTypes: ['largest-contentful-paint']});
+
+                // Fallback: load after 2 seconds if LCP never fires
+                setTimeout(loadScriptsAfterLCP, 2000);
+            } else {
+                // Fallback for browsers without PerformanceObserver
+                setTimeout(loadScriptsAfterLCP, 100);
+            }
+        }
+
+        function loadScriptsAfterLCP() {
+            // Load HTMX
+            const htmxScript = document.createElement('script');
+            htmxScript.src = 'https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js';
+            htmxScript.onload = () => console.log('HTMX loaded');
+            document.head.appendChild(htmxScript);
+
+            // Load drag-drop system
+            const dragDropScript = document.createElement('script');
+            dragDropScript.src = '/static/js/drag-drop.js';
+            dragDropScript.onload = () => {
+                if (typeof SpatialDragDrop !== 'undefined') {
+                    dragDropSystem = new SpatialDragDrop();
+                    console.log('MultiCardz™ drag-drop system initialized');
+                }
+            };
+            document.head.appendChild(dragDropScript);
+        }
 
     </script>
     {% endblock %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

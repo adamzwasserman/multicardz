@@ -57,7 +57,7 @@ def main():
     app = create_app()
 
     logger.info("Starting MultiCardz™ User Application")
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=8011, reload=True)
 
 
 if __name__ == "__main__":

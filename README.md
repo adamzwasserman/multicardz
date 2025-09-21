@@ -54,7 +54,7 @@ uv sync --package multicardz-user
 
 ```bash
 # Run the user application
-cd apps/user && uv run uvicorn main:app --reload --port 8000
+cd apps/user && uv run uvicorn main:app --reload --port 8011
 
 # Run tests
 uv run pytest
