@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MultiCardz™ - Spatial tag manipulation system for intuitive data organization and filtering using drag-and-drop interactions">
     <title>{% block title %}MultiCardz™{% endblock %}</title>
 
     <!-- Base template styles -->
@@ -19,6 +20,10 @@
     <!-- CSS -->
     <link rel="stylesheet" href="/static/css/user.css">
     {% block extra_css %}{% endblock %}
+
+    <!-- Deferred JavaScript -->
+    <script defer src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js"></script>
+    <script defer src="/static/js/drag-drop.min.js"></script>
 </head>
 <body data-workspace="{{ workspace_id | default('default-workspace') }}" data-user="{{ user_id | default('anonymous-user') }}">
     {% block body %}
@@ -54,15 +59,10 @@
     </div>
     {% endblock %}
 
-    <!-- Defer JavaScript loading until after LCP -->
+    <!-- Utility JavaScript functions -->
     {% block scripts %}
     <script>
-        // Initialize on DOM ready (drag-drop.js handles the rest)
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('MultiCardz™ DOM ready, drag-drop system initializing...');
-        });
-
-        // JavaScript functions for the new drag-drop system
+        // JavaScript functions for the drag-drop system
         let dragDropSystem = null;
 
         function toggleMode() {
@@ -130,60 +130,6 @@
             console.log('Performance monitoring toggled');
             // Could implement performance monitoring here
         }
-
-        // Delay loading heavy JavaScript until after LCP
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadDeferredScripts);
-        } else {
-            loadDeferredScripts();
-        }
-
-        let scriptsLoaded = false;
-
-        function loadDeferredScripts() {
-            // Wait for LCP to be calculated before loading heavy scripts
-            if ('PerformanceObserver' in window) {
-                const observer = new PerformanceObserver((list) => {
-                    for (const entry of list.getEntries()) {
-                        if (entry.entryType === 'largest-contentful-paint') {
-                            observer.disconnect();
-                            loadScriptsAfterLCP();
-                        }
-                    }
-                });
-                observer.observe({entryTypes: ['largest-contentful-paint']});
-
-                // Fallback: load after 2 seconds if LCP never fires
-                setTimeout(loadScriptsAfterLCP, 2000);
-            } else {
-                // Fallback for browsers without PerformanceObserver
-                setTimeout(loadScriptsAfterLCP, 100);
-            }
-        }
-
-        function loadScriptsAfterLCP() {
-            // Ensure scripts are only loaded once
-            if (scriptsLoaded) return;
-            scriptsLoaded = true;
-
-            // Load HTMX
-            const htmxScript = document.createElement('script');
-            htmxScript.src = 'https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js';
-            htmxScript.onload = () => console.log('HTMX loaded');
-            document.head.appendChild(htmxScript);
-
-            // Load drag-drop system
-            const dragDropScript = document.createElement('script');
-            dragDropScript.src = '/static/js/drag-drop.js';
-            dragDropScript.onload = () => {
-                if (typeof SpatialDragDrop !== 'undefined') {
-                    dragDropSystem = new SpatialDragDrop();
-                    console.log('MultiCardz™ drag-drop system initialized');
-                }
-            };
-            document.head.appendChild(dragDropScript);
-        }
-
     </script>
     {% endblock %}
     {% block extra_js %}{% endblock %}

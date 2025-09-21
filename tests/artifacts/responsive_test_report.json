@@ -68,36 +68,36 @@
       75.50464767616192
     ],
     "Mobile Landscape (667x375)": [
-      92.91754122938531,
-      92.91754122938531
+      90.57631184407796,
+      90.57631184407796
     ],
     "Tablet Portrait (768x1024)": [
-      34.2529296875,
-      34.2529296875
+      33.50830078125,
+      33.50830078125
     ],
     "Tablet Landscape (1024x768)": [
       24.0142822265625,
       24.0142822265625
     ],
     "Desktop Small (1280x720)": [
-      28.44172159830729,
-      28.44172159830729
+      27.236663818359375,
+      27.236663818359375
     ],
     "Desktop Medium (1440x900)": [
-      23.269046585648148,
-      23.269046585648148
+      22.843229166666667,
+      22.843229166666667
     ],
     "Desktop Large (1920x1080)": [
-      19.61655906394676,
-      19.61655906394676
+      19.447224934895832,
+      19.447224934895832
     ],
     "Desktop XL (2560x1440)": [
-      28.056360880533855,
-      28.056360880533855
+      27.755418989393448,
+      27.755418989393448
     ],
     "Ultrawide (3440x1440)": [
-      28.24027853480297,
-      28.24027853480297
+      27.98484404019299,
+      27.98484404019299
     ],
     "1920x1080 \u2192 375x667": [
       75.50464767616192
@@ -108,7 +108,7 @@
       "test": "Viewport Resize 1",
       "viewport": "Mobile Portrait (375x667)",
       "success": false,
-      "duration": 1.165320873260498,
+      "duration": 1.1189556121826172,
       "measurements": {
         "viewport": {
           "innerWidth": 375,
@@ -119,33 +119,32 @@
         "card_display": {
           "width": 516,
           "height": 366,
-          "top": 1114,
-          "left": 16,
-          "right": 532,
-          "bottom": 1480,
+          "top": 952,
+          "left": 24,
+          "right": 540,
+          "bottom": 1318,
           "visibleArea": 188856
         },
         "grid": {
-          "width": 375,
+          "width": 359,
           "height": 559,
-          "utilizationPercent": 83.80809595202399
+          "utilizationPercent": 80.23228385807096
         },
         "card_utilization_percent": 75.50464767616192,
         "viewport_efficiency": "excellent",
         "drag_test": true,
         "layout_issues": [
-          "horizontal_overflow",
           "elements_outside_viewport",
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146753.201268
+      "timestamp": 1758470418.3159292
     },
     {
       "test": "Viewport Resize 2",
       "viewport": "Mobile Landscape (667x375)",
       "success": false,
-      "duration": 1.0571939945220947,
+      "duration": 1.0489609241485596,
       "measurements": {
         "viewport": {
           "innerWidth": 667,
@@ -154,20 +153,20 @@
           "outerHeight": 455
         },
         "card_display": {
-          "width": 635,
+          "width": 619,
           "height": 366,
-          "top": 1114,
-          "left": 16,
-          "right": 651,
-          "bottom": 1480,
-          "visibleArea": 232410
+          "top": 952,
+          "left": 24,
+          "right": 643,
+          "bottom": 1318,
+          "visibleArea": 226554
         },
         "grid": {
-          "width": 667,
+          "width": 651,
           "height": 267,
-          "utilizationPercent": 71.2
+          "utilizationPercent": 69.49205397301348
         },
-        "card_utilization_percent": 92.91754122938531,
+        "card_utilization_percent": 90.57631184407796,
         "viewport_efficiency": "excellent",
         "drag_test": true,
         "layout_issues": [
@@ -175,13 +174,13 @@
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146754.258476
+      "timestamp": 1758470419.364901
     },
     {
       "test": "Viewport Resize 3",
       "viewport": "Tablet Portrait (768x1024)",
       "success": false,
-      "duration": 1.1011979579925537,
+      "duration": 1.057676076889038,
       "measurements": {
         "viewport": {
           "innerWidth": 768,
@@ -190,20 +189,20 @@
           "outerHeight": 1104
         },
         "card_display": {
-          "width": 736,
+          "width": 720,
           "height": 366,
-          "top": 1114,
-          "left": 16,
-          "right": 752,
-          "bottom": 1480,
-          "visibleArea": 269376
+          "top": 952,
+          "left": 24,
+          "right": 744,
+          "bottom": 1318,
+          "visibleArea": 263520
         },
         "grid": {
-          "width": 768,
+          "width": 752,
           "height": 916,
-          "utilizationPercent": 89.453125
+          "utilizationPercent": 87.58951822916666
         },
-        "card_utilization_percent": 34.2529296875,
+        "card_utilization_percent": 33.50830078125,
         "viewport_efficiency": "good",
         "drag_test": true,
         "layout_issues": [
@@ -211,13 +210,13 @@
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146755.359692
+      "timestamp": 1758470420.4225862
     },
     {
       "test": "Viewport Resize 4",
       "viewport": "Tablet Landscape (1024x768)",
       "success": false,
-      "duration": 1.0631279945373535,
+      "duration": 1.0544562339782715,
       "measurements": {
         "viewport": {
           "innerWidth": 1024,
@@ -228,33 +227,32 @@
         "card_display": {
           "width": 516,
           "height": 366,
-          "top": 558,
-          "left": 266,
-          "right": 782,
-          "bottom": 924,
+          "top": 635,
+          "left": 274,
+          "right": 790,
+          "bottom": 1001,
           "visibleArea": 188856
         },
         "grid": {
-          "width": 1024,
+          "width": 1008,
           "height": 660,
-          "utilizationPercent": 85.9375
+          "utilizationPercent": 84.5947265625
         },
         "card_utilization_percent": 24.0142822265625,
         "viewport_efficiency": "poor",
         "drag_test": true,
         "layout_issues": [
-          "horizontal_overflow",
           "elements_outside_viewport",
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146756.422831
+      "timestamp": 1758470421.4770591
     },
     {
       "test": "Viewport Resize 5",
       "viewport": "Desktop Small (1280x720)",
       "success": false,
-      "duration": 1.0658910274505615,
+      "duration": 1.0630393028259277,
       "measurements": {
         "viewport": {
           "innerWidth": 1280,
@@ -263,20 +261,20 @@
           "outerHeight": 800
         },
         "card_display": {
-          "width": 716.171875,
+          "width": 685.828125,
           "height": 366,
-          "top": 558,
-          "left": 271.90625,
-          "right": 988.078125,
-          "bottom": 924,
-          "visibleArea": 262118.90625
+          "top": 635,
+          "left": 274,
+          "right": 959.828125,
+          "bottom": 1001,
+          "visibleArea": 251013.09375
         },
         "grid": {
-          "width": 1280,
+          "width": 1264,
           "height": 612,
-          "utilizationPercent": 85
+          "utilizationPercent": 83.9375
         },
-        "card_utilization_percent": 28.44172159830729,
+        "card_utilization_percent": 27.236663818359375,
         "viewport_efficiency": "good",
         "drag_test": true,
         "layout_issues": [
@@ -284,13 +282,13 @@
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146757.4887302
+      "timestamp": 1758470422.5401149
     },
     {
       "test": "Viewport Resize 6",
       "viewport": "Desktop Medium (1440x900)",
       "success": false,
-      "duration": 1.1029469966888428,
+      "duration": 1.052351951599121,
       "measurements": {
         "viewport": {
           "innerWidth": 1440,
@@ -299,33 +297,34 @@
           "outerHeight": 980
         },
         "card_display": {
-          "width": 823.953125,
+          "width": 808.875,
           "height": 366,
-          "top": 388,
-          "left": 308.015625,
-          "right": 1131.96875,
-          "bottom": 754,
-          "visibleArea": 301566.84375
+          "top": 471,
+          "left": 310.953125,
+          "right": 1119.828125,
+          "bottom": 837,
+          "visibleArea": 296048.25
         },
         "grid": {
-          "width": 1440,
+          "width": 1424,
           "height": 792,
-          "utilizationPercent": 88
+          "utilizationPercent": 87.02222222222223
         },
-        "card_utilization_percent": 23.269046585648148,
+        "card_utilization_percent": 22.843229166666667,
         "viewport_efficiency": "poor",
         "drag_test": true,
         "layout_issues": [
+          "elements_outside_viewport",
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146758.591687
+      "timestamp": 1758470423.592476
     },
     {
       "test": "Viewport Resize 7",
       "viewport": "Desktop Large (1920x1080)",
       "success": false,
-      "duration": 1.099726676940918,
+      "duration": 1.0512688159942627,
       "measurements": {
         "viewport": {
           "innerWidth": 1920,
@@ -334,33 +333,33 @@
           "outerHeight": 1160
         },
         "card_display": {
-          "width": 1111.390625,
+          "width": 1101.796875,
           "height": 366,
-          "top": 444,
-          "left": 404.296875,
-          "right": 1515.6875,
-          "bottom": 810,
-          "visibleArea": 406768.96875
+          "top": 521,
+          "left": 409.09375,
+          "right": 1510.890625,
+          "bottom": 887,
+          "visibleArea": 403257.65625
         },
         "grid": {
-          "width": 1920,
+          "width": 1904,
           "height": 972,
-          "utilizationPercent": 90
+          "utilizationPercent": 89.25
         },
-        "card_utilization_percent": 19.61655906394676,
+        "card_utilization_percent": 19.447224934895832,
         "viewport_efficiency": "poor",
         "drag_test": true,
         "layout_issues": [
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146759.691423
+      "timestamp": 1758470424.643753
     },
     {
       "test": "Viewport Resize 8",
       "viewport": "Desktop XL (2560x1440)",
       "success": false,
-      "duration": 1.0982511043548584,
+      "duration": 1.0645039081573486,
       "measurements": {
         "viewport": {
           "innerWidth": 2560,
@@ -369,33 +368,33 @@
           "outerHeight": 1520
         },
         "card_display": {
-          "width": 1494.609375,
-          "height": 692,
-          "top": 478,
-          "left": 532.6875,
-          "right": 2027.296875,
-          "bottom": 1170,
-          "visibleArea": 1034269.6875
+          "width": 1485.015625,
+          "height": 689,
+          "top": 558,
+          "left": 537.484375,
+          "right": 2022.5,
+          "bottom": 1247,
+          "visibleArea": 1023175.765625
         },
         "grid": {
-          "width": 2560,
+          "width": 2544,
           "height": 1332,
-          "utilizationPercent": 92.5
+          "utilizationPercent": 91.921875
         },
-        "card_utilization_percent": 28.056360880533855,
+        "card_utilization_percent": 27.755418989393448,
         "viewport_efficiency": "good",
         "drag_test": true,
         "layout_issues": [
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146760.7896829
+      "timestamp": 1758470425.708265
     },
     {
       "test": "Viewport Resize 9",
       "viewport": "Ultrawide (3440x1440)",
       "success": false,
-      "duration": 1.1051459312438965,
+      "duration": 1.0497591495513916,
       "measurements": {
         "viewport": {
           "innerWidth": 3440,
@@ -404,33 +403,33 @@
           "outerHeight": 1520
         },
         "card_display": {
-          "width": 2021.546875,
-          "height": 692,
-          "top": 478,
-          "left": 709.21875,
-          "right": 2730.765625,
-          "bottom": 1170,
-          "visibleArea": 1398910.4375
+          "width": 2011.984375,
+          "height": 689,
+          "top": 558,
+          "left": 714,
+          "right": 2725.984375,
+          "bottom": 1247,
+          "visibleArea": 1386257.234375
         },
         "grid": {
-          "width": 3440,
+          "width": 3424,
           "height": 1332,
-          "utilizationPercent": 92.5
+          "utilizationPercent": 92.06976744186046
         },
-        "card_utilization_percent": 28.24027853480297,
+        "card_utilization_percent": 27.98484404019299,
         "viewport_efficiency": "good",
         "drag_test": true,
         "layout_issues": [
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146761.894839
+      "timestamp": 1758470426.7580328
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Mobile Portrait (375x667)",
       "success": true,
-      "duration": 0.3326570987701416,
+      "duration": 0.31805992126464844,
       "measurements": {
         "viewport": {
           "innerWidth": 375,
@@ -441,27 +440,27 @@
         "card_display": {
           "width": 516,
           "height": 366,
-          "top": 1114,
-          "left": 16,
-          "right": 532,
-          "bottom": 1480,
+          "top": 952,
+          "left": 24,
+          "right": 540,
+          "bottom": 1318,
           "visibleArea": 188856
         },
         "grid": {
-          "width": 375,
+          "width": 359,
           "height": 559,
-          "utilizationPercent": 83.80809595202399
+          "utilizationPercent": 80.23228385807096
         },
         "card_utilization_percent": 75.50464767616192,
         "viewport_efficiency": "excellent"
       },
-      "timestamp": 1758146762.22751
+      "timestamp": 1758470427.0761092
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Mobile Landscape (667x375)",
       "success": true,
-      "duration": 0.3293030261993408,
+      "duration": 0.31543684005737305,
       "measurements": {
         "viewport": {
           "innerWidth": 667,
@@ -470,29 +469,29 @@
           "outerHeight": 455
         },
         "card_display": {
-          "width": 635,
+          "width": 619,
           "height": 366,
-          "top": 1114,
-          "left": 16,
-          "right": 651,
-          "bottom": 1480,
-          "visibleArea": 232410
+          "top": 952,
+          "left": 24,
+          "right": 643,
+          "bottom": 1318,
+          "visibleArea": 226554
         },
         "grid": {
-          "width": 667,
+          "width": 651,
           "height": 267,
-          "utilizationPercent": 71.2
+          "utilizationPercent": 69.49205397301348
         },
-        "card_utilization_percent": 92.91754122938531,
+        "card_utilization_percent": 90.57631184407796,
         "viewport_efficiency": "excellent"
       },
-      "timestamp": 1758146762.556828
+      "timestamp": 1758470427.3915598
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Tablet Portrait (768x1024)",
       "success": true,
-      "duration": 0.33768486976623535,
+      "duration": 0.334564208984375,
       "measurements": {
         "viewport": {
           "innerWidth": 768,
@@ -501,29 +500,29 @@
           "outerHeight": 1104
         },
         "card_display": {
-          "width": 736,
+          "width": 720,
           "height": 366,
-          "top": 1114,
-          "left": 16,
-          "right": 752,
-          "bottom": 1480,
-          "visibleArea": 269376
+          "top": 952,
+          "left": 24,
+          "right": 744,
+          "bottom": 1318,
+          "visibleArea": 263520
         },
         "grid": {
-          "width": 768,
+          "width": 752,
           "height": 916,
-          "utilizationPercent": 89.453125
+          "utilizationPercent": 87.58951822916666
         },
-        "card_utilization_percent": 34.2529296875,
+        "card_utilization_percent": 33.50830078125,
         "viewport_efficiency": "good"
       },
-      "timestamp": 1758146762.894518
+      "timestamp": 1758470427.7261271
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Tablet Landscape (1024x768)",
       "success": false,
-      "duration": 0.33534717559814453,
+      "duration": 0.3299839496612549,
       "measurements": {
         "viewport": {
           "innerWidth": 1024,
@@ -534,27 +533,27 @@
         "card_display": {
           "width": 516,
           "height": 366,
-          "top": 558,
-          "left": 266,
-          "right": 782,
-          "bottom": 924,
+          "top": 635,
+          "left": 274,
+          "right": 790,
+          "bottom": 1001,
           "visibleArea": 188856
         },
         "grid": {
-          "width": 1024,
+          "width": 1008,
           "height": 660,
-          "utilizationPercent": 85.9375
+          "utilizationPercent": 84.5947265625
         },
         "card_utilization_percent": 24.0142822265625,
         "viewport_efficiency": "poor"
       },
-      "timestamp": 1758146763.229871
+      "timestamp": 1758470428.056114
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Desktop Small (1280x720)",
       "success": false,
-      "duration": 0.33417797088623047,
+      "duration": 0.33649682998657227,
       "measurements": {
         "viewport": {
           "innerWidth": 1280,
@@ -563,29 +562,29 @@
           "outerHeight": 800
         },
         "card_display": {
-          "width": 716.171875,
+          "width": 685.828125,
           "height": 366,
-          "top": 558,
-          "left": 271.90625,
-          "right": 988.078125,
-          "bottom": 924,
-          "visibleArea": 262118.90625
+          "top": 635,
+          "left": 274,
+          "right": 959.828125,
+          "bottom": 1001,
+          "visibleArea": 251013.09375
         },
         "grid": {
-          "width": 1280,
+          "width": 1264,
           "height": 612,
-          "utilizationPercent": 85
+          "utilizationPercent": 83.9375
         },
-        "card_utilization_percent": 28.44172159830729,
+        "card_utilization_percent": 27.236663818359375,
         "viewport_efficiency": "good"
       },
-      "timestamp": 1758146763.5640562
+      "timestamp": 1758470428.3926148
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Desktop Medium (1440x900)",
       "success": false,
-      "duration": 0.33176589012145996,
+      "duration": 0.34876322746276855,
       "measurements": {
         "viewport": {
           "innerWidth": 1440,
@@ -594,29 +593,29 @@
           "outerHeight": 980
         },
         "card_display": {
-          "width": 823.953125,
+          "width": 808.875,
           "height": 366,
-          "top": 388,
-          "left": 308.015625,
-          "right": 1131.96875,
-          "bottom": 754,
-          "visibleArea": 301566.84375
+          "top": 465,
+          "left": 310.953125,
+          "right": 1119.828125,
+          "bottom": 831,
+          "visibleArea": 296048.25
         },
         "grid": {
-          "width": 1440,
+          "width": 1424,
           "height": 792,
-          "utilizationPercent": 88
+          "utilizationPercent": 87.02222222222223
         },
-        "card_utilization_percent": 23.269046585648148,
+        "card_utilization_percent": 22.843229166666667,
         "viewport_efficiency": "poor"
       },
-      "timestamp": 1758146763.895829
+      "timestamp": 1758470428.741382
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Desktop Large (1920x1080)",
       "success": false,
-      "duration": 0.3315432071685791,
+      "duration": 0.34186482429504395,
       "measurements": {
         "viewport": {
           "innerWidth": 1920,
@@ -625,29 +624,29 @@
           "outerHeight": 1160
         },
         "card_display": {
-          "width": 1111.390625,
+          "width": 1101.796875,
           "height": 366,
-          "top": 444,
-          "left": 404.296875,
-          "right": 1515.6875,
-          "bottom": 810,
-          "visibleArea": 406768.96875
+          "top": 521,
+          "left": 409.09375,
+          "right": 1510.890625,
+          "bottom": 887,
+          "visibleArea": 403257.65625
         },
         "grid": {
-          "width": 1920,
+          "width": 1904,
           "height": 972,
-          "utilizationPercent": 90
+          "utilizationPercent": 89.25
         },
-        "card_utilization_percent": 19.61655906394676,
+        "card_utilization_percent": 19.447224934895832,
         "viewport_efficiency": "poor"
       },
-      "timestamp": 1758146764.2273762
+      "timestamp": 1758470429.0832498
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Desktop XL (2560x1440)",
       "success": false,
-      "duration": 0.33065128326416016,
+      "duration": 0.32941484451293945,
       "measurements": {
         "viewport": {
           "innerWidth": 2560,
@@ -656,29 +655,29 @@
           "outerHeight": 1520
         },
         "card_display": {
-          "width": 1494.609375,
-          "height": 692,
-          "top": 478,
-          "left": 532.6875,
-          "right": 2027.296875,
-          "bottom": 1170,
-          "visibleArea": 1034269.6875
+          "width": 1485.015625,
+          "height": 689,
+          "top": 558,
+          "left": 537.484375,
+          "right": 2022.5,
+          "bottom": 1247,
+          "visibleArea": 1023175.765625
         },
         "grid": {
-          "width": 2560,
+          "width": 2544,
           "height": 1332,
-          "utilizationPercent": 92.5
+          "utilizationPercent": 91.921875
         },
-        "card_utilization_percent": 28.056360880533855,
+        "card_utilization_percent": 27.755418989393448,
         "viewport_efficiency": "good"
       },
-      "timestamp": 1758146764.558031
+      "timestamp": 1758470429.4126668
     },
     {
       "test": "Card Display Maximization",
       "viewport": "Ultrawide (3440x1440)",
       "success": false,
-      "duration": 0.3339812755584717,
+      "duration": 0.3318030834197998,
       "measurements": {
         "viewport": {
           "innerWidth": 3440,
@@ -687,29 +686,29 @@
           "outerHeight": 1520
         },
         "card_display": {
-          "width": 2021.546875,
-          "height": 692,
-          "top": 478,
-          "left": 709.21875,
-          "right": 2730.765625,
-          "bottom": 1170,
-          "visibleArea": 1398910.4375
+          "width": 2011.984375,
+          "height": 689,
+          "top": 558,
+          "left": 714,
+          "right": 2725.984375,
+          "bottom": 1247,
+          "visibleArea": 1386257.234375
         },
         "grid": {
-          "width": 3440,
+          "width": 3424,
           "height": 1332,
-          "utilizationPercent": 92.5
+          "utilizationPercent": 92.06976744186046
         },
-        "card_utilization_percent": 28.24027853480297,
+        "card_utilization_percent": 27.98484404019299,
         "viewport_efficiency": "good"
       },
-      "timestamp": 1758146764.8920162
+      "timestamp": 1758470429.7444742
     },
     {
       "test": "Dynamic Resizing",
       "viewport": "1920x1080 \u2192 375x667",
       "success": false,
-      "duration": 1.397857904434204,
+      "duration": 1.2872190475463867,
       "measurements": {
         "viewport": {
           "innerWidth": 375,
@@ -720,26 +719,25 @@
         "card_display": {
           "width": 516,
           "height": 366,
-          "top": 1114,
-          "left": 16,
-          "right": 532,
-          "bottom": 1480,
+          "top": 952,
+          "left": 24,
+          "right": 540,
+          "bottom": 1318,
           "visibleArea": 188856
         },
         "grid": {
-          "width": 375,
+          "width": 359,
           "height": 559,
-          "utilizationPercent": 83.80809595202399
+          "utilizationPercent": 80.23228385807096
         },
         "card_utilization_percent": 75.50464767616192,
         "viewport_efficiency": "excellent",
         "final_issues": [
-          "horizontal_overflow",
           "elements_outside_viewport",
           "small_touch_targets"
         ]
       },
-      "timestamp": 1758146767.728008
+      "timestamp": 1758470432.444715
     }
   ]
 }

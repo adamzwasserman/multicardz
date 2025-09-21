@@ -3,156 +3,156 @@
     "total": 21,
     "passed": 17,
     "failed": 4,
-    "duration": 80.16311812400818,
+    "duration": 80.25177073478699,
     "success_rate": 0.8095238095238095
   },
   "results": [
     {
       "test": "User tag \u2192 Union zone",
       "success": true,
-      "duration": 2.346815824508667,
+      "duration": 2.3453288078308105,
       "details": ".tag-user[data-tag] \u2192 .union-zone",
-      "timestamp": 1758428488.548427
+      "timestamp": 1758468720.906163
     },
     {
       "test": "User tag \u2192 Intersection zone",
       "success": true,
-      "duration": 2.335904121398926,
+      "duration": 2.3352460861206055,
       "details": ".tag-user[data-tag] \u2192 .intersection-zone",
-      "timestamp": 1758428491.389424
+      "timestamp": 1758468723.746468
     },
     {
       "test": "User tag \u2192 Row zone",
       "success": true,
-      "duration": 2.334359884262085,
+      "duration": 2.3575968742370605,
       "details": ".tag-user[data-tag] \u2192 .row-zone",
-      "timestamp": 1758428494.228839
+      "timestamp": 1758468726.60884
     },
     {
       "test": "User tag \u2192 Column zone",
       "success": true,
-      "duration": 2.380949020385742,
+      "duration": 2.336738109588623,
       "details": ".tag-user[data-tag] \u2192 .column-zone",
-      "timestamp": 1758428497.117888
+      "timestamp": 1758468729.450311
     },
     {
       "test": "AI tag \u2192 Union zone",
       "success": false,
-      "duration": 10.00954794883728,
+      "duration": 10.010488271713257,
       "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".tag-ai[data-tag]\") to be visible\n    11 \u00d7 locator resolved to 3 elements. Proceeding with the first one: <span draggable=\"true\" class=\"tag tag-ai\" data-type=\"ai-tag\" data-tag=\"machine-learning\">\u21b5                            machine-learning\u21b5   \u2026</span>\n",
-      "timestamp": 1758428507.633097
+      "timestamp": 1758468739.965995
     },
     {
       "test": "AI tag \u2192 Intersection zone",
       "success": false,
-      "duration": 10.01136827468872,
+      "duration": 10.013004064559937,
       "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".tag-ai[data-tag]\") to be visible\n    11 \u00d7 locator resolved to 3 elements. Proceeding with the first one: <span draggable=\"true\" class=\"tag tag-ai\" data-type=\"ai-tag\" data-tag=\"machine-learning\">\u21b5                            machine-learning\u21b5   \u2026</span>\n",
-      "timestamp": 1758428518.149183
+      "timestamp": 1758468750.4839501
     },
     {
       "test": "Populate union zone",
       "success": true,
-      "duration": 2.336528778076172,
+      "duration": 2.3349130153656006,
       "details": ".tag-user[data-tag]:nth-child(1) \u2192 .union-zone",
-      "timestamp": 1758428520.992764
+      "timestamp": 1758468753.3288162
     },
     {
       "test": "Populate intersection zone",
       "success": true,
-      "duration": 2.336637020111084,
+      "duration": 2.343186855316162,
       "details": ".tag-user[data-tag]:nth-child(2) \u2192 .intersection-zone",
-      "timestamp": 1758428523.6342201
+      "timestamp": 1758468755.977463
     },
     {
       "test": "Populate row zone",
       "success": true,
-      "duration": 2.3336777687072754,
+      "duration": 2.336845874786377,
       "details": ".tag-user[data-tag]:nth-child(3) \u2192 .row-zone",
-      "timestamp": 1758428526.2729769
+      "timestamp": 1758468758.620579
     },
     {
       "test": "Populate column zone",
       "success": true,
-      "duration": 2.33854079246521,
+      "duration": 2.3662877082824707,
       "details": ".tag-user[data-tag]:nth-child(4) \u2192 .column-zone",
-      "timestamp": 1758428528.917838
+      "timestamp": 1758468761.292751
     },
     {
       "test": "Filter zone \u2192 Left area",
       "success": true,
-      "duration": 2.3297479152679443,
+      "duration": 2.3367011547088623,
       "details": ".filter-zone-container \u2192 .left-control .control-area-container",
-      "timestamp": 1758428531.591265
+      "timestamp": 1758468763.9708748
     },
     {
       "test": "Filter zone \u2192 Right area",
       "success": true,
-      "duration": 2.4414000511169434,
+      "duration": 2.4546542167663574,
       "details": ".filter-zone-container \u2192 .right-control .control-area-container",
-      "timestamp": 1758428535.037386
+      "timestamp": 1758468767.431299
     },
     {
       "test": "Filter zone \u2192 Bottom area",
       "success": true,
-      "duration": 2.445518970489502,
+      "duration": 2.447942018508911,
       "details": ".filter-zone-container \u2192 .bottom-control .control-area-container",
-      "timestamp": 1758428538.4873412
+      "timestamp": 1758468770.884523
     },
     {
       "test": "Row zone \u2192 Top area",
       "success": true,
-      "duration": 2.333998918533325,
+      "duration": 2.3533718585968018,
       "details": ".row-zone \u2192 .top-control .control-area-container",
-      "timestamp": 1758428541.827368
+      "timestamp": 1758468774.250015
     },
     {
       "test": "Row zone \u2192 Right area",
       "success": true,
-      "duration": 2.333721160888672,
+      "duration": 2.362025022506714,
       "details": ".row-zone \u2192 .right-control .control-area-container",
-      "timestamp": 1758428545.171756
+      "timestamp": 1758468777.616995
     },
     {
       "test": "Row zone \u2192 Bottom area",
       "success": true,
-      "duration": 2.3942060470581055,
+      "duration": 2.4268338680267334,
       "details": ".row-zone \u2192 .bottom-control .control-area-container",
-      "timestamp": 1758428548.571031
+      "timestamp": 1758468781.0491881
     },
     {
       "test": "Column zone \u2192 Left area",
       "success": true,
-      "duration": 2.34368634223938,
+      "duration": 2.3401870727539062,
       "details": ".column-zone \u2192 .left-control .control-area-container",
-      "timestamp": 1758428551.9215128
+      "timestamp": 1758468784.3979242
     },
     {
       "test": "Column zone \u2192 Top area",
       "success": true,
-      "duration": 2.411942958831787,
+      "duration": 2.3806211948394775,
       "details": ".column-zone \u2192 .top-control .control-area-container",
-      "timestamp": 1758428555.3385699
+      "timestamp": 1758468787.7838662
     },
     {
       "test": "Column zone \u2192 Bottom area",
       "success": true,
-      "duration": 2.344813108444214,
+      "duration": 2.346463918685913,
       "details": ".column-zone \u2192 .bottom-control .control-area-container",
-      "timestamp": 1758428558.688513
+      "timestamp": 1758468791.135802
     },
     {
       "test": "Multi-selected tags \u2192 Union zone",
       "success": false,
-      "duration": 10.011845111846924,
+      "duration": 10.012000799179077,
       "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".tag-user.selected:first-child\") to be visible\n",
-      "timestamp": 1758428571.0832288
+      "timestamp": 1758468803.536672
     },
     {
       "test": "Multi-selected zone tags \u2192 Different zone",
       "success": false,
-      "duration": 10.00790810585022,
+      "duration": 10.01133394241333,
       "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".union-zone .tag.selected:first-child\") to be visible\n",
-      "timestamp": 1758428586.096127
+      "timestamp": 1758468818.5563881
     }
   ]
 }

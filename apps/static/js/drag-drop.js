@@ -566,11 +566,92 @@ class SpatialDragDrop {
         break;
     }
   }
+
+  // Restore saved view by rearranging tags in DOM
+  restoreView(tagsInPlay) {
+    console.log('Restoring view with tagsInPlay:', tagsInPlay);
+
+    // First, move all tags back to their original clouds
+    this.clearAllZones();
+
+    // Then move tags to their saved positions
+    if (tagsInPlay && tagsInPlay.zones) {
+      Object.entries(tagsInPlay.zones).forEach(([zoneId, zoneData]) => {
+        const zone = document.querySelector(`[data-zone-type="${zoneId}"]`);
+        if (!zone) {
+          console.warn(`Zone ${zoneId} not found`);
+          return;
+        }
+
+        const zoneWrapper = zone.querySelector('.tags-wrapper') || zone.querySelector('.drop-zone-content');
+        if (!zoneWrapper) {
+          console.warn(`No wrapper found in zone ${zoneId}`);
+          return;
+        }
+
+        // Move each tag to the zone
+        if (zoneData.tags && Array.isArray(zoneData.tags)) {
+          zoneData.tags.forEach(tagName => {
+            const tag = document.querySelector(`[data-tag="${tagName}"]`);
+            if (tag) {
+              zoneWrapper.appendChild(tag);
+              console.log(`Moved tag ${tagName} to zone ${zoneId}`);
+            } else {
+              console.warn(`Tag ${tagName} not found`);
+            }
+          });
+        }
+      });
+    }
+
+    // Update the tagsInPlay textarea
+    const tagsTextarea = document.getElementById('tagsInPlay');
+    if (tagsTextarea) {
+      tagsTextarea.value = JSON.stringify(tagsInPlay, null, 2);
+    }
+
+    // Trigger card refresh with the restored state
+    this.updateStateAndRender();
+  }
+
+  // Clear all zones (move tags back to clouds)
+  clearAllZones() {
+    const zones = document.querySelectorAll('.drop-zone');
+    zones.forEach(zone => {
+      const tags = zone.querySelectorAll('.tag');
+      tags.forEach(tag => {
+        // Find the appropriate cloud based on tag type
+        const tagType = tag.dataset.type || 'tag';
+        let cloud;
+
+        if (tagType === 'ai-tag') {
+          cloud = document.querySelector('.cloud-ai .tags-wrapper');
+        } else if (tagType === 'group-tag') {
+          cloud = document.querySelector('.cloud-group .tags-wrapper');
+        } else if (tagType === 'system-tag') {
+          cloud = document.querySelector('.cloud-system .tags-wrapper');
+        } else {
+          cloud = document.querySelector('.cloud-user .tags-wrapper');
+        }
+
+        if (cloud) {
+          cloud.appendChild(tag);
+        }
+      });
+    });
+  }
 }
 
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-  const dragDrop = new SpatialDragDrop();
-  dragDrop.initialize();
-  window.spatialDragDrop = dragDrop; // For debugging
-});
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    window.dragDropSystem = new SpatialDragDrop();
+    window.dragDropSystem.initialize();
+    console.log('MultiCardz™ drag-drop system initialized');
+  });
+} else {
+  // DOM already loaded
+  window.dragDropSystem = new SpatialDragDrop();
+  window.dragDropSystem.initialize();
+  console.log('MultiCardz™ drag-drop system initialized');
+}

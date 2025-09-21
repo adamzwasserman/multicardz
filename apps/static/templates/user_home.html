@@ -5,7 +5,7 @@
     <!-- Row 1: Tag Management (Middle Column Only) -->
     <div class="debug-group">
         <label for="tagsInPlay">tags in play</label>
-        <textarea class="tags-in-play" id="tagsInPlay" placeholder="waiting for zone activity..." readonly rows="8">{"union":[],"intersection":[],"row":[],"column":[]}</textarea>
+        <textarea class="tags-in-play" id="tagsInPlay" placeholder="waiting for zone activity..." aria-label="Tags in play" readonly rows="8">{"union":[],"intersection":[],"row":[],"column":[]}</textarea>
     </div>
     <div class="tag-management">
         <div class="clouds-container horizontal" id="cloudsContainer" data-zone-type="tag-cloud" data-accepts="tags,group-tags">
@@ -29,7 +29,7 @@
                     {% endfor %}
                 </div>
                 <div class="input-wrapper">
-                    <input type="text" class="tag-input" placeholder="Add user tag..."
+                    <input type="text" class="tag-input" placeholder="Add user tag..." aria-label="Add user tag"
 >
                 </div>
             </div>
@@ -67,7 +67,7 @@
                         </span>
                     </div>
                     <div class="input-wrapper">
-                        <input type="text" class="tag-input" placeholder="Add AI tag..."
+                        <input type="text" class="tag-input" placeholder="Add AI tag..." aria-label="Add AI tag"
 >
                     </div>
                 </div>
@@ -89,7 +89,7 @@
                         {% endfor %}
                     </div>
                     <div class="input-wrapper">
-                        <input type="text" class="tag-input" placeholder="Add group..."
+                        <input type="text" class="tag-input" placeholder="Add group..." aria-label="Add group"
 >
                     </div>
                 </div>
@@ -114,7 +114,7 @@
         <div class="controls">
 
             <div class="database-group">
-                <select id="databaseSelector" class="database-selector"
+                <select id="databaseSelector" class="database-selector" aria-label="Database selector"
                         hx-get="/api/database-options"
                         hx-trigger="load"
                         hx-swap="innerHTML"

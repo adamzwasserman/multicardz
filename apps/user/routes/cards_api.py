@@ -289,3 +289,36 @@ def render_simple_card_list(cards):
 async def health_check():
     """Health check for the cards API."""
     return {"status": "healthy", "service": "cards_api"}
+
+
+# View restoration endpoint
+@router.get("/views/{view_id}/restore")
+async def restore_view(view_id: str):
+    """
+    Restore a saved view by returning its tagsInPlay configuration.
+    The frontend JavaScript will rearrange tags based on this data.
+    """
+    # TODO: Load from database/storage based on view_id
+    # For now, return example saved view
+    example_saved_view = {
+        "tagsInPlay": {
+            "zones": {
+                "union": {
+                    "tags": ["javascript", "python"],
+                    "metadata": {"behavior": "union"}
+                },
+                "intersection": {
+                    "tags": ["react"],
+                    "metadata": {"behavior": "intersection"}
+                }
+            },
+            "controls": {
+                "startWithAllCards": True,
+                "showColors": True,
+                "startWithCardsExpanded": False
+            }
+        }
+    }
+
+    logger.info(f"Restoring view {view_id}")
+    return example_saved_view
