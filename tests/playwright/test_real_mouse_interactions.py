@@ -72,7 +72,7 @@ class DragDropTester:
             **kwargs
         })
 
-    async def navigate_to_app(self, url="http://localhost:8001"):
+    async def navigate_to_app(self, url="http://localhost:8011"):
         """Navigate to the MultiCardz app."""
         print(f"🌐 Navigating to {url}...")
 

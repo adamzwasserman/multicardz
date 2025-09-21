@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}multicardz admin{% endblock %}</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/admin/static/css/admin.css">
+    {% block extra_css %}{% endblock %}
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+</head>
+<body class="admin-interface">
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="logo">
+            multicardz admin
+        </div>
+        <div class="user-menu">
+            <span class="admin-badge">Administrator</span>
+            <div class="user-info">
+                <span id="currentUser">{{ current_user.email if current_user else 'Admin User' }}</span>
+            </div>
+            <button class="btn btn-outline" onclick="logout()">Logout</button>
+        </div>
+    </header>
+
+    <!-- Admin Sidebar -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <nav>
+            <div class="nav-section">
+                <h3>Dashboard</h3>
+                <a href="/admin/" class="nav-item {% if current_page == 'dashboard' %}active{% endif %}">
+                    <span class="icon">📊</span>
+                    Overview
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <h3>System Health</h3>
+                <a href="/admin/health/applications" class="nav-item {% if current_page == 'health-apps' %}active{% endif %}">
+                    <span class="icon">🏥</span>
+                    Applications
+                </a>
+                <a href="/admin/health/infrastructure" class="nav-item {% if current_page == 'health-infra' %}active{% endif %}">
+                    <span class="icon">🏗️</span>
+                    Infrastructure
+                </a>
+                <a href="/admin/health/performance" class="nav-item {% if current_page == 'health-perf' %}active{% endif %}">
+                    <span class="icon">⚡</span>
+                    Performance
+                </a>
+                <a href="/admin/health/alerts" class="nav-item {% if current_page == 'health-alerts' %}active{% endif %}">
+                    <span class="icon">🚨</span>
+                    Alerts
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <h3>User Management</h3>
+                <a href="/admin/users" class="nav-item {% if current_page == 'users' %}active{% endif %}">
+                    <span class="icon">👥</span>
+                    Users
+                </a>
+                <a href="/admin/workspaces" class="nav-item {% if current_page == 'workspaces' %}active{% endif %}">
+                    <span class="icon">🏢</span>
+                    Workspaces
+                </a>
+                <a href="/admin/support" class="nav-item {% if current_page == 'support' %}active{% endif %}">
+                    <span class="icon">🎧</span>
+                    Support
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <h3>DevOps Pipeline</h3>
+                <a href="/admin/deployments" class="nav-item {% if current_page == 'deployments' %}active{% endif %}">
+                    <span class="icon">🚀</span>
+                    Deployments
+                </a>
+                <a href="/admin/quality" class="nav-item {% if current_page == 'quality' %}active{% endif %}">
+                    <span class="icon">✅</span>
+                    Quality Gates
+                </a>
+                <a href="/admin/scaling" class="nav-item {% if current_page == 'scaling' %}active{% endif %}">
+                    <span class="icon">📈</span>
+                    Scaling
+                </a>
+                <a href="/admin/architecture" class="nav-item {% if current_page == 'architecture' %}active{% endif %}">
+                    <span class="icon">🏛️</span>
+                    Architecture
+                </a>
+            </div>
+
+            <div class="nav-section">
+                <h3>Configuration</h3>
+                <a href="/admin/settings" class="nav-item {% if current_page == 'settings' %}active{% endif %}">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a>
+                <a href="/admin/security" class="nav-item {% if current_page == 'security' %}active{% endif %}">
+                    <span class="icon">🔒</span>
+                    Security
+                </a>
+                <a href="/admin/audit" class="nav-item {% if current_page == 'audit' %}active{% endif %}">
+                    <span class="icon">📋</span>
+                    Audit Log
+                </a>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+        <div class="admin-container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="/admin/static/js/admin-spatial.js"></script>
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        // Initialize admin interface
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('multicardz admin interface initializing...');
+            initializeAdminSpatialSystem();
+        });
+
+        // Admin functions
+        function logout() {
+            // Implement logout functionality
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/admin/logout';
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Mobile menu toggle
+        if (window.innerWidth <= 768) {
+            const header = document.querySelector('.admin-header .logo');
+            header.addEventListener('click', toggleSidebar);
+        }
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

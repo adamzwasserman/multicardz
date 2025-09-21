@@ -1556,6 +1556,10 @@ body {
     display: block; /* Simple block layout - no flex tricks */
     padding: 0; /* No padding - let content breathe naturally */
     max-width: 100%;
+
+    /* Virtual scrolling container optimization */
+    will-change: transform;
+    transform: translateZ(0); /* Enable GPU acceleration */
 }
 
 /* TRUE MUJI AESTHETIC - Pure Minimalism */
@@ -1572,6 +1576,35 @@ body {
     line-height: 1.5; /* Standard line height */
     display: block; /* Simple block layout */
     position: relative; /* For visual indicator positioning */
+
+    /* Performance optimization: content-visibility for off-screen cards */
+    content-visibility: auto;
+    contain-intrinsic-size: 0 200px; /* Estimated card height */
+    contain: layout style paint;
+}
+
+/* Ensure first row cards render immediately for LCP optimization */
+.card:first-child,
+.card:nth-child(2),
+.card:nth-child(3),
+.card:nth-child(4) {
+    content-visibility: visible;
+}
+
+/* Progressive enhancement fallback for browsers without content-visibility */
+@supports not (content-visibility: auto) {
+    .card {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .card.visible,
+    .card:first-child,
+    .card:nth-child(2),
+    .card:nth-child(3),
+    .card:nth-child(4) {
+        opacity: 1; /* First row always visible */
+    }
 }
 
 .card:hover {

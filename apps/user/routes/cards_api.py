@@ -284,6 +284,34 @@ def render_simple_card_list(cards):
     return ''.join(html_parts)
 
 
+# GET endpoint for initial card loading
+@router.get("/render/cards", response_class=HTMLResponse)
+async def render_cards_get(request: Request):
+    """
+    GET endpoint for initial card rendering without filters.
+    Returns empty state or all cards based on default settings.
+    """
+    try:
+        # Create empty request for initial load
+        render_request = RenderRequest(
+            zones=[],
+            controls={"startWithAllCards": False}
+        )
+
+        # Render empty state
+        template = templates_env.get_template("partials/card_list.html")
+        html_content = template.render(
+            cards=[],
+            zones=[],
+            message="Ready for filtering. Drag tags to zones to see cards."
+        )
+
+        return HTMLResponse(content=html_content)
+
+    except Exception as e:
+        logger.error(f"Error in GET render_cards: {e}")
+        return HTMLResponse(content=f'<p class="error">Error loading cards: {e}</p>')
+
 # Health check endpoint
 @router.get("/health")
 async def health_check():

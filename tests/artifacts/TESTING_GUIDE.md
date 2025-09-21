@@ -28,7 +28,7 @@ uv run python -m apps.user.main
 ```
 
 ### 2. Open in Browser
-Navigate to: `http://localhost:8000`
+Navigate to: `http://localhost:8011`
 
 ### 3. Test These Features
 
@@ -45,7 +45,7 @@ Navigate to: `http://localhost:8000`
 - [ ] Cards update when tags are moved
 
 #### API Testing
-- [ ] Health check: `http://localhost:8000/api/v2/health`
+- [ ] Health check: `http://localhost:8011/api/v2/health`
 - [ ] POST requests to `/api/v2/render/cards` work
 
 ## 🔧 API Testing with curl
@@ -53,10 +53,10 @@ Navigate to: `http://localhost:8000`
 Test the core API:
 ```bash
 # Health check
-curl http://localhost:8000/api/v2/health
+curl http://localhost:8011/api/v2/health
 
 # Test card rendering
-curl -X POST http://localhost:8000/api/v2/render/cards \
+curl -X POST http://localhost:8011/api/v2/render/cards \
   -H "Content-Type: application/json" \
   -d '{
     "tagsInPlay": {

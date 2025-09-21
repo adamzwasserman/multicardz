@@ -337,6 +337,9 @@ def create_test_html():
     return test_file
 
 
+import pytest
+
+@pytest.mark.asyncio
 async def test_static_html():
     """Test the drag-drop system with static HTML."""
     print("🧪 Testing MultiCardz™ with static HTML...")
@@ -347,7 +350,7 @@ async def test_static_html():
 
     try:
         async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=False)  # Show browser
+            browser = await p.chromium.launch(headless=True)  # Headless for CI
             page = await browser.new_page()
 
             # Load the test file
@@ -429,8 +432,8 @@ async def test_static_html():
                 else:
                     print("❌ Control interaction failed")
 
-            print("🔍 Browser will stay open for 5 seconds for manual inspection...")
-            await asyncio.sleep(5)
+            print("🔍 Browser will stay open for 1 second for inspection...")
+            await asyncio.sleep(1)
 
             await browser.close()
 

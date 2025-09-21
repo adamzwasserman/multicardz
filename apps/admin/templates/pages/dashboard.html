@@ -1,0 +1,319 @@
+{% extends "base_admin.html" %}
+
+{% block title %}multicardz admin - Dashboard{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header" style="margin-bottom: 32px;">
+    <h1 style="margin: 0; font-size: 2rem; font-weight: 700; color: var(--color-text-primary);">
+        Administrative Dashboard
+    </h1>
+    <p style="margin: 8px 0 0; color: var(--color-text-secondary); font-size: 1.1rem;">
+        Spatial monitoring and management of the multicardz ecosystem
+    </p>
+</div>
+
+<!-- System Status Overview -->
+<div class="admin-dashboard-grid">
+    <!-- System Health Summary -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">System Health</h3>
+            <span class="status-indicator healthy">All Systems Operational</span>
+        </div>
+        <div class="admin-card-body">
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-status-healthy);">99.9%</div>
+                    <div class="metric-label">Uptime</div>
+                    <div class="metric-change positive">+0.1%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-action-primary);">8</div>
+                    <div class="metric-label">Services</div>
+                    <div class="metric-change positive">All Online</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-metric-low);">45ms</div>
+                    <div class="metric-label">Avg Response</div>
+                    <div class="metric-change positive">-12ms</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Activity -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">User Activity</h3>
+            <span class="status-indicator healthy">Active</span>
+        </div>
+        <div class="admin-card-body">
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-action-primary);">1,247</div>
+                    <div class="metric-label">Total Users</div>
+                    <div class="metric-change positive">+23 today</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-status-healthy);">89</div>
+                    <div class="metric-label">Active Now</div>
+                    <div class="metric-change positive">+12</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-metric-medium);">342</div>
+                    <div class="metric-label">Workspaces</div>
+                    <div class="metric-change positive">+7</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">Performance</h3>
+            <span class="status-indicator healthy">Optimal</span>
+        </div>
+        <div class="admin-card-body">
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-status-healthy);">2.3ms</div>
+                    <div class="metric-label">Set Ops</div>
+                    <div class="metric-change positive">Target: <5ms</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-action-primary);">98.2%</div>
+                    <div class="metric-label">Cache Hit</div>
+                    <div class="metric-change positive">+1.2%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-metric-low);">12.4MB</div>
+                    <div class="metric-label">Memory</div>
+                    <div class="metric-change positive">Target: <15MB</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Alerts -->
+<div class="admin-card" style="margin-bottom: 32px;">
+    <div class="admin-card-header">
+        <h3 class="admin-card-title">Recent Alerts</h3>
+        <button class="btn btn-outline" onclick="window.location.href='/admin/health/alerts'">View All</button>
+    </div>
+    <div class="admin-card-body">
+        <div class="admin-alert info">
+            <span style="font-size: 1.2rem;">ℹ️</span>
+            <div>
+                <strong>Deployment Completed</strong><br>
+                <span style="color: var(--color-text-secondary);">New version v2.1.4 deployed successfully across all environments</span>
+                <br><small style="color: var(--color-text-secondary);">2 hours ago</small>
+            </div>
+        </div>
+        <div class="admin-alert warning">
+            <span style="font-size: 1.2rem;">⚠️</span>
+            <div>
+                <strong>High Memory Usage Detected</strong><br>
+                <span style="color: var(--color-text-secondary);">Instance us-east-1c approaching 80% memory utilization</span>
+                <br><small style="color: var(--color-text-secondary);">4 hours ago</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Spatial Administrative Zones -->
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h3 class="admin-card-title">Spatial Administration</h3>
+        <div style="font-size: 0.875rem; color: var(--color-text-secondary);">
+            Drag entities to zones for spatial manipulation
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <!-- Administrative Tags Cloud -->
+        <div style="margin-bottom: 24px;">
+            <h4 style="margin: 0 0 16px; font-size: 1rem; color: var(--color-text-secondary);">Administrative Entities</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <span class="admin-tag" draggable="true" data-entity="user-1247">User #1247</span>
+                <span class="admin-tag" draggable="true" data-entity="workspace-342">Workspace #342</span>
+                <span class="admin-tag" draggable="true" data-entity="alert-high-memory">High Memory Alert</span>
+                <span class="admin-tag" draggable="true" data-entity="deployment-v2.1.4">Deployment v2.1.4</span>
+                <span class="admin-tag" draggable="true" data-entity="service-auth">Auth Service</span>
+                <span class="admin-tag" draggable="true" data-entity="metric-response-time">Response Time</span>
+            </div>
+        </div>
+
+        <!-- Administrative Zones Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+            <!-- Investigation Zone -->
+            <div class="admin-spatial-zone" data-accepts="user,workspace,alert,service" data-zone="investigate">
+                <div style="font-weight: 600; margin-bottom: 8px;">🔍 Investigation</div>
+                <div style="font-size: 0.875rem;">Drop entities here for detailed analysis</div>
+            </div>
+
+            <!-- Monitoring Zone -->
+            <div class="admin-spatial-zone" data-accepts="service,metric,alert" data-zone="monitor">
+                <div style="font-weight: 600; margin-bottom: 8px;">📊 Enhanced Monitoring</div>
+                <div style="font-size: 0.875rem;">Enable detailed monitoring for entities</div>
+            </div>
+
+            <!-- Escalation Zone -->
+            <div class="admin-spatial-zone" data-accepts="alert,user,workspace" data-zone="escalate">
+                <div style="font-weight: 600; margin-bottom: 8px;">🚨 Escalate</div>
+                <div style="font-size: 0.875rem;">Escalate issues for immediate attention</div>
+            </div>
+
+            <!-- Archive Zone -->
+            <div class="admin-spatial-zone" data-accepts="alert,deployment" data-zone="archive">
+                <div style="font-weight: 600; margin-bottom: 8px;">📦 Archive</div>
+                <div style="font-size: 0.875rem;">Archive completed items</div>
+            </div>
+        </div>
+
+        <!-- Results Display -->
+        <div id="spatialResults" style="margin-top: 24px; padding: 16px; background: var(--color-admin-accent); border-radius: 8px; display: none;">
+            <h4 style="margin: 0 0 8px; font-size: 1rem;">Spatial Operation Result</h4>
+            <div id="resultContent" style="font-family: monospace; font-size: 0.875rem; color: var(--color-text-secondary);">
+                <!-- Results will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 32px;">
+    <button class="btn btn-primary" onclick="window.location.href='/admin/health/applications'" style="padding: 16px; text-align: left;">
+        <div style="font-weight: 600; margin-bottom: 4px;">🏥 System Health</div>
+        <div style="font-size: 0.875rem; opacity: 0.8;">Monitor application status and performance</div>
+    </button>
+
+    <button class="btn btn-outline" onclick="window.location.href='/admin/users'" style="padding: 16px; text-align: left;">
+        <div style="font-weight: 600; margin-bottom: 4px;">👥 User Management</div>
+        <div style="font-size: 0.875rem; opacity: 0.8;">Manage users and workspaces</div>
+    </button>
+
+    <button class="btn btn-outline" onclick="window.location.href='/admin/deployments'" style="padding: 16px; text-align: left;">
+        <div style="font-weight: 600; margin-bottom: 4px;">🚀 DevOps Pipeline</div>
+        <div style="font-size: 0.875rem; opacity: 0.8;">Monitor deployments and quality gates</div>
+    </button>
+
+    <button class="btn btn-outline" onclick="window.location.href='/admin/settings'" style="padding: 16px; text-align: left;">
+        <div style="font-weight: 600; margin-bottom: 4px;">⚙️ Configuration</div>
+        <div style="font-size: 0.875rem; opacity: 0.8;">System settings and security</div>
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+}
+
+.btn-primary {
+    background: var(--color-admin-primary);
+    color: white;
+    border-color: var(--color-admin-primary);
+}
+
+.btn-primary:hover {
+    background: var(--color-admin-hover);
+    border-color: var(--color-admin-hover);
+}
+
+.btn-outline {
+    color: var(--color-admin-primary);
+    border-color: var(--color-admin-primary);
+}
+
+.btn-outline:hover {
+    background: var(--color-admin-primary);
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Spatial administration functionality
+function initializeAdminSpatialSystem() {
+    const tags = document.querySelectorAll('.admin-tag[draggable="true"]');
+    const zones = document.querySelectorAll('.admin-spatial-zone[data-accepts]');
+    const resultsDiv = document.getElementById('spatialResults');
+    const resultContent = document.getElementById('resultContent');
+
+    // Add drag event listeners to tags
+    tags.forEach(tag => {
+        tag.addEventListener('dragstart', handleDragStart);
+        tag.addEventListener('dragend', handleDragEnd);
+    });
+
+    // Add drop event listeners to zones
+    zones.forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+        zone.addEventListener('drop', handleDrop);
+        zone.addEventListener('dragleave', handleDragLeave);
+    });
+
+    function handleDragStart(e) {
+        e.dataTransfer.setData('text/plain', e.target.dataset.entity);
+        e.target.classList.add('dragging');
+    }
+
+    function handleDragEnd(e) {
+        e.target.classList.remove('dragging');
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        e.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+
+        const entityId = e.dataTransfer.getData('text/plain');
+        const zoneType = e.currentTarget.dataset.zone;
+
+        // Show spatial operation result
+        resultsDiv.style.display = 'block';
+        resultContent.innerHTML = `
+            <strong>Spatial Operation Executed:</strong><br>
+            Entity: ${entityId}<br>
+            Zone: ${zoneType}<br>
+            Operation: apply_admin_operation("${entityId}", "${zoneType}")<br>
+            Status: ✅ Applied successfully<br>
+            <em>This would trigger the actual admin backend operation in production</em>
+        `;
+
+        // Add visual feedback to zone
+        e.currentTarget.classList.add('has-content');
+        if (!e.currentTarget.querySelector('.zone-content')) {
+            const content = document.createElement('div');
+            content.className = 'zone-content';
+            content.style.marginTop = '8px';
+            content.innerHTML = `<small>Contains: ${entityId}</small>`;
+            e.currentTarget.appendChild(content);
+        }
+    }
+}
+</script>
+{% endblock %}

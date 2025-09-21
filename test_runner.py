@@ -266,7 +266,7 @@ def show_manual_tests():
     print("=" * 40)
     print("\n🔗 Integration Tests:")
     print("   1. Start server: uv run python tests/integration/test_server.py")
-    print("   2. Open browser: http://localhost:8001")
+    print("   2. Open browser: http://localhost:8011")
     print("   3. Test drag-drop manually")
 
     print("\n🎭 Playwright Browser Tests:")

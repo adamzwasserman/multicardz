@@ -45,7 +45,12 @@
       "Bash(cat:*)",
       "Bash(timeout 5s uv run python -m apps.user.main)",
       "Bash(git config:*)",
-      "Bash(timeout 30 uv run pytest tests/ --collect-only)"
+      "Bash(timeout 30 uv run pytest tests/ --collect-only)",
+      "Bash(pytest:*)",
+      "Bash(timeout 120 uv run pytest tests/playwright/test_static_html.py::test_static_html -v --tb=short)",
+      "Bash(timeout 30 uv run pytest tests/playwright/test_static_html.py -v)",
+      "Bash(curl:*)",
+      "Read(//tmp/**)"
     ],
     "deny": [],
     "ask": []

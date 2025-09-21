@@ -1,0 +1,338 @@
+{% extends "base_admin.html" %}
+
+{% block title %}multicardz admin - User Management{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header" style="margin-bottom: 32px;">
+    <h1 style="margin: 0; font-size: 2rem; font-weight: 700; color: var(--color-text-primary);">
+        User Management
+    </h1>
+    <p style="margin: 8px 0 0; color: var(--color-text-secondary); font-size: 1.1rem;">
+        Spatial administration of users, workspaces, and permissions
+    </p>
+</div>
+
+<!-- User Overview Metrics -->
+<div class="admin-dashboard-grid">
+    <!-- Total Users -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">👥 Total Users</h3>
+            <span class="status-indicator healthy">Active</span>
+        </div>
+        <div class="admin-card-body">
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-action-primary);">1,247</div>
+                    <div class="metric-label">Registered</div>
+                    <div class="metric-change positive">+23 today</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-status-healthy);">89</div>
+                    <div class="metric-label">Active Now</div>
+                    <div class="metric-change positive">+12</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-metric-medium);">94.2%</div>
+                    <div class="metric-label">Retention</div>
+                    <div class="metric-change positive">+2.1%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Workspaces -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">🏢 Workspaces</h3>
+            <span class="status-indicator healthy">Growing</span>
+        </div>
+        <div class="admin-card-body">
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-action-primary);">342</div>
+                    <div class="metric-label">Total</div>
+                    <div class="metric-change positive">+7 today</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-status-healthy);">156</div>
+                    <div class="metric-label">Active</div>
+                    <div class="metric-change positive">+4</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-metric-medium);">2.8</div>
+                    <div class="metric-label">Avg Users</div>
+                    <div class="metric-change positive">+0.3</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Activity -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <h3 class="admin-card-title">⚡ Activity</h3>
+            <span class="status-indicator healthy">High</span>
+        </div>
+        <div class="admin-card-body">
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-status-healthy);">4,829</div>
+                    <div class="metric-label">Operations</div>
+                    <div class="metric-change positive">Today</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-metric-low);">1.2s</div>
+                    <div class="metric-label">Avg Session</div>
+                    <div class="metric-change positive">Target</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value" style="color: var(--color-action-primary);">98.7%</div>
+                    <div class="metric-label">Success Rate</div>
+                    <div class="metric-change positive">+0.3%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Search and Filters -->
+<div class="admin-card" style="margin-bottom: 24px;">
+    <div class="admin-card-header">
+        <h3 class="admin-card-title">Search & Filter Users</h3>
+        <button class="btn btn-primary" onclick="showCreateUserModal()">+ Add User</button>
+    </div>
+    <div class="admin-card-body">
+        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 16px; align-items: center;">
+            <input
+                type="text"
+                placeholder="Search users by name, email, or ID..."
+                style="padding: 8px 12px; border: 1px solid var(--color-admin-border); border-radius: 4px; background: white;"
+                id="userSearch"
+                onkeyup="filterUsers()"
+            >
+            <select
+                id="statusFilter"
+                style="padding: 8px 12px; border: 1px solid var(--color-admin-border); border-radius: 4px; background: white;"
+                onchange="filterUsers()"
+            >
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="suspended">Suspended</option>
+            </select>
+            <select
+                id="roleFilter"
+                style="padding: 8px 12px; border: 1px solid var(--color-admin-border); border-radius: 4px; background: white;"
+                onchange="filterUsers()"
+            >
+                <option value="">All Roles</option>
+                <option value="user">User</option>
+                <option value="workspace_admin">Workspace Admin</option>
+                <option value="enterprise">Enterprise</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- User List Table -->
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h3 class="admin-card-title">User Directory</h3>
+        <div style="font-size: 0.875rem; color: var(--color-text-secondary);">
+            Drag users to spatial zones for administration
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--color-admin-border);">
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: var(--color-text-secondary);">User</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: var(--color-text-secondary);">Status</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: var(--color-text-secondary);">Workspaces</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: var(--color-text-secondary);">Last Active</th>
+                        <th style="text-align: left; padding: 12px 8px; font-weight: 600; color: var(--color-text-secondary);">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Sample Users -->
+                    <tr class="user-row" data-status="active" data-role="user" style="border-bottom: 1px solid var(--color-admin-border);">
+                        <td style="padding: 12px 8px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 32px; height: 32px; background: var(--color-admin-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.875rem; font-weight: 600;">JS</div>
+                                <div>
+                                    <div style="font-weight: 500; color: var(--color-text-primary);">John Smith</div>
+                                    <div style="font-size: 0.875rem; color: var(--color-text-secondary);">john.smith@company.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 12px 8px;">
+                            <span class="status-indicator healthy">Active</span>
+                        </td>
+                        <td style="padding: 12px 8px;">
+                            <span style="background: var(--color-admin-light); color: var(--color-admin-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.75rem;">Marketing Team</span>
+                        </td>
+                        <td style="padding: 12px 8px; color: var(--color-text-secondary);">2 hours ago</td>
+                        <td style="padding: 12px 8px;">
+                            <span class="admin-tag" draggable="true" data-entity="user-1001" data-name="John Smith" style="font-size: 0.75rem;">user-1001</span>
+                        </td>
+                    </tr>
+
+                    <tr class="user-row" data-status="active" data-role="workspace_admin" style="border-bottom: 1px solid var(--color-admin-border);">
+                        <td style="padding: 12px 8px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 32px; height: 32px; background: var(--color-status-healthy); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.875rem; font-weight: 600;">SW</div>
+                                <div>
+                                    <div style="font-weight: 500; color: var(--color-text-primary);">Sarah Wilson</div>
+                                    <div style="font-size: 0.875rem; color: var(--color-text-secondary);">sarah.wilson@company.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 12px 8px;">
+                            <span class="status-indicator healthy">Active</span>
+                        </td>
+                        <td style="padding: 12px 8px;">
+                            <span style="background: var(--color-admin-light); color: var(--color-admin-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; margin-right: 4px;">Dev Team</span>
+                            <span style="background: var(--color-admin-light); color: var(--color-admin-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.75rem;">QA Team</span>
+                        </td>
+                        <td style="padding: 12px 8px; color: var(--color-text-secondary);">15 minutes ago</td>
+                        <td style="padding: 12px 8px;">
+                            <span class="admin-tag" draggable="true" data-entity="user-1002" data-name="Sarah Wilson" style="font-size: 0.75rem;">user-1002</span>
+                        </td>
+                    </tr>
+
+                    <tr class="user-row" data-status="inactive" data-role="user" style="border-bottom: 1px solid var(--color-admin-border);">
+                        <td style="padding: 12px 8px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 32px; height: 32px; background: var(--color-text-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.875rem; font-weight: 600;">MB</div>
+                                <div>
+                                    <div style="font-weight: 500; color: var(--color-text-primary);">Mike Brown</div>
+                                    <div style="font-size: 0.875rem; color: var(--color-text-secondary);">mike.brown@company.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 12px 8px;">
+                            <span class="status-indicator warning">Inactive</span>
+                        </td>
+                        <td style="padding: 12px 8px;">
+                            <span style="background: var(--color-admin-light); color: var(--color-admin-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.75rem;">Sales Team</span>
+                        </td>
+                        <td style="padding: 12px 8px; color: var(--color-text-secondary);">3 days ago</td>
+                        <td style="padding: 12px 8px;">
+                            <span class="admin-tag" draggable="true" data-entity="user-1003" data-name="Mike Brown" style="font-size: 0.75rem;">user-1003</span>
+                        </td>
+                    </tr>
+
+                    <tr class="user-row" data-status="active" data-role="enterprise" style="border-bottom: 1px solid var(--color-admin-border);">
+                        <td style="padding: 12px 8px;">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 32px; height: 32px; background: var(--color-brand-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.875rem; font-weight: 600;">EJ</div>
+                                <div>
+                                    <div style="font-weight: 500; color: var(--color-text-primary);">Emma Johnson</div>
+                                    <div style="font-size: 0.875rem; color: var(--color-text-secondary);">emma.johnson@enterprise.com</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 12px 8px;">
+                            <span class="status-indicator healthy">Active</span>
+                        </td>
+                        <td style="padding: 12px 8px;">
+                            <span style="background: var(--color-brand-primary); color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; margin-right: 4px;">Enterprise Suite</span>
+                            <span style="background: var(--color-admin-light); color: var(--color-admin-primary); padding: 2px 6px; border-radius: 3px; font-size: 0.75rem;">+5 more</span>
+                        </td>
+                        <td style="padding: 12px 8px; color: var(--color-text-secondary);">1 hour ago</td>
+                        <td style="padding: 12px 8px;">
+                            <span class="admin-tag" draggable="true" data-entity="user-1004" data-name="Emma Johnson" style="font-size: 0.75rem;">user-1004</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Spatial User Administration Zones -->
+<div class="admin-card" style="margin-top: 32px;">
+    <div class="admin-card-header">
+        <h3 class="admin-card-title">Spatial User Administration</h3>
+        <div style="font-size: 0.875rem; color: var(--color-text-secondary);">
+            Drag user tags to zones for administrative actions
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <!-- Administrative Zones Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+            <!-- User Support Zone -->
+            <div class="admin-spatial-zone" data-accepts="user" data-zone="support">
+                <div style="font-weight: 600; margin-bottom: 8px;">🎧 User Support</div>
+                <div style="font-size: 0.875rem;">Provide assistance and escalate support tickets</div>
+            </div>
+
+            <!-- Permission Management -->
+            <div class="admin-spatial-zone" data-accepts="user,workspace" data-zone="permissions">
+                <div style="font-weight: 600; margin-bottom: 8px;">🔐 Permission Management</div>
+                <div style="font-size: 0.875rem;">Modify user roles and workspace access</div>
+            </div>
+
+            <!-- Account Actions -->
+            <div class="admin-spatial-zone" data-accepts="user" data-zone="account">
+                <div style="font-weight: 600; margin-bottom: 8px;">👤 Account Actions</div>
+                <div style="font-size: 0.875rem;">Suspend, activate, or reset user accounts</div>
+            </div>
+
+            <!-- Workspace Management -->
+            <div class="admin-spatial-zone" data-accepts="user,workspace" data-zone="workspace">
+                <div style="font-weight: 600; margin-bottom: 8px;">🏢 Workspace Management</div>
+                <div style="font-size: 0.875rem;">Add/remove users from workspaces</div>
+            </div>
+
+            <!-- Usage Analytics -->
+            <div class="admin-spatial-zone" data-accepts="user,workspace" data-zone="analytics">
+                <div style="font-weight: 600; margin-bottom: 8px;">📊 Usage Analytics</div>
+                <div style="font-size: 0.875rem;">Generate detailed usage reports</div>
+            </div>
+
+            <!-- Compliance Review -->
+            <div class="admin-spatial-zone" data-accepts="user,workspace" data-zone="compliance">
+                <div style="font-weight: 600; margin-bottom: 8px;">⚖️ Compliance Review</div>
+                <div style="font-size: 0.875rem;">Review for security and compliance issues</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// User filtering functionality
+function filterUsers() {
+    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value;
+    const roleFilter = document.getElementById('roleFilter').value;
+    const rows = document.querySelectorAll('.user-row');
+
+    rows.forEach(row => {
+        const userText = row.textContent.toLowerCase();
+        const userStatus = row.dataset.status;
+        const userRole = row.dataset.role;
+
+        const matchesSearch = searchTerm === '' || userText.includes(searchTerm);
+        const matchesStatus = statusFilter === '' || userStatus === statusFilter;
+        const matchesRole = roleFilter === '' || userRole === roleFilter;
+
+        if (matchesSearch && matchesStatus && matchesRole) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// Create user modal (placeholder)
+function showCreateUserModal() {
+    alert('Create User Modal would open here\n\nIn the full implementation, this would show:\n- User registration form\n- Role assignment\n- Workspace selection\n- Permission settings');
+}
+</script>
+{% endblock %}

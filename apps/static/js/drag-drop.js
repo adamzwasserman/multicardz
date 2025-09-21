@@ -1,6 +1,7 @@
 /**
  * MultiCardz™ Spatial Drag-Drop System
  * Handles dynamic zone discovery, multi-tag operations, and immutable DOM manipulation
+ * Universal module for maximum compatibility
  */
 
 class SpatialDragDrop {
@@ -568,9 +569,11 @@ class SpatialDragDrop {
   }
 }
 
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', () => {
-  const dragDrop = new SpatialDragDrop();
-  dragDrop.initialize();
-  window.spatialDragDrop = dragDrop; // For debugging
-});
+// Ensure global availability for fallback
+if (typeof window !== 'undefined') {
+    window.SpatialDragDrop = SpatialDragDrop;
+}
+
+// ES Module exports for dynamic import
+export { SpatialDragDrop };
+export default SpatialDragDrop;
