@@ -23,7 +23,7 @@ When organizing a codebase, you will:
 - Separate build artifacts, temporary files, and generated content appropriately
 
 **3. GITIGNORE OPTIMIZATION**
-- Add build chains (like WASM builds) to .gitignore to prevent version control bloat
+- Add build chains (like compiled builds) to .gitignore to prevent version control bloat
 - Use .git/info/exclude for local-only ignores when appropriate
 - Ensure important build configurations and scripts remain tracked
 - Create .gitkeep files in empty directories that should persist across branches

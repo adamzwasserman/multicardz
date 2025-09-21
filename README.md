@@ -1,6 +1,6 @@
 # MultiCardz
 
-A JavaScript-based spatial tag manipulation system replacing C/WASM with pure JavaScript while maintaining patent compliance and set theory operations.
+A JavaScript-based spatial tag manipulation system maintaining patent compliance and set theory operations.
 
 ## Architecture
 

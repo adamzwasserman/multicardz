@@ -332,7 +332,7 @@ def create_renderer(renderer_type: str, **config) -> Renderer[Any]:
 #### 4.3 JavaScript Restrictions
 - Document any required JavaScript (should be minimal)
 - Justify why HTMX cannot achieve the requirement
-- Limit to approved patterns (WASM loading, DOM properties)
+- Limit to approved patterns (spatial manipulation, DOM properties)
 
 ### 5. Performance Considerations
 

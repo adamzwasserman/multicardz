@@ -1,4 +1,4 @@
-{% extends "base_wasm.html" %}
+{% extends "base.html" %}
 
 {% block content %}
 <div class="spatial-grid">
@@ -132,15 +132,15 @@
             </div>
 
             <div class="checkbox-group">
-                <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('start_with_all_cards', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_start_with_all_cards', null, ['number'], [this.checked ? 1 : 0])">
+                <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
                 <label for="startWithAllCards">start with all cards visible</label>
             </div>
             <div class="checkbox-group">
-                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('start_with_cards_expanded', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_start_with_cards_expanded', null, ['number'], [this.checked ? 1 : 0])">
+                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
                 <label for="startWithCardsExpanded">start with cards expanded</label>
             </div>
             <div class="checkbox-group">
-                <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('show_colors', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_show_colors', null, ['number'], [this.checked ? 1 : 0])">
+                <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
                 <label for="showColors">show colors on tags/card</label>
             </div>
 
@@ -206,22 +206,22 @@
                 <div class="theme-radio-group">
                     <div class="theme-radio-item">
                         <input type="radio" id="theme-system" name="theme" value="system" checked
-                               onclick="document.documentElement.style.colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); if(typeof callWasm !== 'undefined') { callWasm('toggle_dark_mode', null, ['number'], [0]); callWasm('toggle_earth_tones', null, ['number'], [0]); } saveThemeChoice('system');">
+                               onclick="document.documentElement.style.colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); saveThemeChoice('system');">
                         <label for="theme-system">system</label>
                     </div>
                     <div class="theme-radio-item">
                         <input type="radio" id="theme-light" name="theme" value="light"
-                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); if(typeof callWasm !== 'undefined') { callWasm('toggle_dark_mode', null, ['number'], [0]); callWasm('toggle_earth_tones', null, ['number'], [0]); } saveThemeChoice('light');">
+                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); saveThemeChoice('light');">
                         <label for="theme-light">light</label>
                     </div>
                     <div class="theme-radio-item">
                         <input type="radio" id="theme-dark" name="theme" value="dark"
-                               onclick="document.documentElement.style.colorScheme = 'dark'; document.body.classList.add('dark-mode'); document.body.classList.remove('earth-tones'); if(typeof callWasm !== 'undefined') { callWasm('toggle_dark_mode', null, ['number'], [1]); callWasm('toggle_earth_tones', null, ['number'], [0]); } saveThemeChoice('dark');">
+                               onclick="document.documentElement.style.colorScheme = 'dark'; document.body.classList.add('dark-mode'); document.body.classList.remove('earth-tones'); saveThemeChoice('dark');">
                         <label for="theme-dark">dark</label>
                     </div>
                     <div class="theme-radio-item">
                         <input type="radio" id="theme-earth" name="theme" value="earth"
-                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.add('earth-tones'); document.body.classList.remove('dark-mode'); if(typeof callWasm !== 'undefined') { callWasm('toggle_earth_tones', null, ['number'], [1]); callWasm('toggle_dark_mode', null, ['number'], [0]); } saveThemeChoice('earth');">
+                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.add('earth-tones'); document.body.classList.remove('dark-mode'); saveThemeChoice('earth');">
                         <label for="theme-earth">earth tones</label>
                     </div>
                 </div>
@@ -232,25 +232,24 @@
                     <label class="theme-label">font picker</label>
                     <div class="font-dropdown-current font-inconsolata" tabindex="0">Inconsolata 200</div>
                     <div class="font-dropdown-options">
-                        <!-- <div class="font-dropdown-option font-berkeley-mono" onclick="callWasm('set_font', null, ['string'], ['berkeley-mono']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Berkeley Mono'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-berkeley-mono';">Berkeley Mono</div> -->
-                        <div class="font-dropdown-option font-inconsolata" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['inconsolata']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Inconsolata 200'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-inconsolata'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-inconsolata'; saveFontChoice('font-inconsolata'); this.parentNode.parentNode.classList.remove('active');">Inconsolata 200</div>
-                        <div class="font-dropdown-option font-optima" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['optima']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Lato'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-optima'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-optima'; saveFontChoice('font-optima'); this.parentNode.parentNode.classList.remove('active');">Lato</div>
-                        <div class="font-dropdown-option font-helvetica" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['helvetica']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Libre Franklin'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-helvetica'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-helvetica'; saveFontChoice('font-helvetica'); this.parentNode.parentNode.classList.remove('active');">Libre Franklin</div>
-                        <div class="font-dropdown-option font-merriweather" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['merriweather']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Merriweather Sans Light'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-merriweather'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-merriweather'; saveFontChoice('font-merriweather'); this.parentNode.parentNode.classList.remove('active');">Merriweather Sans Light</div>
-                        <div class="font-dropdown-option font-avenir" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['avenir']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Mulish'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-avenir'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-avenir'; saveFontChoice('font-avenir'); this.parentNode.parentNode.classList.remove('active');">Mulish</div>
-                        <div class="font-dropdown-option font-sanfrancisco" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['sanfrancisco']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Roboto'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-sanfrancisco'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-sanfrancisco'; saveFontChoice('font-sanfrancisco'); this.parentNode.parentNode.classList.remove('active');">Roboto</div>
-                        <div class="font-dropdown-option font-akzidenz" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['akzidenz']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Work Sans'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-akzidenz'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-akzidenz'; saveFontChoice('font-akzidenz'); this.parentNode.parentNode.classList.remove('active');">Work Sans</div>
+                        <div class="font-dropdown-option font-inconsolata" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Inconsolata 200'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-inconsolata'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-inconsolata'; saveFontChoice('font-inconsolata'); this.parentNode.parentNode.classList.remove('active');">Inconsolata 200</div>
+                        <div class="font-dropdown-option font-optima" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Lato'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-optima'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-optima'; saveFontChoice('font-optima'); this.parentNode.parentNode.classList.remove('active');">Lato</div>
+                        <div class="font-dropdown-option font-helvetica" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Libre Franklin'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-helvetica'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-helvetica'; saveFontChoice('font-helvetica'); this.parentNode.parentNode.classList.remove('active');">Libre Franklin</div>
+                        <div class="font-dropdown-option font-merriweather" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Merriweather Sans Light'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-merriweather'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-merriweather'; saveFontChoice('font-merriweather'); this.parentNode.parentNode.classList.remove('active');">Merriweather Sans Light</div>
+                        <div class="font-dropdown-option font-avenir" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Mulish'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-avenir'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-avenir'; saveFontChoice('font-avenir'); this.parentNode.parentNode.classList.remove('active');">Mulish</div>
+                        <div class="font-dropdown-option font-sanfrancisco" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Roboto'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-sanfrancisco'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-sanfrancisco'; saveFontChoice('font-sanfrancisco'); this.parentNode.parentNode.classList.remove('active');">Roboto</div>
+                        <div class="font-dropdown-option font-akzidenz" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Work Sans'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-akzidenz'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-akzidenz'; saveFontChoice('font-akzidenz'); this.parentNode.parentNode.classList.remove('active');">Work Sans</div>
                     </div>
                 </div>
             </div>
 
             <div class="checkbox-group">
-                <input type="checkbox" id="advancedView" onchange="updateCheckboxStateWithWasm('advanced_view', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_advanced_view', null, ['number'], [this.checked ? 1 : 0])">
+                <input type="checkbox" id="advancedView" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
                 <label for="advancedView">separate user tags / ai tags</label>
             </div>
 
             <div class="checkbox-group">
-                <input type="checkbox" id="verticalLayout" onchange="updateCheckboxStateWithWasm('vertical_layout', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_vertical_layout', null, ['number'], [this.checked ? 1 : 0])">
+                <input type="checkbox" id="verticalLayout" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
                 <label for="verticalLayout">stack tags vertically</label>
             </div>
         </div>
@@ -284,7 +283,7 @@
     <div class="card-display">
         <p>drag a <em>tag</em> to a <em>zone</em> to see the cards that have that tag</p>
         <div class="card-container" id="cardContainer">
-            <!-- Cards will be populated by WASM based on checkbox state and active filters -->
+            <!-- Cards will be populated by JavaScript based on checkbox state and active filters -->
             <p id="emptyStateMessage">No cards to display</p>
         </div>
     </div>

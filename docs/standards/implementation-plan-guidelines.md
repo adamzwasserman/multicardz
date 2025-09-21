@@ -127,7 +127,7 @@ def implement_feature(
 **Architecture Requirements**:
 - Function-based design (NO classes except Pydantic/SQLAlchemy)
 - Pure set theory operations for filtering
-- No JavaScript except approved WASM bridge
+- No JavaScript except approved spatial manipulation code
 - HTMX for all interactivity
 - Follow patent specifications
 

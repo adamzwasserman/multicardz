@@ -4,7 +4,7 @@
 This application is a Continuation-in-Part of U.S. Provisional Application No. [PARENT APPLICATION NUMBER], filed August 11, 2025, titled "System for Multi-Dimensional Data Organization and Query Construction Through Spatial Manipulation of Semantic Tag Sets," the entire disclosure of which is hereby incorporated by reference.
 
 ## TITLE OF INVENTION
-Advanced System for Multi-Dimensional Data Organization Through Spatial Manipulation with Generalized Polymorphic WASM Handler Architecture and DOM-as-Single-Source-of-Truth
+Advanced System for Multi-Dimensional Data Organization Through Spatial Manipulation with Generalized Polymorphic JavaScript Handler Architecture and DOM-as-Single-Source-of-Truth
 
 ## INVENTORS
 Adam Zachary Wasserman
@@ -22,7 +22,7 @@ Not applicable.
 ## BACKGROUND OF THE INVENTION
 
 ### Field of the Invention
-This invention relates to advanced data organization and visualization systems, and more particularly to systems and methods for organizing multi-dimensional data through spatial manipulation of semantic tag sets using polymorphic WASM-based handler architectures where the DOM serves as the single source of truth.
+This invention relates to advanced data organization and visualization systems, and more particularly to systems and methods for organizing multi-dimensional data through spatial manipulation of semantic tag sets using polymorphic JavaScript-based handler architectures where the DOM serves as the single source of truth.
 
 ### Description of Related Art
 The parent application described fundamental innovations in spatial data manipulation through semantic tag sets. Since that filing, additional technical breakthroughs have been achieved that represent substantial improvements and novel approaches beyond the original invention.
@@ -41,13 +41,13 @@ Current web application architectures suffer from several fundamental limitation
 
 This Continuation-in-Part application describes revolutionary advances beyond the original spatial manipulation paradigm, introducing four foundational innovations that represent fundamental breakthroughs in web application architecture:
 
-### 1. Generalized Polymorphic WASM Handler Architecture
-The invention introduces a table-driven dispatch system where all UI operations—from simple clicks to complex spatial manipulations—are routed through a unified WebAssembly-based handler architecture. Unlike traditional event handling systems that require custom JavaScript for each interaction type, this system provides a single, generalizable pattern that can handle any UI operation through lookup tables and polymorphic dispatch.
+### 1. Generalized Polymorphic JavaScript Handler Architecture
+The invention introduces a table-driven dispatch system where all UI operations—from simple clicks to complex spatial manipulations—are routed through a unified JavaScript-based handler architecture. Unlike traditional event handling systems that require custom JavaScript for each interaction type, this system provides a single, generalizable pattern that can handle any UI operation through lookup tables and polymorphic dispatch.
 
 Key innovations include:
 - Universal operation registration through declarative tables
 - Context-aware handler selection based on UI state
-- Performance optimization through WASM execution
+- Performance optimization through JavaScript execution
 - Extensible architecture supporting custom operation types
 - Zero-configuration handler discovery and binding
 
@@ -82,15 +82,15 @@ Mathematical innovations:
 - Provably consistent results regardless of operation ordering
 
 ### Integration with Original Invention
-These new innovations seamlessly integrate with and extend the spatial manipulation paradigm described in the parent application. The original spatial zones (center, left, top, corner) now benefit from the generalized WASM handler architecture. The polymorphic tag behaviors originally achieved through spatial positioning are now enhanced by the unified tag mode system. The set operations underlying spatial manipulation are now mathematically optimized through hierarchical evaluation.
+These new innovations seamlessly integrate with and extend the spatial manipulation paradigm described in the parent application. The original spatial zones (center, left, top, corner) now benefit from the generalized JavaScript handler architecture. The polymorphic tag behaviors originally achieved through spatial positioning are now enhanced by the unified tag mode system. The set operations underlying spatial manipulation are now mathematically optimized through hierarchical evaluation.
 
 The combined system represents a complete reimagining of web application architecture, providing unprecedented power, consistency, and usability while maintaining the intuitive spatial manipulation interface that eliminates the need for traditional configuration dialogs and programming.
 
 ## DETAILED DESCRIPTION OF THE INVENTION
 
-### 1. Generalized Polymorphic WASM Handler Architecture
+### 1. Generalized Polymorphic JavaScript Handler Architecture
 
-The system implements a revolutionary handler architecture where all user interface operations are managed through a unified WebAssembly-based dispatch system. This represents a fundamental departure from traditional event-driven JavaScript architectures.
+The system implements a revolutionary handler architecture where all user interface operations are managed through a unified JavaScript-based dispatch system. This represents a fundamental departure from traditional event-driven JavaScript architectures.
 
 #### Core Architecture Components
 
@@ -103,19 +103,19 @@ Operation Registry Structure:
     "drag_tag_to_zone": {
       handler: "spatial_manipulation_handler",
       context_requirements: ["tag", "zone", "workspace"],
-      wasm_module: "core_operations",
+      js_module: "core_operations",
       priority: 100
     },
     "click_card": {
       handler: "card_interaction_handler",
       context_requirements: ["card", "workspace"],
-      wasm_module: "card_operations",
+      js_module: "card_operations",
       priority: 50
     },
     "multi_touch_gesture": {
       handler: "gesture_recognition_handler",
       context_requirements: ["gesture_data", "target_elements"],
-      wasm_module: "gesture_processing",
+      js_module: "gesture_processing",
       priority: 75
     }
   }
@@ -124,7 +124,7 @@ Operation Registry Structure:
 
 **Context-Aware Dispatch**: When a user interaction occurs, the system analyzes the interaction context (target element, modifier keys, touch points, etc.) and automatically selects the appropriate handler from the registry. This eliminates the need for manually binding event handlers to specific elements.
 
-**WASM Performance Optimization**: All handlers execute within WebAssembly modules, providing near-native performance for complex operations. Set calculations, spatial transformations, and data processing all benefit from WASM's computational efficiency.
+**JavaScript Performance Optimization**: All handlers execute within JavaScript modules, providing near-native performance for complex operations. Set calculations, spatial transformations, and data processing all benefit from JavaScript's computational efficiency.
 
 **Polymorphic Handler Behavior**: The same user gesture (e.g., dragging) triggers different handlers based on context. Dragging a tag to a zone invokes spatial manipulation, while dragging a tag to a card invokes tagging operations, while dragging a card to another card might invoke relationship establishment—all through the same unified dispatch system.
 
@@ -273,19 +273,19 @@ The system automatically:
 
 These four core innovations work together to create a cohesive system that is greater than the sum of its parts:
 
-**WASM Handler + DOM State**: The generalized handler architecture operates on DOM state, ensuring all operations maintain consistency with the single source of truth.
+**JavaScript Handler + DOM State**: The generalized handler architecture operates on DOM state, ensuring all operations maintain consistency with the single source of truth.
 
 **DOM State + Unified Tag Mode**: The DOM's authority enables mode-free operation because all possible states and operations are represented in the observable DOM structure.
 
 **Unified Tag Mode + Hierarchical Set Operations**: Mode-free operation enables intuitive creation of complex set hierarchies through natural interaction patterns.
 
-**Hierarchical Set Operations + WASM Handler**: Mathematical set operations benefit from WASM performance optimization, enabling real-time operation on large datasets.
+**Hierarchical Set Operations + JavaScript Handler**: Mathematical set operations benefit from JavaScript performance optimization, enabling real-time operation on large datasets.
 
 ### Performance Characteristics
 
 The integrated system achieves remarkable performance characteristics:
 
-**Sub-millisecond Operation Response**: WASM handlers and optimized set operations provide immediate feedback for user interactions.
+**Sub-millisecond Operation Response**: JavaScript handlers and optimized set operations provide immediate feedback for user interactions.
 
 **Linear Scalability**: DOM-based state and hierarchical set operations scale linearly with data size rather than exponentially.
 
@@ -300,7 +300,7 @@ What is claimed is:
 ### Primary System Claims
 
 **204.** A generalized polymorphic handler system for web applications, comprising:
-   - a WebAssembly-based operation registry maintaining a comprehensive mapping between user interaction patterns and handler functions;
+   - a JavaScript-based operation registry maintaining a comprehensive mapping between user interaction patterns and handler functions;
    - a context-aware dispatch engine that automatically selects appropriate handlers based on interaction context without manual event listener registration;
    - a polymorphic execution environment where identical user gestures invoke different operations based on contextual analysis;
    - wherein all user interface operations are managed through the unified handler architecture.
@@ -350,24 +350,24 @@ What is claimed is:
 ### Integration Claims
 
 **212.** A system combining the innovations of claims 204, 206, 208, and 210, wherein:
-   - the generalized WASM handler architecture operates on DOM state to ensure consistency with single source of truth;
+   - the generalized JavaScript handler architecture operates on DOM state to ensure consistency with single source of truth;
    - DOM authority enables mode-free operation through observable state representation;
    - unified tag mode enables intuitive creation of hierarchical set operations through natural interaction;
-   - hierarchical set operations benefit from WASM performance optimization for real-time large dataset operation.
+   - hierarchical set operations benefit from JavaScript performance optimization for real-time large dataset operation.
 
 **213.** The integrated system of claim 212, achieving performance characteristics comprising:
-   - sub-millisecond operation response through WASM handlers and optimized set operations;
+   - sub-millisecond operation response through JavaScript handlers and optimized set operations;
    - linear scalability with data size rather than exponential growth;
    - zero configuration overhead through unified architecture eliminating setup interfaces;
    - predictable resource usage through DOM-based state and stateless backend architecture.
 
 ### Advanced Technical Claims
 
-**214.** The system of claim 204, wherein the WASM handler architecture comprises:
+**214.** The system of claim 204, wherein the JavaScript handler architecture comprises:
    - universal operation registration through declarative tables mapping interaction patterns to handler modules;
    - context injection providing comprehensive state information to selected handlers;
    - result processing automatically updating DOM state and propagating changes throughout the application;
-   - performance optimization through near-native WASM execution for complex operations.
+   - performance optimization through near-native JavaScript execution for complex operations.
 
 **215.** The system of claim 206, wherein DOM-based state management comprises:
    - mutation observers detecting state changes and automatically propagating to relevant subsystems;
@@ -390,7 +390,7 @@ What is claimed is:
 ### Method Claims
 
 **218.** A method for unified web application operation handling, comprising:
-   - maintaining a comprehensive registry of interaction patterns mapped to WASM-based handler functions;
+   - maintaining a comprehensive registry of interaction patterns mapped to JavaScript-based handler functions;
    - detecting user interactions and automatically classifying them according to defined patterns;
    - selecting optimal handlers through context analysis and priority weighting;
    - executing handlers with comprehensive context injection and automatic result processing.
@@ -416,7 +416,7 @@ What is claimed is:
 ### Performance and Scalability Claims
 
 **222.** The system of claim 212, wherein performance optimization comprises:
-   - WASM execution providing near-native speed for complex set operations and data processing;
+   - JavaScript execution providing near-native speed for complex set operations and data processing;
    - DOM-based caching eliminating redundant backend state synchronization;
    - Hierarchical operation optimization reducing computational complexity through universe restriction;
    - Parallel processing of independent operations across available system resources.
@@ -432,7 +432,7 @@ What is claimed is:
 **224.** The system of claim 204, fundamentally differing from traditional web architectures by:
    - eliminating manual event listener registration through automatic handler discovery;
    - providing unified operation patterns across all interface elements through polymorphic dispatch;
-   - achieving consistent performance through WASM execution rather than interpreted JavaScript;
+   - achieving consistent performance through JavaScript execution rather than interpreted JavaScript;
    - enabling extensible operation types through modular handler architecture.
 
 **225.** The system of claim 206, fundamentally differing from traditional state management by:
@@ -458,7 +458,7 @@ What is claimed is:
 **228.** A complete web application architecture system comprising the integrated innovations of claims 204, 206, 208, and 210, wherein the system:
    - eliminates traditional configuration dialogs through intelligent operation dispatch;
    - provides mathematically consistent results regardless of operation complexity;
-   - achieves unprecedented performance through WASM optimization and DOM-based state;
+   - achieves unprecedented performance through JavaScript optimization and DOM-based state;
    - enables intuitive data manipulation through spatial interaction paradigms.
 
 **229.** The comprehensive system of claim 228, representing a fundamental paradigm shift in web application development by:
@@ -468,7 +468,7 @@ What is claimed is:
    - optimizing set operations through mathematical hierarchy rather than sequential processing.
 
 **230.** The system of claim 228, achieving unprecedented integration between spatial data manipulation and web application architecture, wherein:
-   - spatial tag operations benefit from generalized WASM handler performance;
+   - spatial tag operations benefit from generalized JavaScript handler performance;
    - DOM-based state enables real-time spatial organization updates;
    - mode-free operation allows simultaneous spatial and non-spatial interactions;
    - hierarchical set operations provide mathematical foundation for spatial query optimization.
@@ -477,9 +477,9 @@ What is claimed is:
 
 The invention may be better understood with reference to the following drawings and detailed description:
 
-**Figure 1**: System architecture diagram showing the integration of WASM Handler Architecture, DOM-as-Single-Source-of-Truth, Unified Tag Mode, and Hierarchical Set Operations.
+**Figure 1**: System architecture diagram showing the integration of JavaScript Handler Architecture, DOM-as-Single-Source-of-Truth, Unified Tag Mode, and Hierarchical Set Operations.
 
-**Figure 2**: WASM Handler dispatch flow diagram illustrating operation registry lookup, context analysis, and polymorphic handler selection.
+**Figure 2**: JavaScript Handler dispatch flow diagram illustrating operation registry lookup, context analysis, and polymorphic handler selection.
 
 **Figure 3**: DOM state management architecture showing mutation observers, change propagation, and stateless backend interaction.
 
@@ -495,7 +495,7 @@ The invention may be better understood with reference to the following drawings 
 
 ## DETAILED TECHNICAL SPECIFICATIONS
 
-### WASM Handler Architecture Specifications
+### JavaScript Handler Architecture Specifications
 
 **Operation Registry Data Structure**:
 ```
@@ -507,7 +507,7 @@ interface OperationRegistry {
 }
 
 interface HandlerDefinition {
-  wasm_module: string;
+  js_module: string;
   entry_point: string;
   context_requirements: ContextType[];
   priority_score: number;
@@ -525,7 +525,7 @@ The system employs a multi-stage context analysis algorithm:
 
 **Performance Characteristics**:
 - Handler selection latency: < 0.1ms for simple operations, < 1ms for complex gestures
-- WASM execution overhead: < 0.05ms compared to equivalent JavaScript
+- JavaScript execution overhead: < 0.05ms compared to equivalent JavaScript
 - Memory usage: 50-75% reduction compared to traditional event handler architectures
 - CPU utilization: 30-60% improvement through optimized dispatch
 

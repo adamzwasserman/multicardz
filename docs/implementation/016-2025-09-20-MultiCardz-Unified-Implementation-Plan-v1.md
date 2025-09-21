@@ -1808,7 +1808,7 @@ Due to length constraints, I'm providing the structure for the remaining phases.
 1. Implement client-side caching layer with LRU eviction
 2. Add progressive rendering for large datasets >100K cards
 3. Optimize database queries with spatial indexing improvements
-4. Consider WASM acceleration for critical path operations
+4. Consider Rust acceleration for critical path operations
 
 #### Polymorphic Integration Complexity
 1. Implement graceful degradation to monolithic fallbacks

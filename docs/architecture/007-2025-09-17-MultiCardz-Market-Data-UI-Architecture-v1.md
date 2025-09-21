@@ -396,7 +396,7 @@ Complete card display with spatial interaction support:
 HTMX-based drag and drop with spatial awareness:
 
 ```javascript
-// Minimal JavaScript for drag/drop (WASM bridge)
+// Minimal JavaScript for drag/drop (spatial manipulation)
 class SpatialDragDrop {
     static initializeDragHandlers() {
         // Use native HTML5 drag/drop with HTMX integration
@@ -642,14 +642,14 @@ def calculate_performance_metrics(
 ```
 
 ### 4.3 JavaScript Restrictions
-Minimal JavaScript limited to WASM bridge and DOM property access:
+Minimal JavaScript limited to spatial manipulation and DOM property access:
 
 ```javascript
 // ONLY approved JavaScript patterns
 class SpatialInterface {
-    // WASM module loading (approved)
-    static async loadSpatialWasm() {
-        this.wasmModule = await import('./spatial_operations.wasm');
+    // JavaScript module loading (approved)
+    static async loadSpatialModule() {
+        this.spatialModule = await import('./spatial_operations.js');
     }
 
     // DOM property access (approved)

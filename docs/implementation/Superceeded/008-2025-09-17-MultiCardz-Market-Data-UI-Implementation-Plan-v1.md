@@ -1038,7 +1038,7 @@ This implementation plan executes the comprehensive architecture for market segm
 1. Implement client-side caching layer
 2. Add progressive rendering for large datasets
 3. Optimize database queries with better indexing
-4. Consider WASM acceleration for critical operations
+4. Consider Rust acceleration for critical operations
 
 #### HTMX Compatibility Problems
 1. Implement graceful degradation to basic HTML forms
