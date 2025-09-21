@@ -135,6 +135,8 @@
             loadDeferredScripts();
         }
 
+        let scriptsLoaded = false;
+
         function loadDeferredScripts() {
             // Wait for LCP to be calculated before loading heavy scripts
             if ('PerformanceObserver' in window) {
@@ -157,6 +159,10 @@
         }
 
         function loadScriptsAfterLCP() {
+            // Ensure scripts are only loaded once
+            if (scriptsLoaded) return;
+            scriptsLoaded = true;
+
             // Load HTMX
             const htmxScript = document.createElement('script');
             htmxScript.src = 'https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js';
