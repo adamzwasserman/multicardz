@@ -1,16 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MultiCardz™{% endblock %}</title>
 
+    <!-- Base template styles -->
+    {% block head %}{% endblock %}
+
+    <!-- Google Fonts for Dongle -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- HTMX for dynamic content loading -->
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js"></script>
+
     <!-- CSS -->
     <link rel="stylesheet" href="/static/css/user.css">
     {% block extra_css %}{% endblock %}
 </head>
-<body>
-    {% block content %}{% endblock %}
+<body class="font-inconsolata" data-workspace="{{ workspace_id | default('default-workspace') }}" data-user="{{ user_id | default('anonymous-user') }}">
+    {% block body %}
+    <!-- Navigation Header -->
+    <nav class="main-navigation">
+        <div class="nav-container">
+            <div class="brand">
+                <a href="/" class="brand-link">mult<span class="brand-i">i</span>cardz</a>
+            </div>
+            <div class="nav-menu">
+                <ul class="nav-items">
+                    <li class="nav-item"><a href="/features">Features</a></li>
+                    <li class="nav-item projects-menu-container">
+                        <div class="projects-menu"
+                             hx-get="/api/v2/projects/menu"
+                             hx-trigger="load"
+                             hx-swap="innerHTML">
+                            <a href="#" class="projects-link">Projects</a>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a href="/pricing">Pricing</a></li>
+                    <li class="nav-item">
+                        <a href="/trial" class="cta-button">Start Free Trial</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        {% block content %}{% endblock %}
+    </div>
+    {% endblock %}
 
     <!-- JavaScript -->
     <script src="/static/js/drag-drop.js"></script>

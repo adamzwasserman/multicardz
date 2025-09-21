@@ -444,7 +444,7 @@ services:
 
 ```bash
 # Development uses Python tooling for fast iteration
-uv run uvicorn multicardz_user.main:app --reload --port 8000
+uv run uvicorn multicardz_user.main:app --reload --port 8011
 
 # Typos checking in development
 typos --write-changes
