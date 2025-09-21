@@ -164,9 +164,7 @@ def run_frontend_tests(show_timing: bool = False, use_smart: bool = False,
 
     tests = [
         (["uv", "run", "python", "tests/api/test_drag_drop_api.py"], "API endpoint tests"),
-        (["uv", "run", "python", "tests/playwright/test_static_html.py"], "Static HTML tests"),
-        (["uv", "run", "python", "tests/playwright/test_comprehensive_drag_drop.py"], "Comprehensive drag-drop tests"),
-        (["uv", "run", "python", "tests/playwright/test_responsive_resizing.py"], "Responsive & resizing tests")
+        (["uv", "run", "python", "tests/playwright/test_real_mouse_interactions.py"], "Real mouse interaction tests")
     ]
 
     results = []
@@ -271,10 +269,8 @@ def show_manual_tests():
 
     print("\n🎭 Playwright Browser Tests:")
     print("   1. Start server: uv run python tests/integration/test_server.py")
-    print("   2. Comprehensive test: uv run python tests/playwright/test_comprehensive_drag_drop.py")
-    print("   3. Responsive test: uv run python tests/playwright/test_responsive_resizing.py")
-    print("   4. Legacy test: uv run python tests/playwright/test_real_mouse_interactions.py")
-    print("   5. Run replay: uv run python tests/playwright/test_real_mouse_interactions.py replay")
+    print("   2. Run test: uv run python tests/playwright/test_real_mouse_interactions.py")
+    print("   3. Run replay: uv run python tests/playwright/test_real_mouse_interactions.py replay")
 
     print("\n📸 Test Artifacts:")
     print("   - tests/artifacts/final_state.png (screenshots)")
