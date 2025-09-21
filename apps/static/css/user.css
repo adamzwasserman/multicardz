@@ -705,6 +705,7 @@ body {
 /* Zone labels consistent styling */
 
 .card-display {
+    grid-area: card-display;
     background: light-dark(#fefefe, var(--color-neutral-100));
     border: 1px solid var(--color-muji-border);
     border-radius: 4px;
@@ -726,6 +727,7 @@ body {
 
 /* Row 4: Bottom Control Area (Middle Column Only) */
 .bottom-control {
+    grid-area: bottom-control;
     background: light-dark(#fefefe, var(--color-neutral-100));
     border: 1px solid var(--color-muji-border);
     border-radius: 4px;
@@ -1029,6 +1031,13 @@ body {
     border: 1px dashed light-dark(#9ca3af, var(--color-neutral-400));
 }
 
+.cloud-ai,
+.cloud-group,
+.cloud-system {
+    flex: 1;
+    min-width: 0; /* Allow flex items to shrink below content size */
+}
+
 .cloud-system {
     border-color: light-dark(#4b5563, var(--color-neutral-500));
 }
@@ -1065,6 +1074,21 @@ body {
 .tags-wrapper {
     display: flex;
     flex-wrap: wrap;
+}
+
+.cloud {
+    background-color: light-dark(#fafafa, var(--color-neutral-100));
+    border: 1px solid light-dark(#e5e7eb, var(--color-neutral-300));
+    border-radius: 8px;
+    padding: 16px;
+    min-height: 120px;
+    min-width: 200px;
+    flex: 1;
+}
+
+.cloud-user, .cloud-mixed {
+    background-color: light-dark(#fefefe, var(--color-neutral-100));
+    border-color: light-dark(#e5e7eb, var(--color-neutral-300));
 }
 
 
@@ -1497,13 +1521,13 @@ body.font-merriweather {
 
 .font-inconsolata,
 body.font-inconsolata {
-    font-family: 'Inconsolata', 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace !important;
+    font-family: 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace !important;
     font-weight: 200 !important;
 }
 
 .font-berkeley-mono,
 body.font-berkeley-mono {
-    font-family: 'Berkeley Mono', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Consolas', monospace !important;
+    font-family: 'Berkeley Mono', 'SF Mono', 'Monaco', 'Roboto Mono', 'Consolas', monospace !important;
     font-weight: 400 !important;
 }
 
@@ -2020,20 +2044,49 @@ body.font-berkeley-mono {
 
 /* Animation for tag movement */
 .tag {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: inline-block;
+    margin: 3px;
+    padding: 4px 8px;
+    font-size: 11px;
+    user-select: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.tag:hover {
+    opacity: 0.8;
+}
+
+.tag-user {
+    background-color: light-dark(#ffffff, var(--color-neutral-200));
+    border: 1px solid light-dark(#d1d5db, var(--color-neutral-400));
+    color: light-dark(#374151, var(--color-text-primary));
+}
+
+.tag-ai {
+    background-color: light-dark(#f3f4f6, var(--color-neutral-300));
+    border: 1px solid light-dark(#d1d5db, var(--color-neutral-400));
+    color: light-dark(#4a5568, var(--color-text-secondary));
+    font-style: italic;
+}
 
 /* Group tag indicators */
 .tag-group {
-    position: relative;
-    background: linear-gradient(135deg, var(--color-success-light), var(--color-success));
+    background-color: transparent;
+    border: 1px dashed light-dark(#9ca3af, var(--color-neutral-400));
+    color: light-dark(#6b7280, var(--color-text-secondary));
+    border-radius: 4px;
 }
 
-.tag-group::before {
-    content: '⊕';
-    margin-right: 4px;
-    font-weight: bold;
+.tag-system {
+    background-color: light-dark(#e5e7eb, var(--color-neutral-300));
+    border: 1px solid light-dark(#9ca3af, var(--color-neutral-500));
+    color: light-dark(#1f2937, var(--color-text-primary));
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 1px;
 }
 
 /* Zone visual enhancements */

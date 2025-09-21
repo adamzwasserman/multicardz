@@ -8,6 +8,9 @@
     <!-- Base template styles -->
     {% block head %}{% endblock %}
 
+    <!-- Preload critical resources for parallel download -->
+    <link rel="preload" href="/static/css/user.css" as="style">
+    <link rel="preload" href="/static/fonts/dongle-wordmark.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
@@ -17,7 +20,7 @@
     <link rel="stylesheet" href="/static/css/user.css">
     {% block extra_css %}{% endblock %}
 </head>
-<body class="font-inconsolata" data-workspace="{{ workspace_id | default('default-workspace') }}" data-user="{{ user_id | default('anonymous-user') }}">
+<body data-workspace="{{ workspace_id | default('default-workspace') }}" data-user="{{ user_id | default('anonymous-user') }}">
     {% block body %}
     <!-- Navigation Header -->
     <nav class="main-navigation">
