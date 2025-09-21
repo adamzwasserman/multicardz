@@ -222,7 +222,6 @@ CREATE TABLE IF NOT EXISTS card_summaries (
 CREATE TABLE IF NOT EXISTS card_details (
     id TEXT PRIMARY KEY REFERENCES card_summaries(id),
     content TEXT DEFAULT '',
-    
     metadata_json TEXT DEFAULT '{}',
     attachment_count INTEGER DEFAULT 0,
     total_attachment_size INTEGER DEFAULT 0,
