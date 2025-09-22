@@ -272,6 +272,7 @@ After thorough examination of the codebase following a major reversion, this doc
 - 40 hours development time
 - SQLite database setup
 - Basic deployment environment
+- **URGENT: Add EXCLUSION zone to complement UNION and INTERSECTION zones**
 
 **Short Term (Weeks 2-3)**:
 - 80 hours development time

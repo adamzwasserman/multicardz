@@ -17,6 +17,13 @@ from typing import (
     Any,
 )
 
+# Import performance tracker
+from apps.shared.services.performance_tracker import (
+    get_performance_tracker,
+    ExecutionContext,
+    PerformanceMetrics,
+)
+
 # Lazy RoaringBitmap loading to handle environment variations
 _roaring_bitmap_class = None
 _roaring_available = None
@@ -510,8 +517,9 @@ def apply_unified_operations(
     # Select processing mode
     cards_count = len(cards)
     operation_complexity = sum(len(tags) for _, tags in operations)
+    first_operation = operations[0][0] if operations else "intersection"
     processing_mode = select_processing_mode(
-        cards_count, operation_complexity, int(unique_tags_estimate)
+        cards_count, operation_complexity, int(unique_tags_estimate), first_operation
     )
 
     # Apply operations
@@ -587,6 +595,23 @@ def apply_unified_operations(
         parallel_workers=parallel_workers,
         chunk_count=chunk_count,
     )
+
+    # Record performance metrics for adaptive learning
+    if operations_applied > 0:
+        tracker = get_performance_tracker()
+        context = ExecutionContext(
+            card_count=cards_count,
+            unique_tags=int(unique_tags_estimate),
+            operation_type=operations[0][0] if operations else "unknown",
+            operation_count=operations_applied,
+            cache_hit=False
+        )
+        metrics = PerformanceMetrics(
+            mode=processing_mode,
+            context=context,
+            actual_ms=execution_time
+        )
+        tracker.record_actual(metrics)
 
     return result, current_state, cache
 
@@ -956,13 +981,36 @@ def execute_roaring_bitmap_operation(
 
 
 def select_processing_mode(
-    cards_count: int, operation_complexity: int, unique_tags_estimate: int = 0
+    cards_count: int, operation_complexity: int, unique_tags_estimate: int = 0,
+    operation_type: str = "intersection"
 ) -> str:
-    """Automatically select optimal processing mode based on dataset characteristics."""
-    # More aggressive mode selection with tighter bounds
+    """
+    Adaptively select optimal processing mode using performance tracker.
+    Falls back to static thresholds if tracker has low confidence.
+    """
+    # Get the adaptive performance tracker
+    tracker = get_performance_tracker()
 
+    # Create execution context
+    context = ExecutionContext(
+        card_count=cards_count,
+        unique_tags=unique_tags_estimate,
+        operation_type=operation_type,
+        operation_count=operation_complexity
+    )
+
+    # Determine available modes
     RoaringBitmap, roaring_available = _get_roaring_bitmap()
 
+    available_modes = ["regular", "parallel", "turbo_bitmap"]
+    if roaring_available:
+        available_modes.append("roaring_bitmap")
+
+    # Use adaptive selection if we have enough confidence
+    if tracker.confidence > 0.2:
+        return tracker.select_best_mode(context, available_modes)
+
+    # Fallback to static thresholds (but more conservative)
     if not roaring_available:
         if cards_count < 5000:
             return "regular"
@@ -973,17 +1021,17 @@ def select_processing_mode(
 
     if cards_count < 1000:
         return "regular"
-    elif cards_count < 10000 and unique_tags_estimate < 200:
+    elif cards_count < 50000 and unique_tags_estimate < 200:  # Increased threshold
         return "parallel"
     elif (
         unique_tags_estimate > 100
-        and cards_count > 10000
+        and cards_count > 50000  # Increased threshold
         or operation_complexity > 3
-        and cards_count > 5000
+        and cards_count > 50000  # Increased threshold
     ):
         return "roaring_bitmap"
-    elif cards_count < 50000:
-        return "turbo_bitmap"
+    elif cards_count < 100000:  # Much higher threshold
+        return "parallel"  # Prefer parallel for medium sizes
     else:
         return "roaring_bitmap"
 
