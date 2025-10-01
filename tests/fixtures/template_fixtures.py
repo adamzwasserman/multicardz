@@ -1,5 +1,6 @@
 import pytest
-from jinja2 import Environment, DictLoader
+from jinja2 import DictLoader, Environment
+
 
 @pytest.fixture
 def jinja_env():

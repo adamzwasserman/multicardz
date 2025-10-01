@@ -2,17 +2,12 @@
 
 import pytest
 from pydantic import ValidationError
-from pytest_bdd import scenarios, given, when, then, parsers
+from pytest_bdd import given, scenarios, then, when
 
 # Load scenarios from feature file
 scenarios('features/pydantic_models.feature')
 
 # Import fixtures
-from tests.fixtures.model_fixtures import (
-    valid_card_data,
-    valid_tag_data,
-    invalid_isolation_data
-)
 
 
 # Scenario: Create valid Card model

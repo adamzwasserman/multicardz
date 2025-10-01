@@ -5,7 +5,6 @@ Pure data model with no business logic.
 
 import uuid
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -35,10 +34,10 @@ class User(BaseModel):
     created_at: datetime = Field(
         default_factory=datetime.utcnow, description="Account creation timestamp"
     )
-    last_login: Optional[datetime] = Field(
+    last_login: datetime | None = Field(
         default=None, description="Last login timestamp"
     )
-    default_workspace_id: Optional[str] = Field(
+    default_workspace_id: str | None = Field(
         default=None, description="Default workspace to load on login"
     )
 
@@ -65,10 +64,10 @@ class UserSession(BaseModel):
         default_factory=datetime.utcnow, description="Session creation timestamp"
     )
     expires_at: datetime = Field(description="Session expiration timestamp")
-    ip_address: Optional[str] = Field(
+    ip_address: str | None = Field(
         default=None, description="Client IP address for security"
     )
-    user_agent: Optional[str] = Field(
+    user_agent: str | None = Field(
         default=None, description="Client user agent for security"
     )
 
@@ -94,7 +93,7 @@ class UserWorkspace(BaseModel):
     user_id: str = Field(description="User identifier")
     workspace_id: str = Field(description="Workspace identifier")
     card_id: str = Field(description="Card identifier")
-    position: Optional[int] = Field(
+    position: int | None = Field(
         default=None, description="Card position within workspace for ordering"
     )
     added_at: datetime = Field(
@@ -123,7 +122,7 @@ class UserRole(BaseModel):
     granted_at: datetime = Field(
         default_factory=datetime.utcnow, description="When role was granted"
     )
-    granted_by: Optional[str] = Field(
+    granted_by: str | None = Field(
         default=None, description="Who granted this role"
     )
 

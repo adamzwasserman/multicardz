@@ -6,8 +6,8 @@ Pure functions with explicit state passing for universe-scale operations.
 """
 
 import logging
-import multiprocessing as mp
 import math
+import multiprocessing as mp
 import random
 import threading
 import time
@@ -19,9 +19,9 @@ from typing import (
 
 # Import performance tracker
 from apps.shared.services.performance_tracker import (
-    get_performance_tracker,
     ExecutionContext,
     PerformanceMetrics,
+    get_performance_tracker,
 )
 
 # Lazy RoaringBitmap loading to handle environment variations
@@ -108,9 +108,6 @@ UnifiedMetrics = namedtuple(
 logger = logging.getLogger(__name__)
 
 # Import for type hints only
-import pickle
-import gzip
-from typing import Optional
 
 # Elite Singleton Pattern for Stable In-Memory Data (approved per CLAUDE.md)
 class CardRegistrySingleton:

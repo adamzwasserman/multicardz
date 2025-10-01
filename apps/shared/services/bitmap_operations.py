@@ -1,19 +1,19 @@
 # apps/shared/services/bitmap_operations.py
-from typing import FrozenSet, Set, List, Tuple
-import pyroaring
-from functools import reduce
-import time
 import logging
+import time
+from functools import reduce
+
+import pyroaring
 
 logger = logging.getLogger(__name__)
 
 def perform_bitmap_intersection(
-    tag_bitmaps: List[int],
-    all_cards: FrozenSet,
+    tag_bitmaps: list[int],
+    all_cards: frozenset,
     *,
     workspace_id: str,
     user_id: str
-) -> FrozenSet:
+) -> frozenset:
     """
     Perform intersection using RoaringBitmaps.
 
@@ -39,12 +39,12 @@ def perform_bitmap_intersection(
     return result_cards
 
 def perform_bitmap_union(
-    tag_bitmaps: List[int],
-    all_cards: FrozenSet,
+    tag_bitmaps: list[int],
+    all_cards: frozenset,
     *,
     workspace_id: str,
     user_id: str
-) -> FrozenSet:
+) -> frozenset:
     """
     Perform union using RoaringBitmaps.
 
@@ -71,13 +71,13 @@ def perform_bitmap_union(
     return result_cards
 
 def perform_complex_filter(
-    intersection_tags: List[int],
-    union_tags: List[int],
-    all_cards: FrozenSet,
+    intersection_tags: list[int],
+    union_tags: list[int],
+    all_cards: frozenset,
     *,
     workspace_id: str,
     user_id: str
-) -> FrozenSet:
+) -> frozenset:
     """
     Two-phase filtering: intersection first, then union.
 

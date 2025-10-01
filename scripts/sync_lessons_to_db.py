@@ -4,21 +4,18 @@ Script to sync lesson data from Python definitions to SQLite database.
 This creates the read-only lesson database that will be shared with all users.
 """
 
-import sqlite3
 import json
+import sqlite3
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Add project root to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import lesson data
-from apps.shared.data.onboarding_lessons import (
-    ALL_LESSON_CARDS,
-    ALL_LESSON_TAGS,
-    LESSON_PROGRESSION
-)
+from apps.shared.data.onboarding_lessons import ALL_LESSON_CARDS, ALL_LESSON_TAGS
+
 
 def sync_lessons_to_database(db_path="/var/data/multicardz_dev.db"):
     """Sync all lesson data to the database."""
@@ -53,8 +50,8 @@ def sync_lessons_to_database(db_path="/var/data/multicardz_dev.db"):
                     'success_criteria': card.success_criteria,
                     'next_action': card.next_action
                 }),
-                datetime.now(timezone.utc).isoformat(),
-                datetime.now(timezone.utc).isoformat()
+                datetime.now(UTC).isoformat(),
+                datetime.now(UTC).isoformat()
             ))
 
             # Insert into card_summaries table
@@ -66,8 +63,8 @@ def sync_lessons_to_database(db_path="/var/data/multicardz_dev.db"):
                 card.id,
                 card.title,
                 json.dumps(card.tags),
-                datetime.now(timezone.utc).isoformat(),
-                datetime.now(timezone.utc).isoformat(),
+                datetime.now(UTC).isoformat(),
+                datetime.now(UTC).isoformat(),
                 False
             ))
 
@@ -88,7 +85,7 @@ def sync_lessons_to_database(db_path="/var/data/multicardz_dev.db"):
         cursor.execute("SELECT COUNT(*) FROM card_summaries WHERE id LIKE 'lesson%'")
         summary_count = cursor.fetchone()[0]
 
-        print(f"📊 Database now contains:")
+        print("📊 Database now contains:")
         print(f"   • {card_count} lesson cards")
         print(f"   • {summary_count} lesson card summaries")
 

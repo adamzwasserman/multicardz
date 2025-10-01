@@ -3,18 +3,18 @@ Pydantic models for MultiCardz™ card rendering requests.
 Provides validation and type safety for the dynamic drag-drop system.
 """
 
+
 from pydantic import BaseModel, Field, validator
-from typing import Dict, List, Optional
 
 
 class ZoneMetadata(BaseModel):
     """Metadata for a drop zone."""
     label: str = ""
-    accepts: List[str] = Field(default_factory=lambda: ["tags"])
+    accepts: list[str] = Field(default_factory=lambda: ["tags"])
     position: str = "static"
-    maxTags: Optional[int] = None
+    maxTags: int | None = None
     behavior: str = "standard"
-    temporalRange: Optional[str] = None
+    temporalRange: str | None = None
 
     @validator('accepts', each_item=True)
     def validate_accepts(cls, accept_type):
@@ -42,7 +42,7 @@ class ZoneMetadata(BaseModel):
 
 class ZoneData(BaseModel):
     """Data for a single zone including tags and metadata."""
-    tags: List[str] = Field(default_factory=list)
+    tags: list[str] = Field(default_factory=list)
     metadata: ZoneMetadata = Field(default_factory=ZoneMetadata)
 
     @validator('tags', each_item=True)
@@ -85,7 +85,7 @@ class RenderControls(BaseModel):
 
 class TagsInPlay(BaseModel):
     """Complete state from the UI."""
-    zones: Dict[str, ZoneData] = Field(default_factory=dict)
+    zones: dict[str, ZoneData] = Field(default_factory=dict)
     controls: RenderControls = Field(default_factory=RenderControls)
 
     @validator('zones')
@@ -130,9 +130,9 @@ class CardData(BaseModel):
     """Basic card data for rendering."""
     id: str
     title: str
-    tags: List[str]
-    content: Optional[str] = None
-    metadata: Dict = Field(default_factory=dict)
+    tags: list[str]
+    content: str | None = None
+    metadata: dict = Field(default_factory=dict)
 
 
 class RenderResponse(BaseModel):

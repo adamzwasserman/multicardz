@@ -3,13 +3,14 @@ MultiCardz™ User Application.
 Frontend application for spatial tag manipulation interface.
 """
 
+import logging
 import os
+
 from fastapi import FastAPI, Request
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, Response
-from fastapi.middleware.gzip import GZipMiddleware
-import logging
 
 # Import routers
 from .routes.cards_api import router as cards_router
@@ -58,8 +59,8 @@ def create_app():
     async def read_root(request: Request):
         try:
             # Load lesson tags for the current lesson
-            from apps.shared.services.lesson_service import get_default_lesson_state
             from apps.shared.data.onboarding_lessons import get_lesson_tags
+            from apps.shared.services.lesson_service import get_default_lesson_state
 
             lesson_state = get_default_lesson_state()
 
@@ -76,7 +77,6 @@ def create_app():
 
             # Get tags from tutorial database
             import sqlite3
-            import json
 
             db_path = "/var/data/tutorial_customer.db"
             try:

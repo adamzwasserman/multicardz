@@ -5,6 +5,7 @@ Run with: python test_server.py
 """
 
 import uvicorn
+
 from apps.user.main import create_app
 
 if __name__ == "__main__":

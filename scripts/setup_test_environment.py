@@ -4,8 +4,6 @@ Setup script to install testing dependencies for optimal performance.
 """
 
 import subprocess
-import sys
-from pathlib import Path
 
 
 def run_command(cmd, description):
@@ -13,7 +11,7 @@ def run_command(cmd, description):
     print(f"📦 {description}")
     try:
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
-        print(f"   ✅ Success")
+        print("   ✅ Success")
         return True
     except subprocess.CalledProcessError as e:
         print(f"   ❌ Failed: {e}")

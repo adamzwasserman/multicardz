@@ -1,12 +1,10 @@
 """Tag count auto-maintenance functions with atomic transactions."""
 
-from typing import List, Set, Optional
 import json
-from datetime import datetime
 
 
 async def increment_tag_counts(
-    tag_ids: List[str],
+    tag_ids: list[str],
     workspace_id: str,
     user_id: str,
     *,
@@ -42,7 +40,7 @@ async def increment_tag_counts(
 
 
 async def decrement_tag_counts(
-    tag_ids: List[str],
+    tag_ids: list[str],
     workspace_id: str,
     user_id: str,
     *,
@@ -79,8 +77,8 @@ async def decrement_tag_counts(
 
 async def update_tag_counts_on_reassignment(
     card_id: str,
-    old_tag_ids: List[str],
-    new_tag_ids: List[str],
+    old_tag_ids: list[str],
+    new_tag_ids: list[str],
     workspace_id: str,
     user_id: str,
     *,

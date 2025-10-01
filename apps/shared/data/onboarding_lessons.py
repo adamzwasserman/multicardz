@@ -3,8 +3,8 @@ MultiCardz™ Progressive Onboarding Lesson Data
 Contains all lesson cards, tags, and progression logic for teaching users.
 """
 
-from typing import Dict, List, NamedTuple
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from typing import NamedTuple
 
 
 class LessonCard(NamedTuple):
@@ -12,7 +12,7 @@ class LessonCard(NamedTuple):
     id: str
     title: str
     content: str
-    tags: List[str]
+    tags: list[str]
     lesson_number: int
     step_number: int
     success_criteria: str
@@ -378,29 +378,29 @@ LESSON_PROGRESSION = {
 }
 
 
-def get_lesson_cards(lesson_number: int) -> List[LessonCard]:
+def get_lesson_cards(lesson_number: int) -> list[LessonCard]:
     """Get all cards for a specific lesson."""
     return [card for card in ALL_LESSON_CARDS if card.lesson_number == lesson_number]
 
 
-def get_lesson_tags(lesson_number: int) -> List[LessonTag]:
+def get_lesson_tags(lesson_number: int) -> list[LessonTag]:
     """Get all tags for a specific lesson."""
     return [tag for tag in ALL_LESSON_TAGS if tag.lesson_number == lesson_number]
 
 
-def get_default_lesson_state() -> Dict:
+def get_default_lesson_state() -> dict:
     """Get the default lesson state for new users."""
     return {
         "current_lesson": 1,
         "current_step": 1,
         "completed_lessons": [],
         "lesson_progress": {},
-        "started_at": datetime.now(timezone.utc).isoformat(),
+        "started_at": datetime.now(UTC).isoformat(),
         "show_hints": True
     }
 
 
-def validate_lesson_completion(lesson_number: int, user_state: Dict) -> bool:
+def validate_lesson_completion(lesson_number: int, user_state: dict) -> bool:
     """Check if a lesson has been completed based on success criteria."""
     lesson_meta = LESSON_PROGRESSION.get(lesson_number)
     if not lesson_meta:
@@ -410,7 +410,7 @@ def validate_lesson_completion(lesson_number: int, user_state: Dict) -> bool:
     return all(criterion in user_state.get("achieved_criteria", []) for criterion in criteria)
 
 
-def get_available_lessons(completed_lessons: List[int]) -> List[int]:
+def get_available_lessons(completed_lessons: list[int]) -> list[int]:
     """Get list of lessons available based on completed lessons."""
     available = [1]  # Lesson 1 always available
 

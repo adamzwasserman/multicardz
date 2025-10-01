@@ -1,6 +1,7 @@
-import pytest
-from typing import Dict, List
 from unittest.mock import AsyncMock
+
+import pytest
+
 
 @pytest.fixture
 def mock_db_connection():
@@ -11,7 +12,7 @@ def mock_db_connection():
     return mock
 
 @pytest.fixture
-def sample_tag_counts() -> Dict[str, int]:
+def sample_tag_counts() -> dict[str, int]:
     """Sample tag counts."""
     return {
         "tag_a": 10,
@@ -21,7 +22,7 @@ def sample_tag_counts() -> Dict[str, int]:
     }
 
 @pytest.fixture
-def tag_update_scenarios() -> List[Dict]:
+def tag_update_scenarios() -> list[dict]:
     """Tag update test scenarios."""
     return [
         {

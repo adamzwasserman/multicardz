@@ -10,28 +10,27 @@ This script creates realistic test data including:
 """
 
 import hashlib
-import json
-import sqlite3
+
+# Add the project root to the path
+import sys
 import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# Add the project root to the path
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from apps.shared.services.database_storage import (
-    create_database_connection,
-    initialize_database_schema,
-    save_user,
-    save_card_summary,
-    save_user_session,
-    add_card_to_user_workspace,
-    save_user_preferences,
-    DatabaseConfig,
-)
 from apps.shared.models.card import CardSummary
 from apps.shared.models.user_preferences import UserPreferences
+from apps.shared.services.database_storage import (
+    DatabaseConfig,
+    add_card_to_user_workspace,
+    create_database_connection,
+    initialize_database_schema,
+    save_card_summary,
+    save_user,
+    save_user_preferences,
+    save_user_session,
+)
 
 
 def hash_password(password: str) -> str:

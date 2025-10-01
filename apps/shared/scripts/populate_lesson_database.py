@@ -4,23 +4,18 @@ MultiCardz™ Lesson Database Population Script
 Populates the default database with lesson cards and tags for progressive onboarding.
 """
 
-import sqlite3
 import json
 import logging
+import sqlite3
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
 
 # Import lesson data and services
 from apps.shared.data.onboarding_lessons import (
-    get_available_lessons,
-    get_lesson_cards,
-    get_lesson_tags,
     get_default_lesson_state,
-    LESSON_PROGRESSION
 )
 from apps.shared.services.lesson_service import (
     create_lesson_cards_for_database,
-    create_lesson_tags_for_database
 )
 
 logger = logging.getLogger(__name__)
@@ -172,7 +167,7 @@ def initialize_default_lesson_state(conn: sqlite3.Connection):
     """, (
         'default',
         state_json,
-        datetime.now(timezone.utc).isoformat()
+        datetime.now(UTC).isoformat()
     ))
 
     conn.commit()
@@ -207,7 +202,7 @@ def main():
             summary_count = conn.execute("SELECT COUNT(*) FROM card_summaries").fetchone()[0]
             tag_count = conn.execute("SELECT COUNT(*) FROM tags").fetchone()[0]
 
-            logger.info(f"📊 Database now contains:")
+            logger.info("📊 Database now contains:")
             logger.info(f"   - {card_count} lesson cards")
             logger.info(f"   - {summary_count} card summaries")
             logger.info(f"   - {tag_count} tags total")

@@ -3,17 +3,14 @@ Turso Privacy Mode Manager for multicardz.
 Handles three-way sync between browser WASM SQLite, server SQLite, and Turso cloud.
 """
 
-import os
-import json
 import hashlib
-from typing import Dict, Optional, Any, List
+import json
+import os
 from enum import Enum
-from sqlalchemy import create_engine, event
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.pool import StaticPool
-import libsql_experimental as libsql
+from typing import Any
 
-from apps.shared.models.orm_models import Base, Cards, Tags, CardContents
+import libsql_experimental as libsql
+from apps.shared.models.orm_models import Cards, Tags
 
 
 class SyncDirection(Enum):
@@ -40,8 +37,8 @@ class TursoPrivacyManager:
         self.sync_interval = int(os.getenv('TURSO_SYNC_INTERVAL', '60'))  # seconds
 
         # Cache for embedded replicas
-        self.embedded_replicas: Dict[str, libsql.Database] = {}
-        self.obfuscation_keys: Dict[str, bytes] = {}
+        self.embedded_replicas: dict[str, libsql.Database] = {}
+        self.obfuscation_keys: dict[str, bytes] = {}
 
     def _get_obfuscation_key(self, user_id: str, workspace_id: str) -> bytes:
         """Generate deterministic obfuscation key for user/workspace."""
@@ -111,7 +108,7 @@ class TursoPrivacyManager:
 
         return self.embedded_replicas[replica_id]
 
-    def obfuscate_card(self, card: Cards) -> Dict[str, Any]:
+    def obfuscate_card(self, card: Cards) -> dict[str, Any]:
         """
         Obfuscate card data for Privacy Mode storage.
         Only stores bitmaps and checksums, no actual content.
@@ -133,7 +130,7 @@ class TursoPrivacyManager:
             'checksum': checksum
         }
 
-    def obfuscate_tag(self, tag: Tags) -> Dict[str, Any]:
+    def obfuscate_tag(self, tag: Tags) -> dict[str, Any]:
         """
         Obfuscate tag data for Privacy Mode storage.
         Only stores bitmap and checksum.
@@ -147,7 +144,7 @@ class TursoPrivacyManager:
         }
 
     def sync_browser_to_server(self, user_id: str, workspace_id: str,
-                              browser_data: Dict[str, Any]) -> Dict[str, Any]:
+                              browser_data: dict[str, Any]) -> dict[str, Any]:
         """
         Sync data from browser WASM SQLite to server embedded replica.
         Browser sends full data, server stores obfuscated version.
@@ -212,7 +209,7 @@ class TursoPrivacyManager:
         finally:
             conn.close()
 
-    def get_obfuscated_data(self, user_id: str, workspace_id: str) -> Dict[str, Any]:
+    def get_obfuscated_data(self, user_id: str, workspace_id: str) -> dict[str, Any]:
         """
         Get obfuscated data from server embedded replica.
         Used for RoaringBitmap operations without exposing content.
@@ -247,7 +244,7 @@ class TursoPrivacyManager:
             conn.close()
 
     def perform_set_operation(self, user_id: str, workspace_id: str,
-                            operation: str, tag_bitmaps: List[int]) -> List[int]:
+                            operation: str, tag_bitmaps: list[int]) -> list[int]:
         """
         Perform set operations on obfuscated data.
         Returns card bitmaps matching the operation.
@@ -331,7 +328,7 @@ class TursoPrivacyManager:
             print(f"Restore failed: {e}")
             return False
 
-    def get_sync_status(self, user_id: str, workspace_id: str) -> Dict[str, Any]:
+    def get_sync_status(self, user_id: str, workspace_id: str) -> dict[str, Any]:
         """Get current sync status and metadata."""
         replica = self.create_embedded_replica(user_id, workspace_id)
         conn = replica.connect()

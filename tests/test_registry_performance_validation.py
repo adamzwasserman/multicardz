@@ -9,16 +9,15 @@ performance improvement from 5348ms to <1000ms for 1M card operations.
 import random
 import time
 import tracemalloc
-from pathlib import Path
 
 import pytest
 
-from packages.shared.src.backend.models.card_models import CardSummary
 from apps.shared.services.set_operations_unified import (
     CardRegistrySingleton,
     apply_unified_operations,
     initialize_card_registry,
 )
+from packages.shared.src.backend.models.card_models import CardSummary
 
 
 class TestRegistryPerformanceValidation:
@@ -293,8 +292,8 @@ class TestRegistryPerformanceValidation:
         WHEN performing concurrent operations from multiple threads
         THEN all operations should succeed without data corruption
         """
-        import threading
         import concurrent.futures
+        import threading
 
         # Initialize registry
         CardRegistrySingleton._instance = None

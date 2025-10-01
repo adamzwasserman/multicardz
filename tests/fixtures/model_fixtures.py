@@ -1,8 +1,10 @@
+from typing import Any
+
 import pytest
-from typing import Dict, Any
+
 
 @pytest.fixture
-def valid_card_data() -> Dict[str, Any]:
+def valid_card_data() -> dict[str, Any]:
     """Valid card creation data."""
     return {
         "name": "Test Card",
@@ -12,7 +14,7 @@ def valid_card_data() -> Dict[str, Any]:
     }
 
 @pytest.fixture
-def valid_tag_data() -> Dict[str, Any]:
+def valid_tag_data() -> dict[str, Any]:
     """Valid tag creation data."""
     return {
         "name": "Test Tag",
@@ -22,7 +24,7 @@ def valid_tag_data() -> Dict[str, Any]:
     }
 
 @pytest.fixture
-def invalid_isolation_data() -> Dict[str, Any]:
+def invalid_isolation_data() -> dict[str, Any]:
     """Data missing workspace isolation."""
     return {
         "name": "Test Card",

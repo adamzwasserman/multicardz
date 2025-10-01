@@ -11,7 +11,7 @@ import sys
 import time
 from pathlib import Path
 
-from playwright.async_api import async_playwright, expect
+from playwright.async_api import async_playwright
 
 # Add apps to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -181,7 +181,7 @@ class DragDropTester:
         await self.page.mouse.up()
         await asyncio.sleep(0.2)  # Wait for any animations
 
-        print(f"  ✅ Drag-drop completed")
+        print("  ✅ Drag-drop completed")
 
     async def real_mouse_multi_select(self, selectors, modifier_key="Meta"):
         """
@@ -367,7 +367,7 @@ class DragDropTester:
         """Replay a saved recording."""
         print(f"▶️  Replaying recording: {filename}")
 
-        with open(filename, "r") as f:
+        with open(filename) as f:
             recording = json.load(f)
 
         for action_data in recording:

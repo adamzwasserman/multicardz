@@ -3,11 +3,11 @@ pytest configuration for MultiCardz™ shared package tests.
 """
 
 import pytest
+from jinja2 import DictLoader, Environment
+
 # Commented out to avoid import errors when testing templates
 # from fastapi.testclient import TestClient
-
 from apps.shared.models import Attachment, CardDetail, CardSummary, UserTier, Workspace
-from jinja2 import Environment, DictLoader
 
 
 @pytest.fixture
@@ -88,6 +88,7 @@ def sample_user_tier():
 def test_client():
     """Test client with mocked auth for API route testing."""
     from fastapi.testclient import TestClient
+
     from apps.user.main import create_app
     app = create_app()
     return TestClient(app)
@@ -123,3 +124,58 @@ def workspace_context():
         "workspace_name": "Test Workspace",
         "user_id": "test-user"
     }
+
+
+# Performance testing fixtures
+from typing import FrozenSet
+import random
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class TestCard:
+    card_id: str
+    tag_bitmaps: tuple
+
+
+@pytest.fixture
+def large_card_set() -> FrozenSet[TestCard]:
+    """Generate 100K test cards."""
+    cards = []
+    for i in range(100000):
+        card = TestCard(
+            card_id=f"card-{i:06d}",
+            tag_bitmaps=tuple(random.sample(range(1, 100), k=random.randint(1, 10)))
+        )
+        cards.append(card)
+    return frozenset(cards)
+
+
+@pytest.fixture
+def performance_monitor():
+    """Monitor performance metrics."""
+    import psutil
+    import time
+
+    class Monitor:
+        def __init__(self):
+            self.start_time = None
+            self.start_memory = None
+            self.start_cpu = None
+
+        def start(self):
+            self.start_time = time.perf_counter()
+            self.start_memory = psutil.Process().memory_info().rss / 1024 / 1024
+            self.start_cpu = psutil.cpu_percent()
+
+        def stop(self):
+            elapsed = time.perf_counter() - self.start_time
+            memory = psutil.Process().memory_info().rss / 1024 / 1024 - self.start_memory
+            cpu = psutil.cpu_percent() - self.start_cpu
+            return {
+                "elapsed": elapsed,
+                "memory_mb": memory,
+                "cpu_percent": cpu
+            }
+
+    return Monitor()

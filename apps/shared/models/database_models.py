@@ -4,21 +4,20 @@ These models define the data validation and serialization layer.
 """
 
 from datetime import datetime
-from typing import Optional, List
-from uuid import UUID, uuid4
-from pydantic import BaseModel, Field, ConfigDict
+from uuid import uuid4
 
+from pydantic import BaseModel, ConfigDict, Field
 
 # ============ Card Models ============
 
 class CardBase(BaseModel):
     """Base card model with common fields."""
     name: str = Field(..., min_length=1, max_length=255)
-    description: Optional[str] = None
+    description: str | None = None
     user_id: str
     workspace_id: str
-    tag_ids: List[str] = Field(default_factory=list, description="List of tag UUIDs")
-    tag_bitmaps: List[int] = Field(default_factory=list, description="List of tag integer bitmaps")
+    tag_ids: list[str] = Field(default_factory=list, description="List of tag UUIDs")
+    tag_bitmaps: list[int] = Field(default_factory=list, description="List of tag integer bitmaps")
 
 class CardCreate(CardBase):
     """Model for creating a new card."""
@@ -26,17 +25,17 @@ class CardCreate(CardBase):
 
 class CardUpdate(BaseModel):
     """Model for updating a card."""
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
-    description: Optional[str] = None
-    tag_ids: Optional[List[str]] = None
-    tag_bitmaps: Optional[List[int]] = None
+    name: str | None = Field(None, min_length=1, max_length=255)
+    description: str | None = None
+    tag_ids: list[str] | None = None
+    tag_bitmaps: list[int] | None = None
 
 class Card(CardBase):
     """Complete card model with all fields."""
     card_id: str = Field(default_factory=lambda: str(uuid4()))
     created: datetime = Field(default_factory=datetime.utcnow)
     modified: datetime = Field(default_factory=datetime.utcnow)
-    deleted: Optional[datetime] = None
+    deleted: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -56,14 +55,14 @@ class TagCreate(TagBase):
 
 class TagUpdate(BaseModel):
     """Model for updating a tag (only name can change)."""
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    name: str | None = Field(None, min_length=1, max_length=100)
 
 class Tag(TagBase):
     """Complete tag model with all fields."""
     tag_id: str = Field(default_factory=lambda: str(uuid4()))
     created: datetime = Field(default_factory=datetime.utcnow)
     modified: datetime = Field(default_factory=datetime.utcnow)
-    deleted: Optional[datetime] = None
+    deleted: datetime | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -74,11 +73,11 @@ class CardContentBase(BaseModel):
     """Base card content model."""
     card_id: str
     type: int = Field(..., ge=1, le=5, description="1=text, 2=number, 3=boolean, 4=json, 5=combined")
-    label: Optional[str] = None
-    value_text: Optional[str] = None
-    value_number: Optional[float] = None
-    value_boolean: Optional[bool] = None
-    value_json: Optional[str] = None  # JSON stored as string
+    label: str | None = None
+    value_text: str | None = None
+    value_number: float | None = None
+    value_boolean: bool | None = None
+    value_json: str | None = None  # JSON stored as string
 
 class CardContentCreate(CardContentBase):
     """Model for creating card content."""
@@ -86,12 +85,12 @@ class CardContentCreate(CardContentBase):
 
 class CardContentUpdate(BaseModel):
     """Model for updating card content."""
-    type: Optional[int] = Field(None, ge=1, le=5)
-    label: Optional[str] = None
-    value_text: Optional[str] = None
-    value_number: Optional[float] = None
-    value_boolean: Optional[bool] = None
-    value_json: Optional[str] = None
+    type: int | None = Field(None, ge=1, le=5)
+    label: str | None = None
+    value_text: str | None = None
+    value_number: float | None = None
+    value_boolean: bool | None = None
+    value_json: str | None = None
 
 class CardContent(CardContentBase):
     """Complete card content model."""
@@ -123,13 +122,13 @@ class UserPreferencesCreate(UserPreferencesBase):
 
 class UserPreferencesUpdate(BaseModel):
     """Model for updating user preferences."""
-    start_cards_visible: Optional[bool] = None
-    start_cards_expanded: Optional[bool] = None
-    show_tag_colors: Optional[bool] = None
-    theme: Optional[str] = Field(None, pattern="^(system|light|dark|earth)$")
-    font_family: Optional[str] = Field(None, pattern="^(Inter|Roboto|Arial|Georgia|Courier)$")
-    separate_user_ai_tags: Optional[bool] = None
-    stack_tags_vertically: Optional[bool] = None
+    start_cards_visible: bool | None = None
+    start_cards_expanded: bool | None = None
+    show_tag_colors: bool | None = None
+    theme: str | None = Field(None, pattern="^(system|light|dark|earth)$")
+    font_family: str | None = Field(None, pattern="^(Inter|Roboto|Arial|Georgia|Courier)$")
+    separate_user_ai_tags: bool | None = None
+    stack_tags_vertically: bool | None = None
 
 class UserPreferences(UserPreferencesBase):
     """Complete user preferences model."""
@@ -146,7 +145,7 @@ class SavedViewBase(BaseModel):
     user_id: str
     workspace_id: str
     name: str = Field(..., min_length=1, max_length=100)
-    tags_in_play: List[str] = Field(default_factory=list, description="JSON array of tag combinations")
+    tags_in_play: list[str] = Field(default_factory=list, description="JSON array of tag combinations")
 
 class SavedViewCreate(SavedViewBase):
     """Model for creating a saved view."""
@@ -154,8 +153,8 @@ class SavedViewCreate(SavedViewBase):
 
 class SavedViewUpdate(BaseModel):
     """Model for updating a saved view."""
-    name: Optional[str] = Field(None, min_length=1, max_length=100)
-    tags_in_play: Optional[List[str]] = None
+    name: str | None = Field(None, min_length=1, max_length=100)
+    tags_in_play: list[str] | None = None
 
 class SavedView(SavedViewBase):
     """Complete saved view model."""

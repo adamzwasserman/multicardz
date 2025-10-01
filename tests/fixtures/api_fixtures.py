@@ -1,7 +1,9 @@
 # tests/fixtures/api_fixtures.py
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch
+
 
 @pytest.fixture
 def test_client():

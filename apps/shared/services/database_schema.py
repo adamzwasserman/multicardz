@@ -4,11 +4,8 @@ Pure functions for creating database schemas across different modes.
 NO CLASSES - only pure functions with explicit dependencies.
 """
 
-import sqlite3
-from typing import Optional, Any
 import json
-import uuid
-from datetime import datetime
+import sqlite3
 
 
 def create_zero_trust_schema(connection: sqlite3.Connection, mode: str) -> None:

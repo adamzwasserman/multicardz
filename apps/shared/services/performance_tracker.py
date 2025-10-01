@@ -6,14 +6,14 @@ Layer 2: Per-session adaptive learning (personalizes to user)
 Layer 3: ML telemetry hooks (optional external optimization)
 """
 
-import json
 import logging
 import os
 import time
 from collections import defaultdict, deque
+from collections.abc import Callable
 from dataclasses import dataclass
 from threading import Lock
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class TTLCache:
         self._timestamps = {}
         self._lock = Lock()
 
-    def get(self, key: Tuple) -> Optional[float]:
+    def get(self, key: tuple) -> float | None:
         """Get cached value if not expired."""
         with self._lock:
             if key in self._cache:
@@ -64,7 +64,7 @@ class TTLCache:
                     del self._timestamps[key]
         return None
 
-    def put(self, key: Tuple, value: float) -> None:
+    def put(self, key: tuple, value: float) -> None:
         """Store value with TTL."""
         with self._lock:
             # Evict oldest if at capacity
@@ -81,7 +81,7 @@ class PerformanceTelemetryHook:
     """Telemetry hook for streaming to external ML services."""
 
     def __init__(self):
-        self.handlers: List[Callable] = []
+        self.handlers: list[Callable] = []
         self.buffer: deque = deque(maxlen=1000)
         self.enabled = os.getenv('MULTICARDZ_TELEMETRY_ENABLED', 'false').lower() == 'true'
         self.endpoint = os.getenv('MULTICARDZ_ML_ENDPOINT')
@@ -120,7 +120,7 @@ class PerformanceTelemetryHook:
                 logger.debug(f"Telemetry handler error: {e}")
 
     def get_prediction_async(self, mode: str, context: ExecutionContext,
-                            timeout_ms: int = 5) -> Optional[float]:
+                            timeout_ms: int = 5) -> float | None:
         """Get prediction from ML service (non-blocking)."""
         if not self.endpoint:
             return None
@@ -217,7 +217,7 @@ class AdaptivePerformanceTracker:
 
         return max(0.1, predicted)  # Never predict negative time
 
-    def _predict_from_history(self, mode: str, context: ExecutionContext) -> Optional[float]:
+    def _predict_from_history(self, mode: str, context: ExecutionContext) -> float | None:
         """Predict based on session history using simple linear regression."""
         session_key = (mode, context.operation_type)
         history = self.session_history[session_key]
@@ -237,7 +237,7 @@ class AdaptivePerformanceTracker:
         x_mean = sum(x_values) / n
         y_mean = sum(y_values) / n
 
-        numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(x_values, y_values))
+        numerator = sum((x - x_mean) * (y - y_mean) for x, y in zip(x_values, y_values, strict=False))
         denominator = sum((x - x_mean) ** 2 for x in x_values)
 
         if denominator == 0:
@@ -263,7 +263,7 @@ class AdaptivePerformanceTracker:
         self.telemetry.record_execution(metrics)
 
     def select_best_mode(self, context: ExecutionContext,
-                        available_modes: List[str]) -> str:
+                        available_modes: list[str]) -> str:
         """
         Select the best processing mode based on predictions.
         This replaces the static threshold-based selection.
@@ -290,7 +290,7 @@ class AdaptivePerformanceTracker:
 
         return best_mode
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> dict[str, Any]:
         """Get tracker statistics."""
         stats = {
             "confidence": self.confidence,

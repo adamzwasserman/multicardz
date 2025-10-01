@@ -10,12 +10,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from apps.shared.services.card_service import (
-    create_database_config,
-    with_db_session,
-    get_all_card_summaries,
     create_card,
+    create_database_config,
     filter_cards_with_operations_streamed,
+    get_all_card_summaries,
     get_tag_statistics,
+    with_db_session,
 )
 
 

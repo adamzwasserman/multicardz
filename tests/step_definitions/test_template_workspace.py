@@ -1,8 +1,5 @@
 """Step definitions for template workspace BDD tests."""
-import pytest
-from pytest_bdd import scenarios, given, when, then, parsers
-from jinja2 import Environment, FileSystemLoader, DictLoader
-from pathlib import Path
+from pytest_bdd import given, scenarios, then, when
 
 # Load scenarios from feature file
 scenarios('../features/template_workspace.feature')

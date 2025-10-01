@@ -4,23 +4,21 @@ Pure functional service for managing progressive onboarding lessons.
 Follows function-based architecture with explicit state passing.
 """
 
-from typing import Dict, List, Optional, Tuple, Any
-from datetime import datetime, timezone
 import json
+from datetime import UTC, datetime
+from typing import Any
 
 from ..data.onboarding_lessons import (
+    LESSON_PROGRESSION,
+    get_available_lessons,
+    get_default_lesson_state,
     get_lesson_cards,
     get_lesson_tags,
-    get_default_lesson_state,
     validate_lesson_completion,
-    get_available_lessons,
-    LESSON_PROGRESSION,
-    LessonCard,
-    LessonTag
 )
 
 
-def create_lesson_cards_for_database(lesson_number: int) -> List[Dict[str, Any]]:
+def create_lesson_cards_for_database(lesson_number: int) -> list[dict[str, Any]]:
     """
     Convert lesson cards to database-compatible format.
 
@@ -46,15 +44,15 @@ def create_lesson_cards_for_database(lesson_number: int) -> List[Dict[str, Any]]
                 "success_criteria": card.success_criteria,
                 "next_action": card.next_action
             },
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "modified_at": datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(UTC).isoformat(),
+            "modified_at": datetime.now(UTC).isoformat()
         }
         db_cards.append(db_card)
 
     return db_cards
 
 
-def create_lesson_tags_for_database(lesson_number: int) -> List[Dict[str, Any]]:
+def create_lesson_tags_for_database(lesson_number: int) -> list[dict[str, Any]]:
     """
     Convert lesson tags to database-compatible format.
 
@@ -76,7 +74,7 @@ def create_lesson_tags_for_database(lesson_number: int) -> List[Dict[str, Any]]:
                 "instruction": tag.instruction,
                 "zone_target": tag.zone_target
             },
-            "created_at": datetime.now(timezone.utc).isoformat()
+            "created_at": datetime.now(UTC).isoformat()
         }
         db_tags.append(db_tag)
 
@@ -84,10 +82,10 @@ def create_lesson_tags_for_database(lesson_number: int) -> List[Dict[str, Any]]:
 
 
 def filter_cards_by_lesson_state(
-    all_cards: List[Dict],
-    lesson_state: Dict,
-    zone_state: Dict
-) -> List[Dict]:
+    all_cards: list[dict],
+    lesson_state: dict,
+    zone_state: dict
+) -> list[dict]:
     """
     Filter cards based on current lesson state and user progress.
 
@@ -150,10 +148,10 @@ def filter_cards_by_lesson_state(
 
 
 def detect_lesson_progression(
-    previous_state: Dict,
-    current_zone_state: Dict,
-    lesson_state: Dict
-) -> Tuple[Dict, List[str]]:
+    previous_state: dict,
+    current_zone_state: dict,
+    lesson_state: dict
+) -> tuple[dict, list[str]]:
     """
     Detect if user has achieved lesson progression criteria.
 
@@ -201,12 +199,12 @@ def detect_lesson_progression(
             completed_lessons = updated_state.get("completed_lessons", [])
             if current_lesson not in completed_lessons:
                 updated_state["completed_lessons"] = completed_lessons + [current_lesson]
-                updated_state["lesson_completed_at"] = datetime.now(timezone.utc).isoformat()
+                updated_state["lesson_completed_at"] = datetime.now(UTC).isoformat()
 
     return updated_state, new_criteria
 
 
-def advance_lesson_step(lesson_state: Dict) -> Dict:
+def advance_lesson_step(lesson_state: dict) -> dict:
     """
     Advance to the next step in current lesson.
 
@@ -223,7 +221,7 @@ def advance_lesson_step(lesson_state: Dict) -> Dict:
     return updated_state
 
 
-def change_lesson(lesson_state: Dict, new_lesson_number: int) -> Dict:
+def change_lesson(lesson_state: dict, new_lesson_number: int) -> dict:
     """
     Change to a different lesson.
 
@@ -244,7 +242,7 @@ def change_lesson(lesson_state: Dict, new_lesson_number: int) -> Dict:
     updated_state = lesson_state.copy()
     updated_state["current_lesson"] = new_lesson_number
     updated_state["current_step"] = 1
-    updated_state["lesson_changed_at"] = datetime.now(timezone.utc).isoformat()
+    updated_state["lesson_changed_at"] = datetime.now(UTC).isoformat()
 
     # Reset achieved criteria for new lesson
     if new_lesson_number != "production":
@@ -253,7 +251,7 @@ def change_lesson(lesson_state: Dict, new_lesson_number: int) -> Dict:
     return updated_state
 
 
-def get_lesson_selector_options(lesson_state: Dict) -> List[Dict[str, Any]]:
+def get_lesson_selector_options(lesson_state: dict) -> list[dict[str, Any]]:
     """
     Get available lesson options for the lesson selector.
 
@@ -281,9 +279,7 @@ def get_lesson_selector_options(lesson_state: Dict) -> List[Dict[str, Any]]:
             # Check if current lesson's criteria are met (lesson complete but not marked)
             if lesson_num == 1 and "tag_in_union_zone" in achieved_criteria:
                 status = "🎉"  # Completed but user needs to advance
-            elif lesson_num == 2 and "two_tags_in_union" in achieved_criteria:
-                status = "🎉"
-            elif lesson_num == 3 and "tag_in_intersection" in achieved_criteria:
+            elif lesson_num == 2 and "two_tags_in_union" in achieved_criteria or lesson_num == 3 and "tag_in_intersection" in achieved_criteria:
                 status = "🎉"
             else:
                 status = "🔄"
@@ -337,7 +333,7 @@ def get_lesson_selector_options(lesson_state: Dict) -> List[Dict[str, Any]]:
     return sorted(options, key=lambda x: x["value"] if isinstance(x["value"], int) else 999)
 
 
-def create_lesson_hint_text(lesson_state: Dict, zone_state: Dict) -> Optional[str]:
+def create_lesson_hint_text(lesson_state: dict, zone_state: dict) -> str | None:
     """
     Generate contextual hint text based on lesson state.
 
@@ -389,7 +385,7 @@ def create_lesson_hint_text(lesson_state: Dict, zone_state: Dict) -> Optional[st
     return None
 
 
-def get_lesson_progress_percentage(lesson_state: Dict) -> float:
+def get_lesson_progress_percentage(lesson_state: dict) -> float:
     """
     Calculate overall lesson progress as percentage.
 
@@ -417,12 +413,12 @@ def get_lesson_progress_percentage(lesson_state: Dict) -> float:
     return completed_count / total_lessons
 
 
-def serialize_lesson_state(lesson_state: Dict) -> str:
+def serialize_lesson_state(lesson_state: dict) -> str:
     """Serialize lesson state for storage."""
     return json.dumps(lesson_state, default=str)
 
 
-def deserialize_lesson_state(lesson_state_json: str) -> Dict:
+def deserialize_lesson_state(lesson_state_json: str) -> dict:
     """Deserialize lesson state from storage."""
     try:
         return json.loads(lesson_state_json)

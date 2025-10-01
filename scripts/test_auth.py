@@ -9,14 +9,17 @@ from pathlib import Path
 # Add the project root to the path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from apps.shared.services.database_storage import create_database_connection, DatabaseConfig
 from apps.shared.services.auth_service import (
-    authenticate_user,
-    create_user_session,
-    validate_session,
-    logout_user,
     InvalidCredentialsError,
     SessionExpiredError,
+    authenticate_user,
+    create_user_session,
+    logout_user,
+    validate_session,
+)
+from apps.shared.services.database_storage import (
+    DatabaseConfig,
+    create_database_connection,
 )
 
 

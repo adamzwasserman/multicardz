@@ -1,10 +1,9 @@
 """Step definitions for API routes BDD tests."""
-import pytest
-from pytest_bdd import scenarios, given, when, then, parsers
-from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch, MagicMock
 import time
-import json
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
+from pytest_bdd import given, scenarios, then, when
 
 # Load scenarios from feature file
 scenarios('../features/api_routes.feature')

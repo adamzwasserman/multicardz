@@ -3,29 +3,27 @@ MultiCardz™ Cards API Router
 Handles dynamic card rendering with validated input using the complete backend stack.
 """
 
-from fastapi import APIRouter, Request, HTTPException, Header, Depends
-from fastapi.responses import HTMLResponse
-from jinja2 import Environment, FileSystemLoader
-from typing import List, Dict, Tuple, Optional
-import time
-import logging
 import json
+import logging
+import time
 from pathlib import Path
 
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi.responses import HTMLResponse
+from jinja2 import Environment, FileSystemLoader
+
 # Import models
-from ..models.render_request import RenderRequest, TagsInPlay, ZoneData
+from ..models.render_request import RenderRequest
 
 # Import shared services (adjust paths as needed)
 try:
-    from apps.shared.services.set_operations_unified import apply_unified_operations
+    from apps.shared.services.card_service import CardServiceCompat as CardService
+    from apps.shared.services.card_service import create_database_config
     from apps.shared.services.database_storage import (
         create_database_connection,
-        load_all_card_summaries
+        load_all_card_summaries,
     )
-    from apps.shared.services.card_service import (
-        CardServiceCompat as CardService,
-        create_database_config
-    )
+    from apps.shared.services.set_operations_unified import apply_unified_operations
 except ImportError as e:
     logging.warning(f"Could not import shared services: {e}")
 
@@ -121,7 +119,10 @@ async def render_cards(request: Request):
         # Load and filter cards using shared services
         with create_database_connection(DEFAULT_DB_CONFIG) as conn:
             # Load lesson cards specifically for onboarding
-            from apps.shared.services.lesson_service import get_default_lesson_state, detect_lesson_progression
+            from apps.shared.services.lesson_service import (
+                detect_lesson_progression,
+                get_default_lesson_state,
+            )
 
             lesson_state = get_default_lesson_state()
 
@@ -422,12 +423,12 @@ async def get_workspace_context(
     return x_workspace_id, x_user_id
 
 
-@router.get("/cards", response_model=List[Dict])
+@router.get("/cards", response_model=list[dict])
 async def get_cards(
     context: tuple[str, str] = Depends(get_workspace_context),
     skip: int = 0,
     limit: int = 100
-) -> List[Dict]:
+) -> list[dict]:
     """
     Get cards for workspace with isolation.
 
@@ -476,11 +477,11 @@ async def get_cards(
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.post("/cards", response_model=Dict)
+@router.post("/cards", response_model=dict)
 async def create_card(
     request: Request,
     context: tuple[str, str] = Depends(get_workspace_context)
-) -> Dict:
+) -> dict:
     """
     Create card with automatic workspace assignment.
 
@@ -497,9 +498,10 @@ async def create_card(
         card_data["user_id"] = user_id
 
         # Import services
+        import uuid
+
         from apps.shared.services.database_connection import get_workspace_connection
         from apps.shared.services.tag_count_maintenance import create_card_with_counts
-        import uuid
 
         # Generate card_id if not provided
         if "card_id" not in card_data:
@@ -537,11 +539,11 @@ async def create_card(
         raise HTTPException(status_code=500, detail=f"Error creating card: {str(e)}")
 
 
-@router.get("/cards/{card_id}", response_model=Dict)
+@router.get("/cards/{card_id}", response_model=dict)
 async def get_card(
     card_id: str,
     context: tuple[str, str] = Depends(get_workspace_context)
-) -> Dict:
+) -> dict:
     """
     Get single card with workspace validation.
 
@@ -590,7 +592,10 @@ async def get_lesson_options(request: Request):
     """Get lesson selector options as HTML."""
     try:
         # Import lesson service functions
-        from apps.shared.services.lesson_service import get_lesson_selector_options, get_default_lesson_state
+        from apps.shared.services.lesson_service import (
+            get_default_lesson_state,
+            get_lesson_selector_options,
+        )
 
         # Get default lesson state (in production, this would come from user session/database)
         lesson_state = get_default_lesson_state()
@@ -654,7 +659,10 @@ async def switch_lesson(request: Request):
         lesson_id = body.get('lessonId')
 
         # Import lesson service functions
-        from apps.shared.services.lesson_service import change_lesson, get_default_lesson_state
+        from apps.shared.services.lesson_service import (
+            change_lesson,
+            get_default_lesson_state,
+        )
 
         # Get current lesson state (in production, this would come from user session)
         current_state = get_default_lesson_state()
@@ -715,7 +723,10 @@ async def restore_view(view_id: str):
 async def get_lesson_hint(request: Request):
     """Get current lesson hint text."""
     try:
-        from apps.shared.services.lesson_service import get_default_lesson_state, create_lesson_hint_text
+        from apps.shared.services.lesson_service import (
+            create_lesson_hint_text,
+            get_default_lesson_state,
+        )
 
         # Get current lesson state
         lesson_state = get_default_lesson_state()

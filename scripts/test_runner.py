@@ -32,16 +32,11 @@ Examples:
 """
 
 import asyncio
-import concurrent.futures
 import cProfile
-import json
-import os
 import pstats
 import subprocess
 import sys
 import time
-from pathlib import Path
-from typing import Dict, List, Set, Tuple
 
 
 class TestResult:
@@ -54,7 +49,7 @@ class TestResult:
         self.error = error
 
 
-def get_changed_files() -> Set[str]:
+def get_changed_files() -> set[str]:
     """Get list of changed files from git."""
     try:
         # Get staged files
@@ -85,7 +80,7 @@ def get_changed_files() -> Set[str]:
         return set()
 
 
-def should_run_tests(changed_files: Set[str], test_patterns: List[str]) -> bool:
+def should_run_tests(changed_files: set[str], test_patterns: list[str]) -> bool:
     """Determine if tests should run based on changed files."""
     if not changed_files:
         return True  # No git or no changes - run all tests
@@ -103,7 +98,7 @@ def should_run_tests(changed_files: Set[str], test_patterns: List[str]) -> bool:
     return False
 
 
-def run_command_with_timing(cmd: List[str], description: str, show_output: bool = False,
+def run_command_with_timing(cmd: list[str], description: str, show_output: bool = False,
                           timeout: int = 120) -> TestResult:
     """Run a command and return detailed results with timing."""
     start_time = time.time()
@@ -146,7 +141,7 @@ def print_test_result(result: TestResult, show_timing: bool = False):
 
 
 def run_frontend_tests(show_timing: bool = False, use_smart: bool = False,
-                      changed_files: Set[str] = None) -> Tuple[bool, List[TestResult]]:
+                      changed_files: set[str] = None) -> tuple[bool, list[TestResult]]:
     """Run frontend drag-drop tests with optional smart selection."""
     print("🎨 Frontend Drag-Drop Tests")
     print("=" * 40)
@@ -189,9 +184,9 @@ def run_frontend_tests(show_timing: bool = False, use_smart: bool = False,
 
 
 def run_backend_tests(test_type: str = "all", show_timing: bool = False,
-                     use_smart: bool = False, changed_files: Set[str] = None,
+                     use_smart: bool = False, changed_files: set[str] = None,
                      use_parallel: bool = False, no_cache: bool = False,
-                     use_coverage: bool = False) -> Tuple[bool, List[TestResult]]:
+                     use_coverage: bool = False) -> tuple[bool, list[TestResult]]:
     """Run backend set operations tests with optimizations."""
     print("⚙️ Backend Set Operations Tests")
     print("=" * 40)
@@ -287,7 +282,7 @@ def show_help():
 
 
 async def run_tests_parallel(show_timing: bool = False, use_smart: bool = False,
-                            changed_files: Set[str] = None) -> bool:
+                            changed_files: set[str] = None) -> bool:
     """Run frontend and backend tests in parallel."""
     print("🚀 Running Tests in Parallel Mode")
     print("=" * 40)
@@ -318,13 +313,13 @@ async def run_tests_parallel(show_timing: bool = False, use_smart: bool = False,
         print("\n🎉 All automated tests passed!")
         return True
     else:
-        print(f"\n⚠️ Some tests failed:")
+        print("\n⚠️ Some tests failed:")
         print(f"   Frontend: {'✅' if frontend_ok else '❌'}")
         print(f"   Backend: {'✅' if backend_ok else '❌'}")
         return False
 
 
-def parse_args() -> Tuple[str, Dict[str, bool]]:
+def parse_args() -> tuple[str, dict[str, bool]]:
     """Parse command line arguments."""
     args = sys.argv[1:]
     if not args or args[0] in ["--help", "-h", "help"]:
@@ -409,7 +404,7 @@ def main():
                     show_manual_tests()
                     return True
                 else:
-                    print(f"\n⚠️ Some tests failed:")
+                    print("\n⚠️ Some tests failed:")
                     print(f"   Frontend: {'✅' if frontend_ok else '❌'}")
                     print(f"   Backend: {'✅' if backend_ok else '❌'}")
                     return False

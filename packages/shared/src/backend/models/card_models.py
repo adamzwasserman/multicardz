@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field, field_validator
-from typing import FrozenSet, Dict, Any, Optional
-from datetime import datetime, timezone
 import uuid
+from datetime import UTC, datetime
+from typing import Any
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class CardSummary(BaseModel):
@@ -13,9 +14,9 @@ class CardSummary(BaseModel):
     """
     id: str = Field(default_factory=lambda: str(uuid.uuid4())[:8].upper())
     title: str = Field(min_length=1, max_length=255)
-    tags: FrozenSet[str] = Field(default_factory=frozenset)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    modified_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    tags: frozenset[str] = Field(default_factory=frozenset)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    modified_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     has_attachments: bool = Field(default=False)
 
     model_config = {"frozen": True, "str_strip_whitespace": True}
@@ -55,7 +56,7 @@ class CardDetail(BaseModel):
     """
     id: str = Field(description="Matching CardSummary ID")
     content: str = Field(default="")
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
     attachment_count: int = Field(default=0)
     total_attachment_size: int = Field(default=0)
     version: int = Field(default=1)
@@ -82,7 +83,7 @@ class CardDetail(BaseModel):
 # Pure functions for card operations (no classes for business logic)
 def create_card_summary(
     title: str,
-    tags: FrozenSet[str],
+    tags: frozenset[str],
     *,
     workspace_id: str,
     user_id: str,
@@ -104,7 +105,7 @@ def create_card_summary(
 def create_card_detail(
     card_id: str,
     content: str,
-    metadata: Dict[str, Any],
+    metadata: dict[str, Any],
     *,
     workspace_id: str,
     user_id: str

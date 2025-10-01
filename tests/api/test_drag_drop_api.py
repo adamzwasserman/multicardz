@@ -3,7 +3,6 @@
 Comprehensive test suite for the MultiCardz™ drag-drop system.
 """
 
-import json
 import sys
 from pathlib import Path
 

@@ -1,11 +1,10 @@
 """BDD step definitions for tag count maintenance feature."""
 
-import pytest
-from pytest_bdd import scenarios, given, when, then, parsers
-import asyncio
-from unittest.mock import AsyncMock, MagicMock
 import sqlite3
-from typing import Generator
+from collections.abc import Generator
+
+import pytest
+from pytest_bdd import given, scenarios, then, when
 
 # Import fixtures
 pytest_plugins = ['tests.fixtures.tag_count_fixtures']

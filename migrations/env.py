@@ -5,12 +5,12 @@ This module configures Alembic for database migrations with SQLite support.
 """
 
 import logging
+import sys
 from logging.config import fileConfig
 from pathlib import Path
-import sys
 
-from sqlalchemy import engine_from_config, pool
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
 # Add the project root to the path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))

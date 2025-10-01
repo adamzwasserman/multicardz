@@ -1,8 +1,10 @@
-from typing import FrozenSet, Dict, Any, Optional, Callable, TypeVar
-from packages.shared.src.backend.models.card_models import CardSummary
-import time
 import functools
+import time
+from collections.abc import Callable
 from enum import Enum
+from typing import Any, TypeVar
+
+from packages.shared.src.backend.models.card_models import CardSummary
 
 T = TypeVar('T')
 
@@ -17,7 +19,7 @@ class SetOperationType(Enum):
 
 
 # Performance cache for repeated operations (singleton pattern - approved)
-_OPERATION_CACHE: Dict[str, Any] = {}
+_OPERATION_CACHE: dict[str, Any] = {}
 _CACHE_STATS = {"hits": 0, "misses": 0}
 
 
@@ -28,7 +30,7 @@ def clear_operation_cache() -> None:
     _CACHE_STATS = {"hits": 0, "misses": 0}
 
 
-def get_cache_statistics() -> Dict[str, Any]:
+def get_cache_statistics() -> dict[str, Any]:
     """Get cache performance statistics."""
     total = _CACHE_STATS["hits"] + _CACHE_STATS["misses"]
     hit_rate = _CACHE_STATS["hits"] / total if total > 0 else 0
@@ -80,12 +82,12 @@ def cached_operation(operation_name: str):
 
 @cached_operation("intersection")
 def filter_cards_by_intersection(
-    cards: FrozenSet[CardSummary],
-    required_tags: FrozenSet[str],
+    cards: frozenset[CardSummary],
+    required_tags: frozenset[str],
     *,
     workspace_id: str,
     user_id: str
-) -> FrozenSet[CardSummary]:
+) -> frozenset[CardSummary]:
     """
     Filter cards using set intersection with performance optimization.
 
@@ -119,12 +121,12 @@ def filter_cards_by_intersection(
 
 @cached_operation("union")
 def combine_cards_by_union(
-    card_set_a: FrozenSet[CardSummary],
-    card_set_b: FrozenSet[CardSummary],
+    card_set_a: frozenset[CardSummary],
+    card_set_b: frozenset[CardSummary],
     *,
     workspace_id: str,
     user_id: str
-) -> FrozenSet[CardSummary]:
+) -> frozenset[CardSummary]:
     """
     Combine card sets using union operation preserving multiplicity.
 
@@ -144,12 +146,12 @@ def combine_cards_by_union(
 
 @cached_operation("difference")
 def subtract_cards_by_difference(
-    card_set_a: FrozenSet[CardSummary],
-    card_set_b: FrozenSet[CardSummary],
+    card_set_a: frozenset[CardSummary],
+    card_set_b: frozenset[CardSummary],
     *,
     workspace_id: str,
     user_id: str
-) -> FrozenSet[CardSummary]:
+) -> frozenset[CardSummary]:
     """
     Subtract cards using set difference operation.
 
@@ -168,12 +170,12 @@ def subtract_cards_by_difference(
 
 
 def symmetric_difference_cards(
-    card_set_a: FrozenSet[CardSummary],
-    card_set_b: FrozenSet[CardSummary],
+    card_set_a: frozenset[CardSummary],
+    card_set_b: frozenset[CardSummary],
     *,
     workspace_id: str,
     user_id: str
-) -> FrozenSet[CardSummary]:
+) -> frozenset[CardSummary]:
     """
     Calculate symmetric difference of card sets.
 
@@ -187,9 +189,9 @@ def symmetric_difference_cards(
 
 
 def validate_mathematical_properties(
-    operation_result: FrozenSet[T],
+    operation_result: frozenset[T],
     expected_properties: list[str],
-    operation_context: Dict[str, Any]
+    operation_context: dict[str, Any]
 ) -> bool:
     """
     Validate that set operations maintain mathematical properties.
@@ -224,13 +226,13 @@ def validate_mathematical_properties(
 
 
 def execute_complex_set_operation(
-    cards: FrozenSet[CardSummary],
+    cards: frozenset[CardSummary],
     operation_expression: str,
-    tag_sets: Dict[str, FrozenSet[str]],
+    tag_sets: dict[str, frozenset[str]],
     *,
     workspace_id: str,
     user_id: str
-) -> FrozenSet[CardSummary]:
+) -> frozenset[CardSummary]:
     """
     Execute complex set operations like (A ∩ B) ∪ (C - D).
 
@@ -264,9 +266,9 @@ def execute_complex_set_operation(
 
 
 def benchmark_set_operations(
-    datasets: Dict[str, FrozenSet[CardSummary]],
+    datasets: dict[str, frozenset[CardSummary]],
     operation_type: SetOperationType
-) -> Dict[str, Dict[str, float]]:
+) -> dict[str, dict[str, float]]:
     """
     Benchmark set operations across different dataset sizes.
 

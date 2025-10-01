@@ -2,7 +2,8 @@
 
 Pure functions for building Jinja2 template contexts with workspace metadata.
 """
-from typing import Dict, Any, Optional
+from typing import Any
+
 from fastapi import Request
 
 
@@ -10,7 +11,7 @@ def get_workspace_template_context(
     request: Request,
     workspace_id: str,
     user_id: str
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Build template context with workspace isolation.
 

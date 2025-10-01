@@ -1,10 +1,11 @@
 # tests/fixtures/bitmap_fixtures.py
-import pytest
-from typing import FrozenSet, Dict
+
 import pyroaring
+import pytest
+
 
 @pytest.fixture
-def sample_bitmaps() -> Dict[str, pyroaring.BitMap]:
+def sample_bitmaps() -> dict[str, pyroaring.BitMap]:
     """Sample bitmaps for testing."""
     return {
         "tag1": pyroaring.BitMap([1, 2, 3, 4, 5]),
@@ -14,7 +15,7 @@ def sample_bitmaps() -> Dict[str, pyroaring.BitMap]:
     }
 
 @pytest.fixture
-def sample_cards() -> FrozenSet:
+def sample_cards() -> frozenset:
     """Sample cards for testing."""
     from collections import namedtuple
     Card = namedtuple('Card', ['card_id', 'tag_bitmaps'])

@@ -3,19 +3,19 @@ Step definitions for database schema BDD tests.
 """
 
 import os
+import shutil
 import sqlite3
 import tempfile
-import shutil
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 import pytest
-from pytest_bdd import scenarios, given, when, then, parsers
-import json
+from pytest_bdd import given, parsers, scenarios, then, when
 
 # Import the feature
 scenarios('../features/database_schema.feature')
 
 # Global test state
-test_state: Dict[str, Any] = {}
+test_state: dict[str, Any] = {}
 
 
 @pytest.fixture
