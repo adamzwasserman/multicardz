@@ -3,9 +3,11 @@ pytest configuration for MultiCardz™ shared package tests.
 """
 
 import pytest
-from fastapi.testclient import TestClient
+# Commented out to avoid import errors when testing templates
+# from fastapi.testclient import TestClient
 
 from apps.shared.models import Attachment, CardDetail, CardSummary, UserTier, Workspace
+from jinja2 import Environment, DictLoader
 
 
 @pytest.fixture
@@ -85,6 +87,39 @@ def sample_user_tier():
 @pytest.fixture
 def test_client():
     """Test client with mocked auth for API route testing."""
+    from fastapi.testclient import TestClient
     from apps.user.main import create_app
     app = create_app()
     return TestClient(app)
+
+
+@pytest.fixture
+def jinja_env():
+    """Jinja2 environment for testing."""
+    templates = {
+        "card_grid.html": """
+        <div class="card-grid" data-workspace="{{ workspace_id }}">
+            {% for card in cards %}
+            <div class="card" data-card-id="{{ card.card_id }}">
+                {{ card.name }}
+            </div>
+            {% endfor %}
+        </div>
+        """,
+        "tag_filter.html": """
+        <div class="tag-filter" data-workspace="{{ workspace_id }}">
+            <div id="tagsInPlay"></div>
+        </div>
+        """
+    }
+    return Environment(loader=DictLoader(templates))
+
+
+@pytest.fixture
+def workspace_context():
+    """Workspace context for templates."""
+    return {
+        "workspace_id": "test-workspace",
+        "workspace_name": "Test Workspace",
+        "user_id": "test-user"
+    }

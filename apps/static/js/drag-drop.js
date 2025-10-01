@@ -546,9 +546,17 @@ class SpatialDragDrop {
   // Send to backend
   async renderCards(tagsInPlay) {
     try {
+      // Get workspace context from DOM
+      const workspaceId = this.getWorkspaceContext();
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (workspaceId) {
+        headers['X-Workspace-Id'] = workspaceId;
+      }
+
       const response = await fetch('/api/v2/render/cards', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: headers,
         body: JSON.stringify({ tagsInPlay })
       });
 
@@ -562,6 +570,12 @@ class SpatialDragDrop {
     } catch (error) {
       console.error('Failed to render cards:', error);
     }
+  }
+
+  // Get workspace context from DOM
+  getWorkspaceContext() {
+    const container = document.querySelector('[data-workspace]');
+    return container ? container.dataset.workspace : null;
   }
 
   // Observe zone changes with scoped observer

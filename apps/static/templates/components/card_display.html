@@ -1,5 +1,7 @@
 <!-- Card Display Component Template -->
-<div class="card-display-container">
+<div class="card-display-container"
+     {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
+     {% if user_id %}data-user="{{ user_id }}"{% endif %}>
     <!-- Lesson completion banner (will be shown/hidden by JavaScript) -->
     <div id="lessonCompletionBanner" class="lesson-completion-banner" style="display: none;">
         <div class="completion-content">
@@ -11,10 +13,18 @@
             <button class="completion-dismiss" onclick="dismissLessonCompletion(this)">✕</button>
         </div>
     </div>
-    <div class="card-grid" data-layout="{{ layout_type | default('grid') }}">
+    <div class="card-grid"
+         data-layout="{{ layout_type | default('grid') }}"
+         {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
+         {% if htmx_enabled %}
+         hx-get="/api/cards"
+         hx-trigger="workspace-changed from:body"
+         hx-headers='{"X-Workspace-Id": "{{ workspace_id }}"}'
+         {% endif %}>
         {% for card in cards %}
         <div class="card-item"
              data-card-id="{{ card.id }}"
+             {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
              {% if card.draggable %}draggable="true"{% endif %}>
             <div class="card-content">
                 <div class="card-header">

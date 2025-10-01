@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="spatial-grid" id="spatialGrid">
+<div class="spatial-grid" id="spatialGrid"
+     {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
+     {% if user_id %}data-user="{{ user_id }}"{% endif %}>
     <!-- Row 1: Tag Management (Middle Column Only) -->
     <button class="collapse-toggle collapse-row1" onclick="toggleRow(1)" title="Toggle Row 1" aria-label="Toggle row 1">
         <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">

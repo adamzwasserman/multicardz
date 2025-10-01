@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="MultiCardz™ - Spatial tag manipulation system for intuitive data organization and filtering using drag-and-drop interactions">
-    <title>{% block title %}MultiCardz™{% endblock %}</title>
+    {% if workspace_id %}
+    <meta name="workspace-id" content="{{ workspace_id }}">
+    {% endif %}
+    {% if user_id %}
+    <meta name="user-id" content="{{ user_id }}">
+    {% endif %}
+    <title>{% block title %}MultiCardz™{% if workspace_name %} - {{ workspace_name }}{% endif %}{% endblock %}</title>
 
     <!-- Base template styles -->
     {% block head %}{% endblock %}
