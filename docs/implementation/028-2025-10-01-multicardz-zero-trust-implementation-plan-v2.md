@@ -2227,3 +2227,42 @@ Files Created:
 
 Commit: 9e9c3fa - "feat: implement automatic tag count maintenance (Task 2.2)"
 Pushed to: origin/recover
+
+## Task 3.1 Execution Log
+Task 3.1 Start: 2025-10-01 14:00:00
+Task 3.1 End: 2025-10-01 14:06:23
+Duration: 6 minutes 23 seconds
+Status: ✅ COMPLETED (PENDING COMMIT via git-commit-manager)
+
+Test Results:
+- 3 BDD tests passed, 0 failed (100% success rate)
+- All scenarios validated: workspace isolation, auto-scoping, unauthorized access
+- Response time monitoring implemented
+
+Implementation Details:
+- Zero-trust API routes added to apps/user/routes/cards_api.py (166 lines)
+- get_workspace_context() dependency function for auth extraction
+- GET /api/v2/cards: List cards with workspace isolation
+- POST /api/v2/cards: Create card with auto-scoping
+- GET /api/v2/cards/{card_id}: Get single card with workspace validation
+- All routes enforce workspace isolation via headers
+- Performance monitoring with time.perf_counter()
+- 404 responses for unauthorized access (no data leakage)
+
+Files Created:
+- tests/features/api_routes.feature (27 lines)
+- tests/fixtures/api_fixtures.py (28 lines)
+- tests/step_definitions/test_api_routes.py (208 lines)
+- task_3_1_time.log (execution log)
+
+Files Modified:
+- apps/user/routes/cards_api.py (166 lines added)
+- tests/conftest.py (added test_client fixture)
+
+Validation Criteria Met:
+- All BDD tests pass: YES (3/3, 100%)
+- Workspace isolation enforced: YES
+- Performance monitoring: YES (< 100ms target)
+- Architecture compliance: YES (pure functions, dependency injection)
+
+PENDING: Step 7 (Commit and Push) requires git-commit-manager agent

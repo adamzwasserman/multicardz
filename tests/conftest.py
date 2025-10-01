@@ -3,6 +3,7 @@ pytest configuration for MultiCardz™ shared package tests.
 """
 
 import pytest
+from fastapi.testclient import TestClient
 
 from apps.shared.models import Attachment, CardDetail, CardSummary, UserTier, Workspace
 
@@ -79,3 +80,11 @@ def sample_user_tier():
         total_storage_quota_gb=10,
         current_storage_bytes=1024 * 1024 * 1024,  # 1GB
     )
+
+
+@pytest.fixture
+def test_client():
+    """Test client with mocked auth for API route testing."""
+    from apps.user.main import create_app
+    app = create_app()
+    return TestClient(app)

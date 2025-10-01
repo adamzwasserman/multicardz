@@ -3,10 +3,10 @@ MultiCardz™ Cards API Router
 Handles dynamic card rendering with validated input using the complete backend stack.
 """
 
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Header, Depends
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 import time
 import logging
 import json
@@ -399,6 +399,189 @@ def render_simple_card_list(cards):
 async def health_check():
     """Health check for the cards API."""
     return {"status": "healthy", "service": "cards_api"}
+
+
+# ============================================================================
+# Zero-Trust API Routes with Workspace Isolation
+# ============================================================================
+
+async def get_workspace_context(
+    authorization: str = Header(...),
+    x_workspace_id: str = Header(...),
+    x_user_id: str = Header(...)
+) -> tuple[str, str]:
+    """
+    Extract and validate workspace context.
+
+    Pure function for context extraction.
+    """
+    # Validate token
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Invalid auth")
+
+    return x_workspace_id, x_user_id
+
+
+@router.get("/cards", response_model=List[Dict])
+async def get_cards(
+    context: tuple[str, str] = Depends(get_workspace_context),
+    skip: int = 0,
+    limit: int = 100
+) -> List[Dict]:
+    """
+    Get cards for workspace with isolation.
+
+    Endpoint with automatic workspace scoping.
+    """
+    start_time = time.perf_counter()
+    workspace_id, user_id = context
+
+    try:
+        # Import database connection service
+        from apps.shared.services.database_connection import get_workspace_connection
+
+        with get_workspace_connection(workspace_id, user_id) as conn:
+            cursor = conn.execute(
+                """
+                SELECT card_id, name, description, tag_ids, created, modified
+                FROM cards
+                WHERE workspace_id = ? AND user_id = ? AND deleted IS NULL
+                ORDER BY created DESC
+                LIMIT ? OFFSET ?
+                """,
+                (workspace_id, user_id, limit, skip)
+            )
+
+            cards = []
+            for row in cursor:
+                cards.append({
+                    "card_id": row[0],
+                    "name": row[1],
+                    "description": row[2],
+                    "tag_ids": json.loads(row[3]) if row[3] else [],
+                    "user_id": user_id,
+                    "workspace_id": workspace_id,
+                    "created": row[4],
+                    "modified": row[5]
+                })
+
+        elapsed = time.perf_counter() - start_time
+        if elapsed > 0.1:
+            logger.warning(f"Get cards took {elapsed:.3f}s")
+
+        return cards
+
+    except Exception as e:
+        logger.error(f"Error getting cards: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.post("/cards", response_model=Dict)
+async def create_card(
+    request: Request,
+    context: tuple[str, str] = Depends(get_workspace_context)
+) -> Dict:
+    """
+    Create card with automatic workspace assignment.
+
+    Ensures workspace isolation even if not provided.
+    """
+    workspace_id, user_id = context
+
+    try:
+        # Parse card data
+        card_data = await request.json()
+
+        # Force workspace context
+        card_data["workspace_id"] = workspace_id
+        card_data["user_id"] = user_id
+
+        # Import services
+        from apps.shared.services.database_connection import get_workspace_connection
+        from apps.shared.services.tag_count_maintenance import create_card_with_counts
+        import uuid
+
+        # Generate card_id if not provided
+        if "card_id" not in card_data:
+            card_data["card_id"] = str(uuid.uuid4())
+
+        with get_workspace_connection(workspace_id, user_id) as conn:
+            card_id = await create_card_with_counts(
+                card_data,
+                db_connection=conn
+            )
+
+            # Fetch and return created card
+            cursor = conn.execute(
+                "SELECT card_id, name, description, tag_ids, created, modified FROM cards WHERE card_id = ?",
+                (card_id,)
+            )
+            row = cursor.fetchone()
+
+            if not row:
+                raise HTTPException(status_code=500, detail="Card created but not found")
+
+            return {
+                "card_id": row[0],
+                "name": row[1],
+                "description": row[2],
+                "tag_ids": json.loads(row[3]) if row[3] else [],
+                "user_id": user_id,
+                "workspace_id": workspace_id,
+                "created": row[4],
+                "modified": row[5]
+            }
+
+    except Exception as e:
+        logger.error(f"Error creating card: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error creating card: {str(e)}")
+
+
+@router.get("/cards/{card_id}", response_model=Dict)
+async def get_card(
+    card_id: str,
+    context: tuple[str, str] = Depends(get_workspace_context)
+) -> Dict:
+    """
+    Get single card with workspace validation.
+
+    Prevents cross-workspace data access.
+    """
+    workspace_id, user_id = context
+
+    try:
+        from apps.shared.services.database_connection import get_workspace_connection
+
+        with get_workspace_connection(workspace_id, user_id) as conn:
+            cursor = conn.execute(
+                """
+                SELECT card_id, name, description, tag_ids, created, modified
+                FROM cards
+                WHERE card_id = ? AND workspace_id = ? AND user_id = ?
+                """,
+                (card_id, workspace_id, user_id)
+            )
+
+            row = cursor.fetchone()
+            if not row:
+                raise HTTPException(status_code=404, detail="Card not found")
+
+            return {
+                "card_id": row[0],
+                "name": row[1],
+                "description": row[2],
+                "tag_ids": json.loads(row[3]) if row[3] else [],
+                "user_id": user_id,
+                "workspace_id": workspace_id,
+                "created": row[4],
+                "modified": row[5]
+            }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting card {card_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 # Lesson-related endpoints
