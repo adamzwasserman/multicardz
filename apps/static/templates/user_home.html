@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="spatial-grid">
+<div class="spatial-grid" id="spatialGrid">
     <!-- Row 1: Tag Management (Middle Column Only) -->
-    <div class="debug-group">
+    <button class="collapse-toggle collapse-row1" onclick="toggleRow(1)" title="Toggle Row 1" aria-label="Toggle row 1">
+        <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+    <div class="debug-group collapsible-row row-1" style="position: relative;">
         <label for="tagsInPlay">tags in play</label>
-        <textarea class="tags-in-play" id="tagsInPlay" placeholder="waiting for zone activity..." aria-label="Tags in play" readonly rows="8">{"union":[],"intersection":[],"row":[],"column":[]}</textarea>
+        <textarea class="tags-in-play" id="tagsInPlay" placeholder="waiting for zone activity..." aria-label="Tags in play" readonly rows="8">{"union":[],"intersection":[],"exclusion":[],"row":[],"column":[]}</textarea>
     </div>
-    <div class="tag-management">
+    <div class="tag-management collapsible-row row-1" style="position: relative;">
         <div class="clouds-container horizontal" id="cloudsContainer" data-zone-type="tag-cloud" data-accepts="tags,group-tags">
             <!-- User Tags Cloud -->
             <div class="cloud cloud-user"
@@ -109,8 +114,20 @@
     </div>
 
     <!-- Row 2: Control Areas (All 3 Columns) -->
-    <div class="universal-control">
-        <h3>universal control</h3>
+    <button class="collapse-toggle collapse-row2" onclick="toggleRow(2)" title="Toggle Row 2" aria-label="Toggle row 2">
+        <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+    <div class="universal-control collapsible-section collapsible-row row-2" style="position: relative;">
+        <div class="section-header">
+            <h3>global settings</h3>
+            <button class="collapse-toggle collapse-universal" onclick="toggleSection('universal')" title="Toggle Universal Control" aria-label="Toggle universal control">
+                <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
         <div class="controls">
 
             <div class="database-group">
@@ -119,7 +136,7 @@
                         hx-trigger="load"
                         hx-swap="innerHTML"
                         onchange="switchDatabase(this.value)">
-                    <option value="">Loading databases...</option>
+                    <option value="">loading saved project...</option>
                 </select>
                 <label for="fontSelector">pick a project</label>
                 <!-- <label for="databaseSelector">active database</label>
@@ -132,15 +149,15 @@
             </div>
 
             <div class="checkbox-group">
-                <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
+                <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
                 <label for="startWithAllCards">start with all cards visible</label>
             </div>
             <div class="checkbox-group">
-                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
+                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
                 <label for="startWithCardsExpanded">start with cards expanded</label>
             </div>
             <div class="checkbox-group">
-                <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
+                <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
                 <label for="showColors">show colors on tags/card</label>
             </div>
 
@@ -148,7 +165,7 @@
         </div>
     </div>
 
-    <div class="top-control">
+    <div class="top-control collapsible-row row-2" style="position: relative;">
         <!-- Control areas are DROP TARGETS for zones -->
         <div class="control-area-container zone-container"
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
@@ -170,7 +187,7 @@
                      data-zone-type="union"
                      data-accepts="tags,group-tags"
 >
-                    <span class="zone-label">Select (ANY matches)</span>
+                    <span class="zone-label">SHOW cards with these tags</span>
                     <div class="tag-collection" id="union-tags-container"></div>
                 </div>
 
@@ -185,8 +202,24 @@
                      data-zone-type="intersection"
                      data-accepts="tags,group-tags"
 >
-                    <span class="zone-label">Filter (ALL required)</span>
+                    <span class="zone-label">FILTER cards by these tags</span>
                     <div class="tag-collection" id="intersection-tags-container"></div>
+                </div>
+
+                <!-- Red Dot Separator -->
+                <div class="zone-separator">
+                    <div class="separator-dot separator-dot-red"></div>
+                </div>
+
+                <!-- Exclusion Drop Zone (NONE) -->
+                <div class="drop-zone filter-subzone exclusion-zone"
+                     id="exclusion_tags"
+                     data-zone-type="exclusion"
+                     data-zone-behavior="exclusion"
+                     data-accepts="tags,group-tags"
+>
+                    <span class="zone-label">HIDE cards with these tags</span>
+                    <div class="tag-collection" id="exclusion-tags-container"></div>
                 </div>
 
                 <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
@@ -196,8 +229,15 @@
         </div>
     </div>
 
-    <div class="ui-control">
-        <h3>user interface</h3>
+    <div class="ui-control collapsible-section collapsible-row row-2" style="position: relative;">
+        <div class="section-header">
+            <h3>user interface</h3>
+            <button class="collapse-toggle collapse-ui" onclick="toggleSection('ui')" title="Toggle User Interface" aria-label="Toggle user interface">
+                <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
+                    <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
 
         <div class="controls">
             <!-- Theme Switcher -->
@@ -245,19 +285,19 @@
             </div>
 
             <div class="checkbox-group">
-                <input type="checkbox" id="advancedView" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
+                <input type="checkbox" id="advancedView" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
                 <label for="advancedView">separate user tags / ai tags</label>
             </div>
 
             <div class="checkbox-group">
-                <input type="checkbox" id="verticalLayout" onchange="if(typeof dragDropSystem !== 'undefined') dragDropSystem.handleControlChange()">
+                <input type="checkbox" id="verticalLayout" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
                 <label for="verticalLayout">stack tags vertically</label>
             </div>
         </div>
     </div>
 
     <!-- Row 3: Main Content (All 3 Columns) -->
-    <div class="left-control">
+    <div class="left-control collapsible-col col-1" style="position: relative;">
         <!-- Control areas are DROP TARGETS for zones -->
         <div class="control-area-container zone-container"
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
@@ -273,7 +313,7 @@
                 <div class="zone-drag-handle" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>
-                <span class="zone-label">row zone</span>
+                <span class="zone-label">rows</span>
                 <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>
@@ -282,14 +322,17 @@
     </div>
 
     <div class="card-display">
-        <p>drag a <em>tag</em> to a <em>zone</em> to see the cards that have that tag</p>
+        <p id="instructionalText" class="instructional-text"
+           hx-get="/api/v2/lessons/hint"
+           hx-trigger="load, dragdrop from:body"
+           hx-swap="innerHTML">drag a <em>tag</em> to a <em>zone</em> to see the cards that have that tag</p>
         <div class="card-container" id="cardContainer">
             <!-- Cards will be populated by JavaScript based on checkbox state and active filters -->
             <p id="emptyStateMessage">No cards to display</p>
         </div>
     </div>
 
-    <div class="right-control">
+    <div class="right-control collapsible-col col-3" style="position: relative;">
         <!-- Control areas are DROP TARGETS for zones -->
         <div class="control-area-container zone-container"
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
@@ -305,7 +348,7 @@
                 <div class="zone-drag-handle" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>
-                <span class="zone-label">column zone</span>
+                <span class="zone-label">columns</span>
                 <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>
@@ -313,8 +356,28 @@
         </div>
     </div>
 
+    <!-- Row 4 collapse toggle - positioned outside collapsible area -->
+    <button class="collapse-toggle collapse-row4" onclick="toggleRow(4)" title="Toggle Row 4" aria-label="Toggle row 4">
+        <svg class="chevron chevron-down" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <!-- Column collapse toggles - positioned at outer edges -->
+    <button class="collapse-toggle collapse-col1" onclick="toggleColumn(1)" title="Toggle Column 1" aria-label="Toggle column 1">
+        <svg class="chevron chevron-left" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+    <button class="collapse-toggle collapse-col3" onclick="toggleColumn(3)" title="Toggle Column 3" aria-label="Toggle column 3">
+        <svg class="chevron chevron-right" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
     <!-- Row 4: Bottom Area (Middle Column Only) -->
-    <div class="bottom-control">
+    <div class="bottom-control collapsible-row row-4">
         <!-- Control areas are DROP TARGETS for zones -->
         <div class="control-area-container zone-container"
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
@@ -348,6 +411,159 @@ function handleZoneDrop(event, container) {
         }
     }
 }
+
+function toggleRow(rowNum) {
+    const grid = document.getElementById('spatialGrid');
+    const rowElements = document.querySelectorAll('.row-' + rowNum);
+
+    // Get all toggles for this row
+    let toggles;
+    if (rowNum === 1) {
+        toggles = document.querySelectorAll('.collapse-row1');
+    } else if (rowNum === 2) {
+        toggles = document.querySelectorAll('.collapse-row2');
+    } else if (rowNum === 4) {
+        toggles = document.querySelectorAll('.collapse-row4');
+    }
+
+    rowElements.forEach(elem => {
+        elem.classList.toggle('collapsed');
+    });
+
+    const isCollapsed = rowElements[0] && rowElements[0].classList.contains('collapsed');
+
+    if (isCollapsed) {
+        grid.classList.add('row-' + rowNum + '-collapsed');
+        // Add collapsed state class for CSS animation
+        toggles.forEach(toggle => {
+            toggle.classList.add('is-collapsed');
+        });
+    } else {
+        grid.classList.remove('row-' + rowNum + '-collapsed');
+        // Remove collapsed state class for CSS animation
+        toggles.forEach(toggle => {
+            toggle.classList.remove('is-collapsed');
+        });
+    }
+}
+
+function toggleColumn(colNum) {
+    const grid = document.getElementById('spatialGrid');
+    const colElements = document.querySelectorAll('.col-' + colNum);
+    const toggle = document.querySelector('.collapse-col' + colNum);
+    const chevron = toggle.querySelector('.chevron');
+
+    colElements.forEach(elem => {
+        elem.classList.toggle('collapsed');
+    });
+
+    if (colElements[0].classList.contains('collapsed')) {
+        grid.classList.add('col-' + colNum + '-collapsed');
+        toggle.classList.add('is-collapsed');
+    } else {
+        grid.classList.remove('col-' + colNum + '-collapsed');
+        toggle.classList.remove('is-collapsed');
+    }
+}
+function toggleSection(section) {
+    let sectionElement;
+    let toggleButton;
+
+    if (section === 'universal') {
+        sectionElement = document.querySelector('.universal-control');
+        toggleButton = document.querySelector('.collapse-universal');
+    } else if (section === 'ui') {
+        sectionElement = document.querySelector('.ui-control');
+        toggleButton = document.querySelector('.collapse-ui');
+    }
+
+    if (sectionElement && toggleButton) {
+        sectionElement.classList.toggle('collapsed-section');
+        const chevron = toggleButton.querySelector('.chevron');
+
+        if (sectionElement.classList.contains('collapsed-section')) {
+            toggleButton.classList.add('is-collapsed');
+            chevron.querySelector('path').setAttribute('d', 'M4 10L8 6L12 10');
+        } else {
+            toggleButton.classList.remove('is-collapsed');
+            chevron.querySelector('path').setAttribute('d', 'M4 6L8 10L12 6');
+        }
+    }
+}
+
+function switchLesson(lessonValue) {
+    console.log('Switching to lesson:', lessonValue);
+
+    // Send lesson switch request to backend
+    fetch('/api/v2/lessons/switch', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            lessonId: lessonValue
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            console.log('Lesson switched successfully:', data.lesson_state);
+
+            // Store lesson state in localStorage for persistence
+            localStorage.setItem('currentLesson', lessonValue);
+            window.currentLessonState = data.lesson_state;
+
+            // Clear all zones and reset state when switching lessons
+            if (typeof window.dragDropSystem !== 'undefined') {
+                window.dragDropSystem.clearAllZones();
+            }
+
+            // Reload the page with lesson parameter to load the new lesson's tags and cards
+            console.log('Reloading page for lesson', lessonValue);
+            const currentUrl = new URL(window.location.href);
+            currentUrl.searchParams.set('lesson', lessonValue);
+            window.location.href = currentUrl.toString();
+
+        } else {
+            console.error('Failed to switch lesson:', data);
+        }
+    })
+    .catch(error => {
+        console.error('Error switching lesson:', error);
+    });
+}
+
+// Placeholder for database switching function (if not already implemented)
+function switchDatabase(databaseValue) {
+    console.log('Switching to database:', databaseValue);
+    // TODO: Implement database switching logic
+}
+
+// Initialize cards on page load - always trigger initial render for lesson mode
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a moment for drag-drop system to initialize
+    setTimeout(function() {
+        console.log('Initializing cards on page load for lesson mode...');
+        if (typeof window.dragDropSystem !== 'undefined') {
+            window.dragDropSystem.updateStateAndRender();
+        } else {
+            console.log('dragDropSystem not yet available, will try again...');
+            // Try again after another delay
+            setTimeout(function() {
+                if (typeof window.dragDropSystem !== 'undefined') {
+                    window.dragDropSystem.updateStateAndRender();
+                } else {
+                    console.log('dragDropSystem still not available, trying once more...');
+                    setTimeout(function() {
+                        if (typeof window.dragDropSystem !== 'undefined') {
+                            window.dragDropSystem.updateStateAndRender();
+                        }
+                    }, 2000);
+                }
+            }, 1000);
+        }
+    }, 500);
+});
 </script>
 
 {% endblock %}

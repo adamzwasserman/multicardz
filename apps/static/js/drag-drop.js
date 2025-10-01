@@ -36,7 +36,8 @@ class SpatialDragDrop {
 
     const state = {
       zones: this.discoverZones(),
-      controls: this.getRenderingControls()
+      controls: this.getRenderingControls(),
+      currentLesson: this.getCurrentLesson()
     };
 
     // Update cache
@@ -44,6 +45,25 @@ class SpatialDragDrop {
     this.stateCacheTime = now;
 
     return state;
+  }
+
+  // Get current lesson from URL parameters or localStorage
+  getCurrentLesson() {
+    // First check URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const lessonParam = urlParams.get('lesson');
+    if (lessonParam) {
+      return parseInt(lessonParam, 10);
+    }
+
+    // Fallback to localStorage
+    const storedLesson = localStorage.getItem('currentLesson');
+    if (storedLesson) {
+      return parseInt(storedLesson, 10);
+    }
+
+    // Default to lesson 1
+    return 1;
   }
 
   // Discover zones with null checks
@@ -438,7 +458,89 @@ class SpatialDragDrop {
 
       // Send to backend
       await this.renderCards(tagsInPlay);
+
+      // Update lesson hint with current zone state
+      await this.updateLessonHint(tagsInPlay);
     }, this.DEBOUNCE_DELAY);
+  }
+
+  // Update lesson hint based on current zone state
+  async updateLessonHint(tagsInPlay) {
+    try {
+      // Build query parameters from zone state
+      const params = new URLSearchParams();
+
+      if (tagsInPlay.zones) {
+        Object.entries(tagsInPlay.zones).forEach(([zoneType, zoneData]) => {
+          if (zoneData.tags && Array.isArray(zoneData.tags)) {
+            zoneData.tags.forEach(tag => {
+              params.append(zoneType, tag);
+            });
+          }
+        });
+      }
+
+      // Add completed lessons from localStorage
+      const completedLessons = JSON.parse(localStorage.getItem('completedLessons') || '[]');
+      if (completedLessons.length > 0) {
+        params.append('completed', JSON.stringify(completedLessons));
+      }
+
+      // Fetch updated hint
+      const response = await fetch(`/api/v2/lessons/hint?${params}`);
+      if (response.ok) {
+        const hintHtml = await response.text();
+        const instructionalText = document.getElementById('instructionalText');
+        if (instructionalText) {
+          instructionalText.innerHTML = hintHtml;
+
+          // Check if lesson completion hint is showing
+          if (hintHtml.includes('LESSON 1 COMPLETE')) {
+            this.markLessonComplete(1);
+            this.refreshLessonSelector();
+          } else if (hintHtml.includes('LESSON 2 COMPLETE')) {
+            this.markLessonComplete(2);
+            this.refreshLessonSelector();
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to update lesson hint:', error);
+    }
+  }
+
+  // Mark lesson as complete in localStorage
+  markLessonComplete(lessonNumber) {
+    try {
+      const completedLessons = JSON.parse(localStorage.getItem('completedLessons') || '[]');
+      if (!completedLessons.includes(lessonNumber)) {
+        completedLessons.push(lessonNumber);
+        localStorage.setItem('completedLessons', JSON.stringify(completedLessons));
+        console.log(`Lesson ${lessonNumber} marked as complete!`);
+      }
+    } catch (error) {
+      console.warn('Failed to save lesson completion:', error);
+    }
+  }
+
+  // Refresh lesson selector to show updated status
+  refreshLessonSelector() {
+    try {
+      // Update hidden input with completed lessons from localStorage
+      const completedLessons = JSON.parse(localStorage.getItem('completedLessons') || '[]');
+      const hiddenInput = document.getElementById('completedLessons');
+      if (hiddenInput) {
+        hiddenInput.value = JSON.stringify(completedLessons);
+      }
+
+      // Trigger HTMX reload
+      const selector = document.getElementById('navLessonSelector');
+      if (selector && typeof htmx !== 'undefined') {
+        htmx.trigger(selector, 'load');
+      }
+    } catch (error) {
+      console.warn('Failed to refresh lesson selector:', error);
+    }
   }
 
   // Send to backend

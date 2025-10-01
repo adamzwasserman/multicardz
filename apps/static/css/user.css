@@ -738,6 +738,288 @@ body {
     background-color: #7c3aed;
 }
 
+/* Collapsible Functionality Styles - Minimalist */
+.collapse-toggle {
+    background: transparent;
+    color: var(--color-action-primary);
+    border: none;
+    padding: 0.25rem;
+    border-radius: 4px;
+    cursor: pointer;
+    position: absolute;
+    z-index: 100;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.collapse-toggle:hover {
+    background: light-dark(rgba(13, 110, 253, 0.1), rgba(13, 110, 253, 0.2));
+}
+
+/* Row 1 toggle - positioned as first element in center column */
+.collapse-toggle.collapse-row1 {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 0;
+    z-index: 101;
+    justify-self: center;
+    align-self: start;
+    margin-bottom: -24px; /* Don't take up grid space */
+}
+
+/* Row 2 toggle - positioned as first element spanning row 2 */
+.collapse-toggle.collapse-row2 {
+    grid-column: 2;
+    grid-row: 2;
+    position: sticky;
+    top: 0;
+    z-index: 101;
+    justify-self: center;
+    align-self: start;
+    margin-bottom: -24px; /* Don't take up grid space */
+}
+
+/* Section headers with inline collapse buttons */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.section-header h3 {
+    margin: 0;
+}
+
+/* Section-specific collapse toggles */
+.collapse-toggle.collapse-universal,
+.collapse-toggle.collapse-ui {
+    position: static;
+    transform: none;
+    margin-left: auto;
+}
+
+/* Row 4 toggle - positioned using grid at bottom */
+.collapse-toggle.collapse-row4 {
+    grid-column: 2;
+    grid-row: 4;
+    position: sticky;
+    bottom: 0;
+    z-index: 101;
+    justify-self: center;
+    align-self: end;
+    margin-top: -24px;
+}
+
+/* Column 1 toggle - positioned at left edge */
+.collapse-toggle.collapse-col1 {
+    grid-column: 1;
+    grid-row: 2;
+    position: sticky;
+    left: 0;
+    z-index: 101;
+    justify-self: start;
+    align-self: center;
+    margin-right: -24px;
+}
+
+/* Column 3 toggle - positioned at right edge */
+.collapse-toggle.collapse-col3 {
+    grid-column: 3;
+    grid-row: 2;
+    position: sticky;
+    right: 0;
+    z-index: 101;
+    justify-self: end;
+    align-self: center;
+    margin-left: -24px;
+}
+
+/* Chevron rotation animations */
+.collapse-toggle .chevron {
+    transition: transform 0.2s ease-in-out;
+    transform-origin: center;
+}
+
+/* Row chevron rotations */
+.collapse-toggle.collapse-row1 .chevron,
+.collapse-toggle.collapse-row2 .chevron {
+    /* Default state: pointing up */
+    transform: rotate(0deg);
+}
+
+.collapse-toggle.collapse-row1.is-collapsed .chevron,
+.collapse-toggle.collapse-row2.is-collapsed .chevron {
+    /* Collapsed state: pointing down (180deg rotation) */
+    transform: rotate(180deg);
+}
+
+.collapse-toggle.collapse-row4 .chevron {
+    /* Default state: pointing down */
+    transform: rotate(0deg);
+}
+
+.collapse-toggle.collapse-row4.is-collapsed .chevron {
+    /* Collapsed state: pointing up (180deg rotation) */
+    transform: rotate(180deg);
+}
+
+/* Column chevron rotations */
+.collapse-toggle.collapse-col1 .chevron {
+    /* Default state: pointing left */
+    transform: rotate(0deg);
+}
+
+.collapse-toggle.collapse-col1.is-collapsed .chevron {
+    /* Collapsed state: pointing right (180deg rotation) */
+    transform: rotate(180deg);
+}
+
+.collapse-toggle.collapse-col3 .chevron {
+    /* Default state: pointing right */
+    transform: rotate(0deg);
+}
+
+.collapse-toggle.collapse-col3.is-collapsed .chevron {
+    /* Collapsed state: pointing left (180deg rotation) */
+    transform: rotate(180deg);
+}
+
+/* Section chevron rotations */
+.collapse-toggle.collapse-universal .chevron,
+.collapse-toggle.collapse-ui .chevron {
+    /* Default state: pointing up */
+    transform: rotate(0deg);
+}
+
+.collapse-toggle.collapse-universal.is-collapsed .chevron,
+.collapse-toggle.collapse-ui.is-collapsed .chevron {
+    /* Collapsed state: pointing down (180deg rotation) */
+    transform: rotate(180deg);
+}
+
+/* Row 1 and Row 2 stay at same position when collapsed */
+.collapse-toggle.collapse-row1.is-collapsed,
+.collapse-toggle.collapse-row2.is-collapsed {
+    /* Stay in place, no change needed */
+}
+
+/* Column toggles - inside padding when open */
+.collapse-toggle.collapse-col1 {
+    top: 50%;
+    left: 0.5rem;
+    transform: translateY(-50%);
+}
+
+.collapse-toggle.collapse-col3 {
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+}
+
+/* Column toggles - at boundary when collapsed */
+.collapse-toggle.collapse-col1.is-collapsed {
+    left: -12px;
+}
+
+.collapse-toggle.collapse-col3.is-collapsed {
+    right: -12px;
+}
+
+.chevron {
+    transition: transform 0.2s ease;
+}
+
+.collapsible-row, .collapsible-col {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.collapsible-row.collapsed {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    border: none;
+}
+
+.collapsible-col.collapsed {
+    max-width: 0;
+    padding-left: 0;
+    padding-right: 0;
+    opacity: 0;
+    border: none;
+}
+
+/* Collapsed sections - show only header */
+.collapsible-section.collapsed-section {
+    min-height: auto !important;
+    overflow: hidden;
+    max-height: 3rem;
+}
+
+/* Keep controls visible, just collapse height */
+.collapsible-section.collapsed-section .controls {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.collapsible-section .controls {
+    transition: all 0.3s ease;
+}
+
+.collapsible-section.collapsed-section .section-header {
+    margin-bottom: 0;
+}
+
+/* Grid adjustments when rows/columns are collapsed */
+.spatial-grid.row-1-collapsed {
+    grid-template-rows: 0 auto 1fr auto;
+}
+
+.spatial-grid.row-2-collapsed {
+    grid-template-rows: auto 0 1fr auto;
+}
+
+.spatial-grid.row-4-collapsed {
+    grid-template-rows: auto auto 1fr 0;
+}
+
+.spatial-grid.row-1-collapsed.row-2-collapsed {
+    grid-template-rows: 0 0 1fr auto;
+}
+
+.spatial-grid.row-1-collapsed.row-4-collapsed {
+    grid-template-rows: 0 auto 1fr 0;
+}
+
+.spatial-grid.row-2-collapsed.row-4-collapsed {
+    grid-template-rows: auto 0 1fr 0;
+}
+
+.spatial-grid.row-1-collapsed.row-2-collapsed.row-4-collapsed {
+    grid-template-rows: 0 0 1fr 0;
+}
+
+.spatial-grid.col-1-collapsed {
+    grid-template-columns: 0 2fr 0.67fr;
+}
+
+.spatial-grid.col-3-collapsed {
+    grid-template-columns: 0.67fr 2fr 0;
+}
+
+.spatial-grid.col-1-collapsed.col-3-collapsed {
+    grid-template-columns: 0 1fr 0;
+}
+
 /* Row 2: Control Areas (All 3 Columns) */
 .universal-control, .top-control, .ui-control, .left-control, .right-control {
     background: light-dark(var(--color-muji-bg), var(--color-neutral-100));
@@ -745,6 +1027,7 @@ body {
     border-radius: 4px;
     padding: 1rem;
     min-height: 120px;
+    position: relative;
 }
 
 .universal-control h3 {
@@ -1553,27 +1836,256 @@ body {
    MUJI-INSPIRED CARD SYSTEM
    ======================================== */
 
-/* True Muji Card Container - Simple List */
+/* Card Container - Flex Grid for Proper Layout */
 .card-container {
-    display: block; /* Simple block layout - no flex tricks */
-    padding: 0; /* No padding - let content breathe naturally */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 0;
     max-width: 100%;
+    overflow: hidden;
 }
 
 /* TRUE MUJI AESTHETIC - Pure Minimalism */
 .card {
     background: light-dark(#f8f8f8, var(--color-neutral-200)); /* Clean contrast in dark mode */
-    border: none; /* NO BORDERS - Pure Muji */
-    border-radius: 0; /* NO ROUNDED CORNERS - True minimalism */
+    border: 1px solid light-dark(#d4d4d8, var(--color-neutral-300)); /* Subtle border for definition */
+    border-radius: 4px; /* Slight rounding for modern look */
     padding: 16px 16px 16px 20px; /* Add left padding for visual indicator */
     margin: 8px 0; /* Minimal vertical spacing */
     width: 300px; /* Fixed width for uniformity */;
-    transition: background 0.2s ease; /* Subtle transition for hover */
-    box-shadow: none;
+    transition: all 0.2s ease; /* Smooth transitions */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle depth */
     font-family: inherit; /* Inherit selected font from body */
     line-height: 1.5; /* Standard line height */
     display: block; /* Simple block layout */
     position: relative; /* For visual indicator positioning */
+}
+
+.card:hover {
+    border-color: light-dark(#a4a4a7, var(--color-neutral-400)); /* Darker border on hover */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Enhanced depth on hover */
+    transform: translateY(-1px); /* Subtle lift effect */
+}
+
+/* Card Item styles for lesson cards */
+.card-item {
+    background: light-dark(#f8f8f8, var(--color-neutral-200));
+    border: 1px solid light-dark(#d4d4d8, var(--color-neutral-300));
+    border-radius: 4px;
+    padding: 8px;
+    margin: 4px;
+    max-width: 300px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    font-family: inherit;
+}
+
+.card-item:hover {
+    border-color: light-dark(#a4a4a7, var(--color-neutral-400));
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+/* Lesson card specific styles */
+.lesson-card {
+    background: light-dark(#f9f9f9, var(--color-neutral-100));
+    padding: 20px;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.lesson-instruction.highlight {
+    background: light-dark(#e3f2fd, var(--color-blue-100));
+    border-left: 4px solid light-dark(#1976d2, var(--color-blue-500));
+    padding: 16px;
+    margin: 16px 0;
+    border-radius: 4px;
+}
+
+.lesson-instruction.highlight code {
+    background: light-dark(#bbdefb, var(--color-blue-200));
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+}
+
+.lesson-hint {
+    background: light-dark(#fff3e0, var(--color-orange-100));
+    border-left: 4px solid light-dark(#ff9800, var(--color-orange-500));
+    padding: 12px;
+    margin: 16px 0;
+    border-radius: 4px;
+    font-style: italic;
+}
+
+.lesson-hint em {
+    color: light-dark(#e65100, var(--color-orange-700));
+}
+
+/* Enhanced next-step instruction styling */
+.lesson-instruction.next-step.highlight-action {
+    background: light-dark(#e8f5e8, var(--color-green-100));
+    border: 2px solid light-dark(#4caf50, var(--color-green-500));
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+.lesson-instruction.next-step.highlight-action h4 {
+    color: light-dark(#2e7d32, var(--color-green-700));
+    margin: 0 0 16px 0;
+    font-size: 1.1em;
+}
+
+.step-instructions {
+    background: light-dark(#ffffff, var(--color-neutral-50));
+    border-radius: 6px;
+    padding: 16px;
+    margin: 12px 0;
+    border-left: 4px solid light-dark(#4caf50, var(--color-green-500));
+}
+
+.step-instructions p {
+    margin: 8px 0;
+    font-weight: 500;
+}
+
+.visual-guide {
+    background: light-dark(#fff3e0, var(--color-amber-100));
+    border-radius: 6px;
+    padding: 12px;
+    margin: 12px 0;
+    border-left: 4px solid light-dark(#ff9800, var(--color-amber-500));
+}
+
+.lesson-achievement {
+    background: light-dark(#f3e5f5, var(--color-purple-100));
+    border-radius: 6px;
+    padding: 12px;
+    margin: 12px 0;
+    border-left: 4px solid light-dark(#9c27b0, var(--color-purple-500));
+}
+
+@keyframes gentle-pulse {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(76, 175, 80, 0.5);
+    }
+}
+
+/* Special highlighting for the lesson drag tag */
+.tag[data-tag*="drag me to first box"],
+.tag[data-tag*="drag_me_to_first_box"] {
+    background: linear-gradient(45deg, #e3f2fd, #bbdefb) !important;
+    border: 2px solid #1976d2 !important;
+    color: #0d47a1 !important;
+    font-weight: bold !important;
+    position: relative !important;
+    animation: attention-pulse 3s ease-in-out infinite;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.4) !important;
+}
+
+.tag[data-tag*="drag me to first box"]:hover,
+.tag[data-tag*="drag_me_to_first_box"]:hover {
+    background: linear-gradient(45deg, #bbdefb, #90caf9) !important;
+    border-color: #0d47a1 !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.6) !important;
+}
+
+@keyframes attention-pulse {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(25, 118, 210, 0.7);
+        transform: scale(1.02);
+    }
+}
+
+/* Navigation Bar Learning Mode Styling */
+.learning-mode-container {
+    display: flex !important;
+    align-items: center !important;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    margin: 0 8px;
+    animation: nav-highlight-pulse 4s ease-in-out infinite;
+}
+
+.learning-mode-menu.highlighted-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.learning-mode-label {
+    color: white;
+    font-weight: 600;
+    font-size: 0.9em;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.nav-lesson-selector {
+    background: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.85em;
+    min-width: 180px;
+    color: #333;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-lesson-selector:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-lesson-selector:focus {
+    outline: none;
+    border-color: #4caf50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+}
+
+@keyframes nav-highlight-pulse {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.6);
+    }
+}
+
+.learning-mode-footer {
+    margin-top: 8px;
+    text-align: center;
+}
+
+.hide-learning-mode {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.hide-learning-mode:hover {
+    color: white;
+    text-decoration: underline;
 }
 
 .card:hover {
@@ -2109,6 +2621,14 @@ body.font-berkeley-mono {
     border-style: solid !important;
 }
 
+/* EXCLUSION Zone Styling - Red color scheme for visual distinction */
+.exclusion-zone:hover,
+.exclusion-zone.drag-over {
+    border-color: #dc2626 !important;
+    background: rgba(220, 38, 38, 0.1);
+    border-style: solid !important;
+}
+
 .filter-subzone:hover {
     border-color: light-dark(var(--color-neutral-400), var(--color-neutral-500));
     background: light-dark(var(--color-neutral-50), var(--color-neutral-300));
@@ -2198,6 +2718,12 @@ body.font-berkeley-mono {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* Red separator dot for EXCLUSION zone */
+.separator-dot-red {
+    background: #dc2626 !important;
+    box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3);
+}
+
 /* Tags within filter zones */
 .filter-subzone .tag {
     background: light-dark(var(--color-neutral-100), var(--color-neutral-300));
@@ -2220,6 +2746,19 @@ body.font-berkeley-mono {
 }
 
 .intersection-zone .tag {
+}
+
+/* EXCLUSION zone tags - red color scheme for visual distinction */
+.exclusion-zone .tag {
+    background: rgba(220, 38, 38, 0.1) !important;
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+.exclusion-zone .tag:hover {
+    background: rgba(220, 38, 38, 0.2) !important;
+    border-color: #b91c1c !important;
+    color: #b91c1c !important;
 }
 
 /* ========================================
@@ -2391,7 +2930,6 @@ body.font-berkeley-mono {
 }
 
 .tag-collection:empty::before {
-    content: "Drop tags here";
     color: var(--color-text-secondary);
     font-style: italic;
     font-size: 0.85rem;
@@ -2462,4 +3000,156 @@ body.font-berkeley-mono {
     [data-zone-type].drag-over {
         transform: none;
     }
+}
+
+/* ========================================
+   LESSON COMPLETION BANNER
+   ======================================== */
+
+.lesson-completion-banner {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+    animation: lesson-completion-appear 0.5s ease-out;
+}
+
+.completion-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+.completion-icon {
+    font-size: 2rem;
+    animation: completion-bounce 1s ease-in-out infinite alternate;
+}
+
+.completion-message h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.completion-message p {
+    margin: 0;
+    opacity: 0.95;
+    line-height: 1.4;
+}
+
+.completion-dismiss {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.completion-dismiss:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes lesson-completion-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes completion-bounce {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.1);
+    }
+}
+
+/* ========================================
+   CARD GRID LAYOUT FIXES
+   ======================================== */
+
+.card-display-container {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    max-width: 100%;
+    overflow: hidden;
+}
+
+
+/* Ensure cards don't exceed container */
+.card-grid .card-item,
+.card-container .card-item {
+    flex: 0 0 auto;
+    min-width: 280px;
+    max-width: 300px;
+}
+
+/* Card content sizing for lesson cards */
+.card-item .card-title {
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+}
+
+.card-item .card-content,
+.card-item .card-body {
+    font-size: 10px;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+.card-item .lesson-card h2 {
+    font-size: 14px;
+    margin: 0 0 8px 0;
+}
+
+.card-item .lesson-card p {
+    font-size: 9px;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+}
+
+.card-item .lesson-instruction {
+    font-size: 9px;
+    padding: 6px;
+    margin: 6px 0;
+}
+
+.card-item .card-tags-section {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid var(--color-neutral-300);
+}
+
+.card-item .card-tag {
+    font-size: 8px;
+    padding: 2px 4px;
+    margin: 1px;
 }

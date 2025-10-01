@@ -95,6 +95,7 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "email-validator>=2.3.0",
     "httpx>=0.28.1",
     "hypothesis>=6.139.1",
     "playwright>=1.55.0",

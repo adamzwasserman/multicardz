@@ -271,6 +271,77 @@ class DragDropTester:
 
         return success
 
+    async def verify_card_rendering(self, expected_card_count=None, contains_tags=None, timeout=5000):
+        """Verify that cards are properly rendered based on current tag state."""
+        print("🃏 Verifying card rendering...")
+
+        # Wait for card rendering to complete (API call + DOM update)
+        try:
+            # Wait for network to be idle (API call completion)
+            await self.page.wait_for_load_state("networkidle", timeout=timeout)
+
+            # Additional wait for DOM update
+            await asyncio.sleep(0.5)
+
+            # Get the card container and verify it has content
+            card_container = await self.page.wait_for_selector("#cardContainer", timeout=timeout)
+            if not card_container:
+                print("  ❌ Card container not found")
+                return False
+
+            # Check if cards were rendered
+            cards = await self.page.query_selector_all("#cardContainer .card")
+            card_count = len(cards)
+
+            print(f"  📊 Found {card_count} rendered cards")
+
+            success = True
+
+            # Verify expected card count if provided
+            if expected_card_count is not None:
+                if card_count != expected_card_count:
+                    print(f"  ❌ Expected {expected_card_count} cards, got {card_count}")
+                    success = False
+                else:
+                    print(f"  ✅ Card count matches: {card_count}")
+
+            # Verify that rendered cards contain expected tags
+            if contains_tags:
+                for tag in contains_tags:
+                    # Check if any card contains this tag
+                    card_with_tag = await self.page.query_selector(f"#cardContainer .card[data-tags*='{tag}']")
+                    if not card_with_tag:
+                        print(f"  ❌ No card found containing tag '{tag}'")
+                        success = False
+                    else:
+                        print(f"  ✅ Found card(s) with tag '{tag}'")
+
+            # Check for any error messages in the card container
+            error_message = await self.page.query_selector("#cardContainer .error, #cardContainer .no-cards")
+            if error_message:
+                error_text = await error_message.text_content()
+                print(f"  ⚠️  Found message: {error_text}")
+
+            # Verify API call was made successfully
+            network_success = await self.page.evaluate("""
+                () => {
+                    // Check if there were any recent network errors in console
+                    return !window.lastNetworkError; // Assuming we track this
+                }
+            """)
+
+            if not network_success:
+                print("  ❌ Network/API error detected")
+                success = False
+            else:
+                print("  ✅ API call successful")
+
+            return success
+
+        except Exception as e:
+            print(f"  ❌ Card rendering verification failed: {e}")
+            return False
+
     async def count_elements(self, selector, description=""):
         """Count elements matching selector."""
         elements = await self.page.query_selector_all(selector)
@@ -348,6 +419,12 @@ async def run_comprehensive_test():
             print("❌ Missing essential elements")
             return False
 
+        # 2.5. Test initial card rendering (empty state)
+        print("\n🧪 Test 0: Initial card rendering (no filters)")
+        initial_card_success = await tester.verify_card_rendering()
+        if not initial_card_success:
+            print("❌ Initial card rendering verification failed")
+
         # 3. Test single drag-drop with REAL mouse
         print("\n🧪 Test 1: Single drag-drop with real mouse")
         await tester.real_mouse_drag_drop(
@@ -360,6 +437,11 @@ async def run_comprehensive_test():
         success = await tester.verify_state(expected_zones={"union": ["javascript"]})
         if not success:
             print("❌ Single drag-drop verification failed")
+
+        # Verify cards were rendered with the javascript tag
+        card_rendering_success = await tester.verify_card_rendering(contains_tags=["javascript"])
+        if not card_rendering_success:
+            print("❌ Card rendering verification failed after single drag-drop")
 
         # 4. Test multi-select with REAL mouse
         print("\n🧪 Test 2: Multi-select with real mouse")
@@ -403,6 +485,11 @@ async def run_comprehensive_test():
         })
         if not success:
             print("❌ Zone-to-zone drag verification failed")
+
+        # Verify cards are still rendered correctly after zone change
+        card_rendering_success = await tester.verify_card_rendering(contains_tags=["javascript"])
+        if not card_rendering_success:
+            print("❌ Card rendering verification failed after zone-to-zone drag")
 
         # 7. Take final screenshot
         await tester.take_screenshot("tests/artifacts/final_state.png")

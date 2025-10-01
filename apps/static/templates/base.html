@@ -9,9 +9,53 @@
     <!-- Base template styles -->
     {% block head %}{% endblock %}
 
+    <!-- Inline Dongle font and logo CSS for immediate rendering -->
+    <style>
+        @font-face {
+            font-family: 'Dongle';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('/static/fonts/dongle-wordmark.woff2') format('woff2');
+        }
+
+        .brand-link {
+            font-family: 'Dongle', sans-serif !important;
+            font-size: 56px;
+            font-weight: 400;
+            color: var(--color-text-primary, #333);
+            text-decoration: none;
+            letter-spacing: 0;
+            transition: opacity 0.2s ease;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        .brand-link:hover {
+            opacity: 0.8;
+            text-decoration: none;
+        }
+
+        .brand-link .brand-i {
+            position: relative;
+            color: var(--color-text-primary, #333);
+        }
+
+        .brand-link .brand-i::after {
+            content: '';
+            position: absolute;
+            top: 0.12em;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0.16em;
+            height: 0.16em;
+            background: #dc2626;
+            border-radius: 50%;
+        }
+    </style>
+
     <!-- Preload critical resources for parallel download -->
     <link rel="preload" href="/static/css/user.css" as="style">
-    <link rel="preload" href="/static/fonts/dongle-wordmark.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
@@ -35,6 +79,23 @@
             </div>
             <div class="nav-menu">
                 <ul class="nav-items">
+                    <li class="nav-item learning-mode-container">
+                        <div class="learning-mode-menu highlighted-menu">
+                            <label for="navLessonSelector" class="learning-mode-label">🎓 Learning Mode:</label>
+                            <input type="hidden" id="completedLessons" name="completed" data-completed-lessons value="[]">
+                            <select id="navLessonSelector" class="nav-lesson-selector"
+                                    hx-get="/api/v2/lessons/options"
+                                    hx-trigger="load"
+                                    hx-swap="innerHTML"
+                                    hx-include="#completedLessons"
+                                    onchange="switchLesson(this.value)">
+                                <option value="1">Loading lessons...</option>
+                            </select>
+                            <div class="learning-mode-footer">
+                                <a href="#" class="hide-learning-mode" onclick="hideLearningMode()">hide this menu</a>
+                            </div>
+                        </div>
+                    </li>
                     <li class="nav-item"><a href="/features">Features</a></li>
                     <li class="nav-item projects-menu-container">
                         <div class="projects-menu"
@@ -63,15 +124,15 @@
     {% block scripts %}
     <script>
         // JavaScript functions for the drag-drop system
-        let dragDropSystem = null;
+        // dragDropSystem is initialized by drag-drop.js as window.dragDropSystem
 
         function toggleMode() {
             // Mode toggle is now handled through DOM controls
             const modeControl = document.querySelector('[data-affects-rendering="true"][name*="mode"]');
             if (modeControl) {
                 modeControl.checked = !modeControl.checked;
-                if (dragDropSystem) {
-                    dragDropSystem.handleControlChange();
+                if (window.dragDropSystem) {
+                    window.dragDropSystem.updateStateAndRender();
                 }
             }
         }
@@ -82,15 +143,15 @@
         }
 
         function debugZones() {
-            if (dragDropSystem) {
-                const state = dragDropSystem.deriveStateFromDOM();
+            if (window.dragDropSystem) {
+                const state = window.dragDropSystem.deriveStateFromDOM();
                 console.log('Zone state:', state);
             }
         }
 
         function clearState() {
-            if (dragDropSystem) {
-                dragDropSystem.clearSelection();
+            if (window.dragDropSystem) {
+                window.dragDropSystem.clearSelection();
                 // Clear all zones by moving tags back to cloud
                 const zones = document.querySelectorAll('.drop-zone');
                 zones.forEach(zone => {
@@ -100,15 +161,15 @@
                         if (cloud) cloud.appendChild(tag);
                     });
                 });
-                dragDropSystem.updateStateAndRender();
+                window.dragDropSystem.updateStateAndRender();
                 console.log('State cleared');
             }
         }
 
         function debugSystem() {
-            console.log('Drag-Drop System:', dragDropSystem);
-            if (dragDropSystem) {
-                console.log('Current state:', dragDropSystem.deriveStateFromDOM());
+            console.log('Drag-Drop System:', window.dragDropSystem);
+            if (window.dragDropSystem) {
+                console.log('Current state:', window.dragDropSystem.deriveStateFromDOM());
             }
         }
 
@@ -117,11 +178,11 @@
         }
 
         function inspectState() {
-            if (dragDropSystem) {
-                const state = dragDropSystem.deriveStateFromDOM();
+            if (window.dragDropSystem) {
+                const state = window.dragDropSystem.deriveStateFromDOM();
                 const totalTags = Object.values(state.zones || {}).reduce((sum, zone) => sum + zone.tags.length, 0);
                 console.log('Total tags in zones:', totalTags);
-                console.log('Selected tags:', dragDropSystem.selectedTags.size);
+                console.log('Selected tags:', window.dragDropSystem.selectedTags.size);
                 console.log('Full state:', state);
             }
         }
@@ -130,6 +191,26 @@
             console.log('Performance monitoring toggled');
             // Could implement performance monitoring here
         }
+
+        function hideLearningMode() {
+            const learningContainer = document.querySelector('.learning-mode-container');
+            if (learningContainer) {
+                learningContainer.style.display = 'none';
+                localStorage.setItem('learningModeHidden', 'true');
+                console.log('Learning mode hidden');
+            }
+        }
+
+        // Check if learning mode should be hidden on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const isHidden = localStorage.getItem('learningModeHidden');
+            if (isHidden === 'true') {
+                const learningContainer = document.querySelector('.learning-mode-container');
+                if (learningContainer) {
+                    learningContainer.style.display = 'none';
+                }
+            }
+        });
     </script>
     {% endblock %}
     {% block extra_js %}{% endblock %}

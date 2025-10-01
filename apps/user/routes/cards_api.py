@@ -9,6 +9,8 @@ from jinja2 import Environment, FileSystemLoader
 from typing import List, Dict, Tuple
 import time
 import logging
+import json
+from pathlib import Path
 
 # Import models
 from ..models.render_request import RenderRequest, TagsInPlay, ZoneData
@@ -20,7 +22,10 @@ try:
         create_database_connection,
         load_all_card_summaries
     )
-    from apps.shared.services.card_service import CardServiceCompat as CardService
+    from apps.shared.services.card_service import (
+        CardServiceCompat as CardService,
+        create_database_config
+    )
 except ImportError as e:
     logging.warning(f"Could not import shared services: {e}")
 
@@ -34,6 +39,15 @@ templates_env = Environment(
 router = APIRouter(prefix="/api/v2", tags=["cards"])
 
 logger = logging.getLogger(__name__)
+
+# Create default database configuration
+DEFAULT_DB_CONFIG = create_database_config(
+    db_path=Path("/var/data/multicardz_dev.db"),
+    enable_foreign_keys=True,
+    timeout=30.0,
+    check_same_thread=False,
+    max_attachment_size_mb=10
+)
 
 
 @router.post("/render/cards", response_class=HTMLResponse)
@@ -79,6 +93,10 @@ async def render_cards(request: Request):
         elif behavior == 'difference' or behavior == 'exclude':
             exclude_tags.extend(zone_data.tags)
 
+        elif behavior == 'exclusion' or zone_type == 'exclusion':
+            # EXCLUSION: Cards with NONE of the specified tags
+            operations.append(('exclusion', [(tag, 1) for tag in zone_data.tags]))
+
         # Dimensional layout
         elif zone_type == 'row':
             dimensional_zones['row'] = zone_data.tags
@@ -101,8 +119,54 @@ async def render_cards(request: Request):
 
     try:
         # Load and filter cards using shared services
-        with create_database_connection() as conn:
-            all_cards = load_all_card_summaries(conn)
+        with create_database_connection(DEFAULT_DB_CONFIG) as conn:
+            # Load lesson cards specifically for onboarding
+            from apps.shared.services.lesson_service import get_default_lesson_state, detect_lesson_progression
+
+            lesson_state = get_default_lesson_state()
+
+            # Check for current lesson from the frontend request
+            current_lesson_from_request = tags_in_play.controls.__dict__.get('currentLesson') if hasattr(tags_in_play, 'controls') else None
+            if not current_lesson_from_request and hasattr(tags_in_play, '__dict__'):
+                current_lesson_from_request = tags_in_play.__dict__.get('currentLesson')
+
+            current_lesson = current_lesson_from_request or lesson_state.get('current_lesson', 1)
+            lesson_state['current_lesson'] = current_lesson
+
+            logger.info(f"Loading cards for lesson {current_lesson}")
+
+            # Load only lesson cards for the current lesson to start with
+            lesson_cards_query = """
+                SELECT cs.id, cs.title, cs.tags_json, cs.created_at, cs.modified_at, cs.has_attachments
+                FROM card_summaries cs
+                JOIN cards c ON cs.id = c.id
+                WHERE c.card_type = 'lesson'
+                AND JSON_EXTRACT(c.lesson_metadata, '$.lesson_number') = ?
+            """
+
+            cursor = conn.execute(lesson_cards_query, (current_lesson,))
+            lesson_cards = []
+
+            for row in cursor.fetchall():
+                card_id, title, tags_json, created_at, modified_at, has_attachments = row
+                try:
+                    tags = frozenset(json.loads(tags_json))
+                except:
+                    tags = frozenset()
+
+                # Create CardSummary-like object
+                card = type('CardSummary', (), {
+                    'id': card_id,
+                    'title': title,
+                    'tags': tags,
+                    'created_at': created_at,
+                    'modified_at': modified_at,
+                    'has_attachments': has_attachments
+                })()
+                lesson_cards.append(card)
+
+            all_cards = lesson_cards
+            logger.info(f"Loaded {len(all_cards)} lesson {current_lesson} cards")
 
             # Apply temporal filters first if present
             if temporal_filters:
@@ -113,22 +177,40 @@ async def render_cards(request: Request):
                 logger.info(f"Applying {len(operations)} set operations")
                 result = apply_unified_operations(
                     frozenset(all_cards),
-                    operations,
-                    processing_mode='auto'  # Let backend auto-select optimal mode
+                    operations
                 )
                 filtered_cards = list(result.cards)
                 logger.info(f"Set operations completed: {len(filtered_cards)} cards result")
             elif tags_in_play.controls.startWithAllCards:
                 filtered_cards = list(all_cards)
-                logger.info(f"Showing all cards: {len(filtered_cards)}")
+                logger.info(f"Showing all cards (lesson-filtered): {len(filtered_cards)}")
             else:
-                filtered_cards = []
-                logger.info("No operations and startWithAllCards=False, showing empty result")
+                # When startWithAllCards is false, show cards with "always_visible" tag
+                always_visible_cards = [card for card in all_cards if hasattr(card, 'tags') and 'always_visible' in card.tags]
+                filtered_cards = always_visible_cards
+                logger.info(f"No operations, showing {len(filtered_cards)} always_visible cards")
 
             # Apply boost ranking if present
             if boost_tags and filtered_cards:
                 filtered_cards = apply_boost_ranking(filtered_cards, boost_tags)
                 logger.info(f"Applied boost ranking for {len(boost_tags)} boost tags")
+
+            # Detect lesson progression after operations are complete
+            current_zone_state = {"zones": {}}
+            for zone_type, zone_data in tags_in_play.zones.items():
+                current_zone_state["zones"][zone_type] = {"tags": zone_data.tags}
+
+            # Check for lesson progression and update state
+            updated_lesson_state, new_criteria = detect_lesson_progression(
+                {},  # Previous state not tracked yet, but could be added
+                current_zone_state,
+                lesson_state
+            )
+
+            if new_criteria:
+                logger.info(f"Lesson progression detected: {new_criteria}")
+                # In a real app, we'd save this to the user's session/database
+                # For now, just log it
 
     except Exception as e:
         logger.error(f"Error processing cards: {str(e)}")
@@ -146,13 +228,41 @@ async def render_cards(request: Request):
                 show_colors=tags_in_play.controls.showColors
             )
         else:
-            # Standard card grid
+            # Standard card grid - convert cards to template-friendly format
+            template_cards = []
+            for card in filtered_cards:
+                # Convert frozenset tags back to list for template
+                tags = list(card.tags) if hasattr(card, 'tags') else []
+
+                # Load full card content from database if available
+                card_content = getattr(card, 'content', '')
+                if not card_content and hasattr(card, 'id'):
+                    try:
+                        with create_database_connection(DEFAULT_DB_CONFIG) as conn:
+                            cursor = conn.execute('SELECT content FROM cards WHERE id = ?', (card.id,))
+                            row = cursor.fetchone()
+                            if row:
+                                card_content = row[0]
+                    except Exception as e:
+                        logger.warning(f"Could not load content for card {card.id}: {e}")
+
+                template_card = {
+                    'id': getattr(card, 'id', ''),
+                    'title': getattr(card, 'title', 'Untitled'),
+                    'content': card_content,
+                    'tags': tags,
+                    'created_at': getattr(card, 'created_at', ''),
+                    'modified_at': getattr(card, 'modified_at', ''),
+                    'has_attachments': getattr(card, 'has_attachments', False)
+                }
+                template_cards.append(template_card)
+
             template = templates_env.get_template('components/card_display.html')
             html = template.render(
-                cards=filtered_cards,
+                cards=template_cards,
                 show_expanded=tags_in_play.controls.startWithCardsExpanded,
                 show_colors=tags_in_play.controls.showColors,
-                card_count=len(filtered_cards)
+                card_count=len(template_cards)
             )
     except Exception as e:
         logger.error(f"Error rendering template: {str(e)}")
@@ -291,6 +401,96 @@ async def health_check():
     return {"status": "healthy", "service": "cards_api"}
 
 
+# Lesson-related endpoints
+@router.get("/lessons/options", response_class=HTMLResponse)
+async def get_lesson_options(request: Request):
+    """Get lesson selector options as HTML."""
+    try:
+        # Import lesson service functions
+        from apps.shared.services.lesson_service import get_lesson_selector_options, get_default_lesson_state
+
+        # Get default lesson state (in production, this would come from user session/database)
+        lesson_state = get_default_lesson_state()
+
+        # Check for completed lessons from query params (sent by frontend localStorage)
+        completed_param = request.query_params.get('completed')
+        if completed_param:
+            try:
+                import json
+                completed_lessons = json.loads(completed_param)
+                lesson_state['completed_lessons'] = completed_lessons
+                lesson_state['achieved_criteria'] = []
+
+                # Add criteria based on completed lessons
+                if 1 in completed_lessons:
+                    lesson_state['achieved_criteria'].append('tag_in_union_zone')
+                if 2 in completed_lessons:
+                    lesson_state['achieved_criteria'].append('two_tags_in_union')
+                if 3 in completed_lessons:
+                    lesson_state['achieved_criteria'].append('tag_in_intersection')
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+        options = get_lesson_selector_options(lesson_state)
+
+        # Generate HTML options
+        html_options = []
+        for option in options:
+            selected = 'selected="selected"' if option.get('selected') else ''
+            duration = option.get('duration', 60)
+            description = option.get('description', '')
+
+            # Format duration for display
+            if duration >= 60:
+                duration_text = f"{duration//60}m"
+            else:
+                duration_text = f"{duration}s"
+
+            html_options.append(f'''
+                <option value="{option['value']}" {selected} data-duration="{duration}" title="{description}">
+                    {option['label']} ({duration_text})
+                </option>
+            ''')
+
+        return HTMLResponse(''.join(html_options))
+
+    except Exception as e:
+        logger.error(f"Error loading lesson options: {str(e)}")
+        # Return fallback options
+        return HTMLResponse('''
+            <option value="1" selected="selected">🔄 Lesson 1: Basic Dragging (30s)</option>
+            <option value="production">🚀 Production Mode</option>
+        ''')
+
+
+@router.post("/lessons/switch")
+async def switch_lesson(request: Request):
+    """Switch to a different lesson."""
+    try:
+        body = await request.json()
+        lesson_id = body.get('lessonId')
+
+        # Import lesson service functions
+        from apps.shared.services.lesson_service import change_lesson, get_default_lesson_state
+
+        # Get current lesson state (in production, this would come from user session)
+        current_state = get_default_lesson_state()
+
+        # Change lesson
+        if lesson_id == "production":
+            new_state = change_lesson(current_state, "production")
+        else:
+            new_state = change_lesson(current_state, int(lesson_id))
+
+        # TODO: Save lesson state to user session/database
+
+        return {"status": "success", "lesson_state": new_state}
+
+    except Exception as e:
+        logger.error(f"Error switching lesson: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Error switching lesson: {str(e)}")
+
+
 # View restoration endpoint
 @router.get("/views/{view_id}/restore")
 async def restore_view(view_id: str):
@@ -310,6 +510,10 @@ async def restore_view(view_id: str):
                 "intersection": {
                     "tags": ["react"],
                     "metadata": {"behavior": "intersection"}
+                },
+                "exclusion": {
+                    "tags": ["deprecated", "archived"],
+                    "metadata": {"behavior": "exclusion"}
                 }
             },
             "controls": {
@@ -322,3 +526,58 @@ async def restore_view(view_id: str):
 
     logger.info(f"Restoring view {view_id}")
     return example_saved_view
+
+
+@router.get("/lessons/hint", response_class=HTMLResponse)
+async def get_lesson_hint(request: Request):
+    """Get current lesson hint text."""
+    try:
+        from apps.shared.services.lesson_service import get_default_lesson_state, create_lesson_hint_text
+
+        # Get current lesson state
+        lesson_state = get_default_lesson_state()
+
+        # Check for completed lessons from query params (sent by frontend localStorage)
+        completed_param = request.query_params.get('completed')
+        if completed_param:
+            try:
+                import json
+                completed_lessons = json.loads(completed_param)
+                lesson_state['completed_lessons'] = completed_lessons
+                lesson_state['achieved_criteria'] = []
+
+                # Add criteria based on completed lessons
+                if 1 in completed_lessons:
+                    lesson_state['achieved_criteria'].append('tag_in_union_zone')
+                if 2 in completed_lessons:
+                    lesson_state['achieved_criteria'].append('two_tags_in_union')
+                if 3 in completed_lessons:
+                    lesson_state['achieved_criteria'].append('tag_in_intersection')
+            except (json.JSONDecodeError, ValueError):
+                pass
+
+        # Get query parameters for current zone state
+        zone_union = request.query_params.getlist('union')
+        zone_intersection = request.query_params.getlist('intersection')
+        zone_exclusion = request.query_params.getlist('exclusion')
+
+        # Build zone state from query params
+        zone_state = {
+            "zones": {
+                "union": {"tags": zone_union},
+                "intersection": {"tags": zone_intersection},
+                "exclusion": {"tags": zone_exclusion}
+            }
+        }
+
+        # Create hint text
+        hint_text = create_lesson_hint_text(lesson_state, zone_state)
+
+        if hint_text:
+            return HTMLResponse(hint_text)
+        else:
+            return HTMLResponse("drag a <em>tag</em> to a <em>zone</em> to see the cards that have that tag")
+
+    except Exception as e:
+        logger.error(f"Error getting lesson hint: {str(e)}")
+        return HTMLResponse("drag a <em>tag</em> to a <em>zone</em> to see the cards that have that tag")

@@ -650,7 +650,8 @@ async def compute_card_sets(
 
     Phase 1 (Intersection): U' = {c ∈ U : I ⊆ c.tags} where I = intersection_tags
     Phase 2 (Union): R = {c ∈ U' : (O ∩ c.tags) ≠ ∅} where O = union_tags
-    Phase 3 (Difference): R' = R \ {c ∈ R : (D ∩ c.tags) ≠ ∅} where D = difference_tags
+    Phase 3 (Exclusion): E = {c ∈ U' : (E ∩ c.tags) = ∅} where E = exclusion_tags
+    Phase 4 (Difference): R' = R \ {c ∈ R : (D ∩ c.tags) ≠ ∅} where D = difference_tags
 
     PROPERTIES GUARANTEED:
     - Associative: (A ∩ B) ∩ C = A ∩ (B ∩ C)
@@ -667,6 +668,7 @@ async def compute_card_sets(
     # Extract zone operations maintaining mathematical purity
     intersection_tags = extract_intersection_tags(tags_in_play)
     union_tags = extract_union_tags(tags_in_play)
+    exclusion_tags = extract_exclusion_tags(tags_in_play)
     difference_tags = extract_difference_tags(tags_in_play)
 
     # Phase 1: Intersection filtering (universe restriction)
@@ -691,15 +693,26 @@ async def compute_card_sets(
         union_result = filtered_cards
         operations.append("identity(no union)")
 
-    # Phase 3: Difference exclusion
+    # Phase 3: Exclusion filtering (complement of union)
+    if exclusion_tags:
+        exclusion_result = frozenset(
+            card for card in union_result
+            if not (exclusion_tags & card.tags)
+        )
+        operations.append(f"exclusion({len(exclusion_tags)} tags)")
+    else:
+        exclusion_result = union_result
+        operations.append("identity(no exclusion)")
+
+    # Phase 4: Difference exclusion (subtract from result)
     if difference_tags:
         final_result = frozenset(
-            card for card in union_result
+            card for card in exclusion_result
             if not (difference_tags & card.tags)
         )
         operations.append(f"difference({len(difference_tags)} tags)")
     else:
-        final_result = union_result
+        final_result = exclusion_result
         operations.append("identity(no difference)")
 
     processing_time = time.perf_counter() - start_time

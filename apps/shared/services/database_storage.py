@@ -150,9 +150,52 @@ def initialize_database_schema(conn: DatabaseConnection) -> None:
         version INTEGER DEFAULT 1
     );
 
+    -- Users: Authentication and authorization
+    CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        username TEXT UNIQUE NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
+        full_name TEXT DEFAULT '',
+        is_active BOOLEAN DEFAULT TRUE,
+        is_verified BOOLEAN DEFAULT FALSE,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        last_login TEXT,
+        default_workspace_id TEXT
+    );
+
+    -- User Sessions: Session management
+    CREATE TABLE IF NOT EXISTS user_sessions (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        expires_at TEXT NOT NULL,
+        ip_address TEXT,
+        user_agent TEXT
+    );
+
+    -- User Workspaces: Junction table for workspace isolation
+    CREATE TABLE IF NOT EXISTS user_workspaces (
+        user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        workspace_id TEXT NOT NULL,
+        card_id TEXT NOT NULL REFERENCES card_summaries(id) ON DELETE CASCADE,
+        position INTEGER,
+        added_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id, workspace_id, card_id)
+    );
+
+    -- User Roles: Simple authorization
+    CREATE TABLE IF NOT EXISTS user_roles (
+        user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        role TEXT NOT NULL CHECK (role IN ('user', 'admin', 'superuser')),
+        granted_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        granted_by TEXT,
+        PRIMARY KEY (user_id, role)
+    );
+
     -- User Preferences: Server-side preference application
     CREATE TABLE IF NOT EXISTS user_preferences (
-        user_id TEXT PRIMARY KEY,
+        user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         preferences_json TEXT NOT NULL,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
@@ -179,6 +222,15 @@ def initialize_database_schema(conn: DatabaseConnection) -> None:
     CREATE INDEX IF NOT EXISTS idx_card_tags_card ON card_tags(card_id);
     CREATE INDEX IF NOT EXISTS idx_card_tags_tag ON card_tags(tag_id);
     CREATE INDEX IF NOT EXISTS idx_tags_name ON tags(name);
+
+    -- Indexes for authentication and user management
+    CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+    CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+    CREATE INDEX IF NOT EXISTS idx_user_sessions_user_id ON user_sessions(user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_sessions_expires ON user_sessions(expires_at);
+    CREATE INDEX IF NOT EXISTS idx_user_workspaces_user ON user_workspaces(user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_workspaces_workspace ON user_workspaces(workspace_id);
+    CREATE INDEX IF NOT EXISTS idx_user_roles_user ON user_roles(user_id);
     """
 
     try:
@@ -1341,6 +1393,294 @@ def backup_database_turso(
 
     except Exception as e:
         raise DatabaseStorageError(f"Failed to create Turso backup: {e}")
+
+
+# User Management Functions
+
+
+def save_user(conn: DatabaseConnection, user_data: dict) -> str:
+    """
+    Save user to database.
+
+    Args:
+        conn: Database connection
+        user_data: User data dictionary with required fields
+
+    Returns:
+        User ID
+
+    Raises:
+        DatabaseStorageError: If save operation fails
+    """
+    try:
+        conn.execute(
+            """INSERT OR REPLACE INTO users
+               (id, username, email, password_hash, full_name, is_active, is_verified,
+                created_at, last_login, default_workspace_id)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                user_data['id'],
+                user_data['username'],
+                user_data['email'],
+                user_data['password_hash'],
+                user_data.get('full_name', ''),
+                user_data.get('is_active', True),
+                user_data.get('is_verified', False),
+                user_data.get('created_at', datetime.now().isoformat()),
+                user_data.get('last_login'),
+                user_data.get('default_workspace_id'),
+            ),
+        )
+        conn.commit()
+
+        logger.debug(f"Saved user {user_data['id']}: {user_data['username']}")
+        return user_data['id']
+
+    except sqlite3.Error as e:
+        raise DatabaseStorageError(f"Failed to save user {user_data['id']}: {e}")
+
+
+def load_user_by_username(conn: DatabaseConnection, username: str) -> dict | None:
+    """
+    Load user by username for authentication.
+
+    Args:
+        conn: Database connection
+        username: Username to search for
+
+    Returns:
+        User data dictionary or None if not found
+
+    Raises:
+        DatabaseStorageError: If load operation fails
+    """
+    try:
+        cursor = conn.execute(
+            """SELECT id, username, email, password_hash, full_name, is_active, is_verified,
+                      created_at, last_login, default_workspace_id
+               FROM users WHERE username = ?""",
+            (username,),
+        )
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return {
+            'id': row[0],
+            'username': row[1],
+            'email': row[2],
+            'password_hash': row[3],
+            'full_name': row[4],
+            'is_active': bool(row[5]),
+            'is_verified': bool(row[6]),
+            'created_at': row[7],
+            'last_login': row[8],
+            'default_workspace_id': row[9],
+        }
+
+    except sqlite3.Error as e:
+        raise DatabaseStorageError(f"Failed to load user by username {username}: {e}")
+
+
+def load_user_by_email(conn: DatabaseConnection, email: str) -> dict | None:
+    """
+    Load user by email for authentication.
+
+    Args:
+        conn: Database connection
+        email: Email to search for
+
+    Returns:
+        User data dictionary or None if not found
+
+    Raises:
+        DatabaseStorageError: If load operation fails
+    """
+    try:
+        cursor = conn.execute(
+            """SELECT id, username, email, password_hash, full_name, is_active, is_verified,
+                      created_at, last_login, default_workspace_id
+               FROM users WHERE email = ?""",
+            (email,),
+        )
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        return {
+            'id': row[0],
+            'username': row[1],
+            'email': row[2],
+            'password_hash': row[3],
+            'full_name': row[4],
+            'is_active': bool(row[5]),
+            'is_verified': bool(row[6]),
+            'created_at': row[7],
+            'last_login': row[8],
+            'default_workspace_id': row[9],
+        }
+
+    except sqlite3.Error as e:
+        raise DatabaseStorageError(f"Failed to load user by email {email}: {e}")
+
+
+def save_user_session(conn: DatabaseConnection, session_data: dict) -> str:
+    """
+    Save user session for authentication tracking.
+
+    Args:
+        conn: Database connection
+        session_data: Session data dictionary
+
+    Returns:
+        Session ID
+
+    Raises:
+        DatabaseStorageError: If save operation fails
+    """
+    try:
+        conn.execute(
+            """INSERT OR REPLACE INTO user_sessions
+               (id, user_id, created_at, expires_at, ip_address, user_agent)
+               VALUES (?, ?, ?, ?, ?, ?)""",
+            (
+                session_data['id'],
+                session_data['user_id'],
+                session_data.get('created_at', datetime.now().isoformat()),
+                session_data['expires_at'],
+                session_data.get('ip_address'),
+                session_data.get('user_agent'),
+            ),
+        )
+        conn.commit()
+
+        logger.debug(f"Saved session {session_data['id']} for user {session_data['user_id']}")
+        return session_data['id']
+
+    except sqlite3.Error as e:
+        raise DatabaseStorageError(f"Failed to save session {session_data['id']}: {e}")
+
+
+def load_user_session(conn: DatabaseConnection, session_id: str) -> dict | None:
+    """
+    Load user session for authentication.
+
+    Args:
+        conn: Database connection
+        session_id: Session ID to load
+
+    Returns:
+        Session data dictionary or None if not found/expired
+
+    Raises:
+        DatabaseStorageError: If load operation fails
+    """
+    try:
+        cursor = conn.execute(
+            """SELECT id, user_id, created_at, expires_at, ip_address, user_agent
+               FROM user_sessions WHERE id = ?""",
+            (session_id,),
+        )
+        row = cursor.fetchone()
+
+        if not row:
+            return None
+
+        # Check if session is expired
+        expires_at = datetime.fromisoformat(row[3])
+        if datetime.now() > expires_at:
+            # Clean up expired session
+            conn.execute("DELETE FROM user_sessions WHERE id = ?", (session_id,))
+            conn.commit()
+            return None
+
+        return {
+            'id': row[0],
+            'user_id': row[1],
+            'created_at': row[2],
+            'expires_at': row[3],
+            'ip_address': row[4],
+            'user_agent': row[5],
+        }
+
+    except sqlite3.Error as e:
+        raise DatabaseStorageError(f"Failed to load session {session_id}: {e}")
+
+
+def add_card_to_user_workspace(
+    conn: DatabaseConnection, user_id: str, workspace_id: str, card_id: str, position: int | None = None
+) -> bool:
+    """
+    Add card to user's workspace with optional positioning.
+
+    Args:
+        conn: Database connection
+        user_id: User identifier
+        workspace_id: Workspace identifier
+        card_id: Card identifier
+        position: Optional position for ordering
+
+    Returns:
+        True if added successfully
+
+    Raises:
+        DatabaseStorageError: If operation fails
+    """
+    try:
+        conn.execute(
+            """INSERT OR REPLACE INTO user_workspaces
+               (user_id, workspace_id, card_id, position, added_at)
+               VALUES (?, ?, ?, ?, ?)""",
+            (
+                user_id,
+                workspace_id,
+                card_id,
+                position,
+                datetime.now().isoformat(),
+            ),
+        )
+        conn.commit()
+
+        logger.debug(f"Added card {card_id} to workspace {workspace_id} for user {user_id}")
+        return True
+
+    except sqlite3.Error as e:
+        raise DatabaseStorageError(f"Failed to add card to workspace: {e}")
+
+
+def load_user_workspace_cards(
+    conn: DatabaseConnection, user_id: str, workspace_id: str
+) -> list[str]:
+    """
+    Load card IDs for user's workspace.
+
+    Args:
+        conn: Database connection
+        user_id: User identifier
+        workspace_id: Workspace identifier
+
+    Returns:
+        List of card IDs in the workspace
+
+    Raises:
+        DatabaseStorageError: If load operation fails
+    """
+    try:
+        cursor = conn.execute(
+            """SELECT card_id FROM user_workspaces
+               WHERE user_id = ? AND workspace_id = ?
+               ORDER BY position ASC, added_at ASC""",
+            (user_id, workspace_id),
+        )
+
+        card_ids = [row[0] for row in cursor.fetchall()]
+        logger.debug(f"Loaded {len(card_ids)} cards for user {user_id} workspace {workspace_id}")
+        return card_ids
+
+    except sqlite3.Error as e:
+        raise DatabaseStorageError(f"Failed to load workspace cards: {e}")
 
 
 def optimize_database(conn: DatabaseConnection) -> None:

@@ -324,8 +324,13 @@ def filter_bitmaps_chunk(
             match = (bitmap & target_bitmap) == target_bitmap
         elif op_type == "union":
             match = bool(bitmap & target_bitmap)
-        else:  # difference
+        elif op_type == "difference":
             match = not (bitmap & target_bitmap)
+        elif op_type == "exclusion":
+            # EXCLUSION: cards with NONE of the specified tags
+            match = not (bitmap & target_bitmap)
+        else:
+            raise ValueError(f"Unknown operation type: {op_type}")
         if match:
             matches.append(global_i)
     return matches
@@ -342,8 +347,13 @@ def filter_roaring_bitmaps_chunk(
             match = target_rb.issubset(rb)
         elif op_type == "union":
             match = not rb.isdisjoint(target_rb)
-        else:  # difference
+        elif op_type == "difference":
             match = rb.isdisjoint(target_rb)
+        elif op_type == "exclusion":
+            # EXCLUSION: cards with NONE of the specified tags
+            match = rb.isdisjoint(target_rb)
+        else:
+            raise ValueError(f"Unknown operation type: {op_type}")
         if match:
             matches.append(global_i)
     return matches
@@ -707,8 +717,17 @@ def execute_regular_operation(
     Designed for near-constant time filtering with minimized computational overhead.
     """
 
-    if not cards or not tag_names:
+    if not cards:
         return frozenset()
+
+    # Handle empty tag names differently for each operation
+    if not tag_names:
+        if operation_type == "exclusion":
+            # EXCLUSION with no tags means exclude nothing -> return all cards
+            return cards
+        else:
+            # Other operations with no tags return empty set
+            return frozenset()
 
     # Ultra-fast tag checking
     if operation_type == "intersection":
@@ -737,8 +756,17 @@ def execute_regular_operation(
         result = frozenset(card for card in cards if difference_match(card.tags))
         return result
 
+    elif operation_type == "exclusion":
+        # EXCLUSION operation: cards with NONE of the specified tags
+        # Mathematical definition: E' = {c ∈ U : c.tags ∩ I = ∅}
+        def exclusion_match(card_tags):
+            return tag_names.isdisjoint(card_tags)
+
+        result = frozenset(card for card in cards if exclusion_match(card.tags))
+        return result
+
     else:
-        valid_operations = ["intersection", "union", "difference"]
+        valid_operations = ["intersection", "union", "difference", "exclusion"]
         raise ValueError(
             f"Unknown operation type: {operation_type}. Valid operations are: {', '.join(valid_operations)}"
         )
@@ -1046,8 +1074,11 @@ def match_operation(
         return not tag_names.isdisjoint(card.tags)
     elif operation_type == "difference":
         return tag_names.isdisjoint(card.tags)
+    elif operation_type == "exclusion":
+        # EXCLUSION: cards with NONE of the specified tags
+        return tag_names.isdisjoint(card.tags)
     else:
-        valid_operations = ["intersection", "union", "difference"]
+        valid_operations = ["intersection", "union", "difference", "exclusion"]
         raise ValueError(
             f"Invalid operation type '{operation_type}'. Valid operations are: {', '.join(valid_operations)}"
         )

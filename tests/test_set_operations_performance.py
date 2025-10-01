@@ -370,6 +370,141 @@ class TestSetOperationsPerformance:
             assert result.operations_applied == 1
 
 
+class TestExclusionOperations:
+    """Test suite for EXCLUSION operation functionality and performance."""
+
+    # Class-level datasets for consistent testing
+    _exclusion_datasets = {}
+
+    @classmethod
+    def _generate_exclusion_test_cards(cls, count: int) -> frozenset[CardSummary]:
+        """Generate cards with predictable tag distribution for EXCLUSION testing."""
+        random.seed(42)  # Consistent results
+        cards = []
+
+        # Create a predictable distribution:
+        # 25% with 'python' tag
+        # 25% with 'javascript' tag
+        # 25% with 'deprecated' tag
+        # 25% with mixed/other tags
+
+        for i in range(count):
+            if i < count // 4:
+                tags = frozenset(['python', 'web'])
+            elif i < count // 2:
+                tags = frozenset(['javascript', 'frontend'])
+            elif i < (3 * count) // 4:
+                tags = frozenset(['deprecated', 'legacy'])
+            else:
+                tags = frozenset(['rust', 'performance'])
+
+            card = CardSummary(
+                id=f"EXC{i+1:05d}",
+                title=f"EXCLUSION Test Card {i+1}",
+                tags=tags
+            )
+            cards.append(card)
+
+        return frozenset(cards)
+
+    def get_exclusion_cards(self, count: int) -> frozenset[CardSummary]:
+        """Get pre-generated exclusion test dataset."""
+        if count not in self._exclusion_datasets:
+            self._exclusion_datasets[count] = self._generate_exclusion_test_cards(count)
+        return self._exclusion_datasets[count]
+
+    @pytest.mark.performance
+    def test_exclusion_mathematical_correctness(self):
+        """Test that EXCLUSION operation is mathematically correct."""
+        cards = self.get_exclusion_cards(1000)
+
+        # Test excluding 'python' tags
+        result = apply_unified_operations(cards, [('exclusion', [('python', 1)])])
+
+        # Manually calculate expected result
+        expected = frozenset(card for card in cards if 'python' not in card.tags)
+
+        assert result.cards == expected, "EXCLUSION result should match manual calculation"
+        assert len(result.cards) == 750, "Should have 750 cards (excluding 250 with 'python')"
+
+    @pytest.mark.performance
+    def test_exclusion_performance_1000_cards(self):
+        """Test EXCLUSION performance with 1,000 cards - target <10ms."""
+        cards = self.get_exclusion_cards(1000)
+
+        start_time = time.perf_counter()
+        result = apply_unified_operations(cards, [('exclusion', [('python', 1)])])
+        execution_time_ms = (time.perf_counter() - start_time) * 1000
+
+        assert execution_time_ms < 25.0, f"EXCLUSION took {execution_time_ms:.2f}ms"
+        assert isinstance(result.cards, frozenset)
+        assert result.operations_applied == 1
+
+    @pytest.mark.performance
+    def test_exclusion_multiple_tags(self):
+        """Test EXCLUSION with multiple tags."""
+        cards = self.get_exclusion_cards(1000)
+
+        # Exclude both 'python' and 'javascript' tags
+        result = apply_unified_operations(cards, [('exclusion', [('python', 1), ('javascript', 1)])])
+
+        # Should exclude cards with ANY of the specified tags
+        expected = frozenset(
+            card for card in cards
+            if not ('python' in card.tags or 'javascript' in card.tags)
+        )
+
+        assert result.cards == expected
+        assert len(result.cards) == 500, "Should have 500 cards (excluding python+javascript)"
+
+    @pytest.mark.performance
+    def test_exclusion_complement_union_property(self):
+        """Test that EXCLUSION is the complement of UNION (mathematical property)."""
+        cards = self.get_exclusion_cards(1000)
+        tags = [('python', 1)]
+
+        # Get UNION result
+        union_result = apply_unified_operations(cards, [('union', tags)])
+
+        # Get EXCLUSION result
+        exclusion_result = apply_unified_operations(cards, [('exclusion', tags)])
+
+        # They should partition the universe (no overlap, complete coverage)
+        assert union_result.cards.isdisjoint(exclusion_result.cards), "UNION and EXCLUSION should be disjoint"
+        assert union_result.cards | exclusion_result.cards == cards, "UNION ∪ EXCLUSION should equal universe"
+
+    @pytest.mark.performance
+    def test_exclusion_empty_tags(self):
+        """Test EXCLUSION with empty tag set returns all cards."""
+        cards = self.get_exclusion_cards(100)
+
+        result = apply_unified_operations(cards, [('exclusion', [])])
+
+        # Empty exclusion should return all cards
+        assert result.cards == cards
+        assert len(result.cards) == 100
+
+    @pytest.mark.performance
+    def test_exclusion_with_other_operations(self):
+        """Test EXCLUSION combined with other operations."""
+        cards = self.get_exclusion_cards(1000)
+
+        # First filter by UNION, then exclude deprecated
+        operations = [
+            ('union', [('python', 1), ('javascript', 1)]),  # Get python OR javascript
+            ('exclusion', [('deprecated', 1)])              # Exclude deprecated
+        ]
+
+        result = apply_unified_operations(cards, operations)
+
+        # Should have cards with python OR javascript, but NOT deprecated
+        for card in result.cards:
+            has_target = 'python' in card.tags or 'javascript' in card.tags
+            has_excluded = 'deprecated' in card.tags
+            assert has_target, "Card should have python or javascript"
+            assert not has_excluded, "Card should not have deprecated"
+
+
 class TestSetOperationsStress:
     """Stress tests for extreme conditions."""
 
