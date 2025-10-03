@@ -105,3 +105,33 @@ async def create_tag(request: CreateTagRequest) -> CreateTagResponse:
         return CreateTagResponse(
             success=False, tag_id="", message=f"Failed to create tag: {str(e)}"
         )
+
+
+@router.post("/delete")
+async def delete_tag(request: Request):
+    """Delete a tag (soft delete by setting deleted timestamp)."""
+    import sqlite3
+    from datetime import datetime
+
+    data = await request.json()
+    tag_id = data.get("tag_id")
+
+    try:
+        db_path = Path("/var/data/tutorial_customer.db")
+
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+
+            # Soft delete - set deleted timestamp
+            cursor.execute(
+                "UPDATE tags SET deleted = ? WHERE tag_id = ?",
+                (datetime.utcnow().isoformat(), tag_id)
+            )
+            conn.commit()
+
+            logger.info(f"Tag deleted: {tag_id}")
+            return {"success": True, "message": "Tag deleted"}
+
+    except Exception as e:
+        logger.error(f"Failed to delete tag: {e}")
+        return {"success": False, "message": str(e)}

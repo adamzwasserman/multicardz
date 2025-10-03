@@ -33,6 +33,7 @@
                           id="tag-{{ tag.name }}"
 >
                         {{ tag.name }} ({{ tag.count }})
+                        <button class="tag-delete" onclick="deleteTag('{{ tag.id }}', this)" title="Delete tag">×</button>
                     </span>
                     {% endfor %}
                 </div>
@@ -560,7 +561,7 @@ async function createTag(tagName, cloudType = 'user') {
                 tagElement.setAttribute('data-type', 'tag');
                 tagElement.setAttribute('draggable', 'true');
                 tagElement.id = `tag-${tagName}`;
-                tagElement.textContent = `${tagName} (0)`;
+                tagElement.innerHTML = `${tagName} (0) <button class="tag-delete" onclick="deleteTag('${data.tag_id}', this)" title="Delete tag">×</button>`;
                 cloud.appendChild(tagElement);
             }
             return data;
@@ -591,6 +592,7 @@ async function createNewCard() {
 
     cardElement.innerHTML = `
         <div class="card-content">
+            <button class="card-delete" onclick="deleteCard('${cardId}', this)" title="Delete card">×</button>
             <div class="card-header">
                 <h4 class="card-title" contenteditable="true" style="outline: 2px solid #3b82f6;"></h4>
             </div>
@@ -683,6 +685,52 @@ async function removeTagFromCard(cardId, tagId, removeButton) {
         }
     } catch (error) {
         console.error('Failed to remove tag from card:', error);
+    }
+}
+
+// Delete card
+async function deleteCard(cardId, deleteButton) {
+    if (!confirm('Delete this card?')) return;
+
+    try {
+        const response = await fetch('/api/v2/cards/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ card_id: cardId })
+        });
+
+        if (response.ok) {
+            const cardElement = deleteButton.closest('.card-item');
+            if (cardElement) cardElement.remove();
+        } else {
+            alert('Failed to delete card');
+        }
+    } catch (error) {
+        console.error('Failed to delete card:', error);
+        alert('Failed to delete card');
+    }
+}
+
+// Delete tag
+async function deleteTag(tagId, deleteButton) {
+    if (!confirm('Delete this tag?')) return;
+
+    try {
+        const response = await fetch('/api/v2/tags/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tag_id: tagId })
+        });
+
+        if (response.ok) {
+            const tagElement = deleteButton.closest('.tag');
+            if (tagElement) tagElement.remove();
+        } else {
+            alert('Failed to delete tag');
+        }
+    } catch (error) {
+        console.error('Failed to delete tag:', error);
+        alert('Failed to delete tag');
     }
 }
 

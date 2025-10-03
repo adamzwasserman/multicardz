@@ -980,3 +980,34 @@ async def create_card(request: Request):
     except Exception as e:
         logger.error(f"Error creating card: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/cards/delete")
+async def delete_card(request: Request):
+    """Delete a card (soft delete by setting deleted timestamp)."""
+    import sqlite3
+    from datetime import datetime
+
+    data = await request.json()
+    card_id = data.get("card_id")
+
+    try:
+        db_path = Path("/var/data/tutorial_customer.db")
+
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+
+            # Soft delete - set deleted timestamp
+            cursor.execute(
+                "UPDATE cards SET deleted = ? WHERE card_id = ?",
+                (datetime.utcnow().isoformat(), card_id)
+            )
+            conn.commit()
+
+            logger.info(f"Card deleted: {card_id}")
+            return {"success": True, "message": "Card deleted"}
+
+    except Exception as e:
+        logger.error(f"Failed to delete card: {e}")
+        return {"success": False, "message": str(e)}
+

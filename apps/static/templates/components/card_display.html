@@ -27,6 +27,7 @@
              {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
              {% if card.draggable %}draggable="true"{% endif %}>
             <div class="card-content">
+                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                 <div class="card-header">
                     <h4 class="card-title">{{ card.title }}</h4>
                     {% if card.subtitle %}
