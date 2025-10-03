@@ -787,27 +787,27 @@ async def get_lesson_hint(request: Request):
 @router.post("/cards/update-title")
 async def update_card_title(request: Request):
     """Update a card's title."""
-    import sqlite3
     from pydantic import BaseModel
+    from apps.shared.repositories import CardRepository
 
     class UpdateTitleRequest(BaseModel):
         card_id: str
         title: str
+        workspace_id: str = "default-workspace"  # TODO: Get from session
 
     try:
         data = await request.json()
         req = UpdateTitleRequest(**data)
 
-        db_path = Path("/var/data/tutorial_customer.db")
-        with sqlite3.connect(db_path) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "UPDATE cards SET title = ?, modified_at = datetime('now') WHERE id = ?",
-                (req.title, req.card_id)
-            )
-            conn.commit()
+        card_repo = CardRepository()
+        success = card_repo.update_title(req.card_id, req.workspace_id, req.title)
 
-        return {"success": True, "message": "Title updated"}
+        if success:
+            return {"success": True, "message": "Title updated"}
+        else:
+            raise HTTPException(status_code=404, detail="Card not found")
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Error updating card title: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -816,53 +816,25 @@ async def update_card_title(request: Request):
 @router.post("/cards/add-tag")
 async def add_tag_to_card(request: Request):
     """Add a tag to a card (using zero-trust inverted index)."""
-    import sqlite3
-    from datetime import datetime
     from pydantic import BaseModel
+    from apps.shared.repositories import CardRepository
 
     class AddTagRequest(BaseModel):
         card_id: str  # UUID
         tag_id: str  # UUID
+        workspace_id: str = "default-workspace"  # TODO: Get from session
 
     try:
         data = await request.json()
         req = AddTagRequest(**data)
 
-        db_path = Path("/var/data/tutorial_customer.db")
-        with sqlite3.connect(db_path) as conn:
-            cursor = conn.cursor()
+        card_repo = CardRepository()
+        success = card_repo.add_tag(req.card_id, req.workspace_id, req.tag_id)
 
-            # Get current tags from card
-            cursor.execute("SELECT tags FROM cards WHERE card_id = ?", (req.card_id,))
-            row = cursor.fetchone()
-            if not row:
-                return {"success": False, "message": "Card not found"}
-
-            current_tags = row[0]
-            tag_ids = current_tags.split(",") if current_tags else []
-
-            # Check if tag already on card
-            if req.tag_id in tag_ids:
-                return {"success": False, "message": "Tag already on card"}
-
-            # Add tag to inverted index
-            tag_ids.append(req.tag_id)
-            new_tags = ",".join(tag_ids)
-
-            # Update card (trigger will auto-update tag.card_count)
-            cursor.execute(
-                """
-                UPDATE cards
-                SET tags = ?,
-                    modified = ?
-                WHERE card_id = ?
-                """,
-                (new_tags, datetime.utcnow().isoformat(), req.card_id),
-            )
-
-            conn.commit()
-
-        return {"success": True, "message": "Tag added"}
+        if success:
+            return {"success": True, "message": "Tag added"}
+        else:
+            return {"success": False, "message": "Card not found or tag already on card"}
     except Exception as e:
         logger.error(f"Error adding tag to card: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -871,67 +843,51 @@ async def add_tag_to_card(request: Request):
 @router.post("/cards/remove-tag")
 async def remove_tag_from_card(request: Request):
     """Remove a tag from a card (using zero-trust inverted index)."""
-    import sqlite3
-    from datetime import datetime
     from pydantic import BaseModel
+    from apps.shared.repositories import CardRepository
 
     class RemoveTagRequest(BaseModel):
         card_id: str  # UUID
         tag_id: str  # UUID
+        workspace_id: str = "default-workspace"  # TODO: Get from session
 
     try:
         data = await request.json()
         req = RemoveTagRequest(**data)
 
-        db_path = Path("/var/data/tutorial_customer.db")
-        with sqlite3.connect(db_path) as conn:
-            cursor = conn.cursor()
+        card_repo = CardRepository()
+        success = card_repo.remove_tag(req.card_id, req.workspace_id, req.tag_id)
 
-            # Get current tags from card
-            cursor.execute("SELECT tags FROM cards WHERE card_id = ?", (req.card_id,))
-            row = cursor.fetchone()
-            if not row:
-                return {"success": False, "message": "Card not found"}
-
-            current_tags = row[0]
-            if not current_tags:
-                return {"success": False, "message": "Card has no tags"}
-
-            tag_ids = current_tags.split(",")
-
-            # Remove tag from inverted index
-            if req.tag_id not in tag_ids:
-                return {"success": False, "message": "Tag not on card"}
-
-            tag_ids.remove(req.tag_id)
-            new_tags = ",".join(tag_ids) if tag_ids else None
-
-            # Update card (trigger will auto-update tag.card_count)
-            cursor.execute(
-                """
-                UPDATE cards
-                SET tags = ?,
-                    modified = ?
-                WHERE card_id = ?
-                """,
-                (new_tags, datetime.utcnow().isoformat(), req.card_id),
-            )
-
-            conn.commit()
-
-        return {"success": True, "message": "Tag removed"}
+        if success:
+            return {"success": True, "message": "Tag removed"}
+        else:
+            return {"success": False, "message": "Card not found or tag not on card"}
     except Exception as e:
         logger.error(f"Error removing tag from card: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/tags/counts")
+async def get_tag_counts():
+    """Get current card_count for all non-deleted tags."""
+    from apps.shared.repositories import TagRepository
+
+    try:
+        tag_repo = TagRepository()
+        workspace_id = "default-workspace"  # TODO: Get from session
+        counts = tag_repo.get_counts(workspace_id)
+        return {"counts": counts}
+    except Exception as e:
+        logger.error(f"Error fetching tag counts: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/cards/create")
 async def create_card(request: Request):
     """Create a new card with tags (using zero-trust schema)."""
-    import sqlite3
     import uuid
-    from datetime import datetime
     from pydantic import BaseModel
+    from apps.shared.repositories import CardRepository
 
     class CreateCardRequest(BaseModel):
         name: str
@@ -945,38 +901,17 @@ async def create_card(request: Request):
         req = CreateCardRequest(**data)
 
         card_id = str(uuid.uuid4())
-        now = datetime.utcnow().isoformat()
-        db_path = Path("/var/data/tutorial_customer.db")
+        card_repo = CardRepository()
 
-        with sqlite3.connect(db_path) as conn:
-            cursor = conn.cursor()
+        # Create card using repository
+        card = card_repo.create(
+            card_id=card_id,
+            name=req.name,
+            workspace_id=req.workspace_id,
+            tag_ids=req.tag_ids
+        )
 
-            # Build tags inverted index (comma-separated tag_ids)
-            tags_inverted_index = ",".join(req.tag_ids) if req.tag_ids else None
-
-            # Insert card with all required fields
-            cursor.execute(
-                """
-                INSERT INTO cards (
-                    user_id, workspace_id, created, modified, deleted,
-                    card_id, card_bitmap, name, description, tags
-                ) VALUES (?, ?, ?, ?, NULL, ?, 0, ?, ?, ?)
-                """,
-                (
-                    req.user_id,
-                    req.workspace_id,
-                    now,
-                    now,
-                    card_id,
-                    req.name,
-                    req.description,
-                    tags_inverted_index,
-                ),
-            )
-
-            conn.commit()
-
-        return {"success": True, "card_id": card_id, "message": "Card created"}
+        return {"success": True, "card_id": card["card_id"], "message": "Card created"}
     except Exception as e:
         logger.error(f"Error creating card: {e}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -985,27 +920,21 @@ async def create_card(request: Request):
 @router.post("/cards/delete")
 async def delete_card(request: Request):
     """Delete a card (soft delete by setting deleted timestamp)."""
-    import sqlite3
-    from datetime import datetime
+    from apps.shared.repositories import CardRepository
 
     data = await request.json()
     card_id = data.get("card_id")
+    workspace_id = "default-workspace"  # TODO: Get from session
 
     try:
-        db_path = Path("/var/data/tutorial_customer.db")
+        card_repo = CardRepository()
+        success = card_repo.soft_delete(card_id, workspace_id)
 
-        with sqlite3.connect(db_path) as conn:
-            cursor = conn.cursor()
-
-            # Soft delete - set deleted timestamp
-            cursor.execute(
-                "UPDATE cards SET deleted = ? WHERE card_id = ?",
-                (datetime.utcnow().isoformat(), card_id)
-            )
-            conn.commit()
-
+        if success:
             logger.info(f"Card deleted: {card_id}")
             return {"success": True, "message": "Card deleted"}
+        else:
+            return {"success": False, "message": "Card not found"}
 
     except Exception as e:
         logger.error(f"Failed to delete card: {e}")

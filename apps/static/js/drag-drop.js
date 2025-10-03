@@ -1,7 +1,504 @@
 /**
  * MultiCardz™ Spatial Drag-Drop System
  * Handles dynamic zone discovery, multi-tag operations, and immutable DOM manipulation
+ *
+ * Architecture: Polymorphic state table-driven drag-drop with handler registry
+ * See: /docs/Architecture/drag-drop-polymorphic-specification.md
  */
+
+/**
+ * Debounce utility - prevents rapid repeated calls
+ */
+function debounce(func, wait) {
+  let timeout;
+  let lastCall = 0;
+
+  return function executedFunction(...args) {
+    const now = Date.now();
+    const timeSinceLastCall = now - lastCall;
+
+    const later = () => {
+      timeout = null;
+      lastCall = now;
+      func(...args);
+    };
+
+    clearTimeout(timeout);
+
+    // If enough time has passed, execute immediately
+    if (timeSinceLastCall >= wait) {
+      lastCall = now;
+      func(...args);
+    } else {
+      // Otherwise, schedule for later
+      timeout = setTimeout(later, wait - timeSinceLastCall);
+    }
+  };
+}
+
+/**
+ * Simple EventEmitter for pub/sub pattern
+ * Allows decoupled communication between components
+ */
+class EventEmitter {
+  constructor() {
+    this.events = {};
+  }
+
+  on(event, listener) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(listener);
+    return () => this.off(event, listener);
+  }
+
+  off(event, listener) {
+    if (!this.events[event]) return;
+    this.events[event] = this.events[event].filter(l => l !== listener);
+  }
+
+  emit(event, data) {
+    if (!this.events[event]) return;
+    this.events[event].forEach(listener => listener(data));
+  }
+}
+
+// Global event emitter for tag/card count updates
+window.tagCountEmitter = new EventEmitter();
+
+/**
+ * Base class for all drop handlers
+ * Implements polymorphic dispatch pattern for drag-drop operations
+ */
+class DropHandler {
+  /**
+   * Check if this handler can process the drop
+   */
+  canHandle(dragType, dropType, dragElement, dropElement) {
+    return false;
+  }
+
+  /**
+   * Validate the drop operation
+   */
+  validate(dragElement, dropElement) {
+    return true;
+  }
+
+  /**
+   * Handle dragover event for visual feedback
+   */
+  handleDragOver(event, dropElement, draggedElements) {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    dropElement.classList.add('drag-over');
+  }
+
+  /**
+   * Handle dragleave event to remove visual feedback
+   */
+  handleDragLeave(event, dropElement, draggedElements) {
+    dropElement.classList.remove('drag-over');
+  }
+
+  /**
+   * Handle drop event (override in subclasses)
+   */
+  async handleDrop(event, dropElement, draggedElements) {
+    throw new Error('Must implement handleDrop() in subclass');
+  }
+
+  /**
+   * Declare if handler mutates tagsInPlay
+   */
+  mutatesTagsInPlay() {
+    return false;
+  }
+
+  /**
+   * Declare if handler requires card re-render
+   */
+  requiresRerender() {
+    return false;
+  }
+}
+
+/**
+ * Registry for drag-drop handlers using state table pattern
+ * Maps (dragType, dropType) → Handler instance
+ */
+class DropTargetRegistry {
+  constructor(dragDropSystem) {
+    this.system = dragDropSystem;
+    this.handlers = new Map();
+    this.registerDefaultHandlers();
+  }
+
+  /**
+   * Register a handler for a specific drag/drop combination
+   */
+  register(dragType, dropType, handler) {
+    if (!this.handlers.has(dragType)) {
+      this.handlers.set(dragType, new Map());
+    }
+    this.handlers.get(dragType).set(dropType, handler);
+  }
+
+  /**
+   * Get handler for specific drag/drop types
+   */
+  getHandler(dragType, dropType) {
+    return this.handlers.get(dragType)?.get(dropType) || null;
+  }
+
+  /**
+   * Find appropriate handler for drag and drop elements
+   */
+  findHandler(dragElement, dropElement) {
+    if (!dragElement || !dropElement) return null;
+
+    const dragType = this.identifyDragType(dragElement);
+    const dropType = this.identifyDropType(dropElement);
+
+    if (dragType === 'unknown' || dropType === 'unknown') return null;
+
+    const handler = this.getHandler(dragType, dropType);
+    if (handler && handler.canHandle(dragType, dropType, dragElement, dropElement)) {
+      return handler;
+    }
+    return null;
+  }
+
+  /**
+   * Identify drag element type
+   */
+  identifyDragType(element) {
+    if (element.dataset.type === 'group-tag') return 'tag-group';
+    if (element.dataset.tag) return 'tag';
+    if (element.dataset.zoneType) return 'drop-zone';
+    if (element.dataset.cardId) return 'card';
+    return 'unknown';
+  }
+
+  /**
+   * Identify drop target type
+   */
+  identifyDropType(element) {
+    if (element.classList.contains('cloud')) return 'tag-cloud';
+    if (element.classList.contains('card-tags')) return 'card-tags';
+    if (element.dataset.zoneType && element.dataset.zoneType !== 'tag-cloud') return 'drop-zone';
+    if (element.classList.contains('control-area-container')) return 'control-area';
+    if (element.dataset.type === 'group-tag') return 'tag-group';
+    if (element.classList.contains('grid-cell')) return 'matrix-cell';
+    return 'unknown';
+  }
+
+  /**
+   * Register all default handlers from state table
+   */
+  registerDefaultHandlers() {
+    // Tag handlers
+    this.register('tag', 'tag-cloud', new TagToCloudHandler(this.system));
+    this.register('tag', 'drop-zone', new TagToZoneHandler(this.system));
+    this.register('tag', 'card-tags', new TagToCardHandler(this.system));
+
+    // Tag group handlers
+    this.register('tag-group', 'tag-cloud', new GroupToCloudHandler(this.system));
+    this.register('tag-group', 'drop-zone', new GroupToZoneHandler(this.system));
+    this.register('tag-group', 'card-tags', new GroupToCardHandler(this.system));
+  }
+}
+
+/**
+ * Tag → Tag Cloud Handler
+ * MOVE tag back to cloud, REMOVE from tagsInPlay
+ */
+class TagToCloudHandler extends DropHandler {
+  constructor(system) {
+    super();
+    this.system = system;
+  }
+
+  canHandle(dragType, dropType, dragElement, dropElement) {
+    return dragType === 'tag' && dropType === 'tag-cloud';
+  }
+
+  validate(dragElement, dropElement) {
+    // Check tag type matches cloud type
+    const tagType = dragElement.dataset.type || 'user-tag';
+    const cloudType = dropElement.dataset.cloudType;
+
+    // User and AI tags can both go to user cloud if preference is set
+    if (cloudType === 'user') return true;
+    if (cloudType === 'ai') return tagType === 'ai-tag';
+    if (cloudType === 'system') return tagType === 'system-tag';
+    if (cloudType === 'group') return tagType === 'group-tag';
+
+    return false;
+  }
+
+  async handleDrop(event, dropElement, draggedElements) {
+    event.preventDefault();
+    dropElement.classList.remove('drag-over');
+
+    const cloudWrapper = dropElement.querySelector('.tags-wrapper');
+    if (!cloudWrapper) return;
+
+    for (const tagElement of draggedElements) {
+      if (!this.validate(tagElement, dropElement)) continue;
+
+      // MOVE tag to cloud (DOM manipulation, not recreation)
+      cloudWrapper.appendChild(tagElement);
+      tagElement.classList.remove('tag-active', 'selected');
+      tagElement.classList.add('tag-cloud');
+    }
+  }
+
+  mutatesTagsInPlay() {
+    return true; // Removes tags from zones
+  }
+
+  requiresRerender() {
+    return true;
+  }
+}
+
+/**
+ * Tag → Drop Zone Handler
+ * MOVE tag to zone, ADD to tagsInPlay
+ */
+class TagToZoneHandler extends DropHandler {
+  constructor(system) {
+    super();
+    this.system = system;
+  }
+
+  canHandle(dragType, dropType, dragElement, dropElement) {
+    return dragType === 'tag' && dropType === 'drop-zone';
+  }
+
+  validate(dragElement, dropElement) {
+    const tagCollection = dropElement.querySelector('.tag-collection');
+    if (!tagCollection) return false;
+
+    // Check if already in zone
+    if (tagCollection.contains(dragElement)) return false;
+
+    // Check maxTags constraint
+    const maxTags = this.system.parseMaxTags(dropElement.dataset.maxTags);
+    if (maxTags && tagCollection.children.length >= maxTags) return false;
+
+    return true;
+  }
+
+  async handleDrop(event, dropElement, draggedElements) {
+    event.preventDefault();
+    dropElement.classList.remove('drag-over');
+
+    const tagCollection = dropElement.querySelector('.tag-collection');
+    if (!tagCollection) return;
+
+    for (const tagElement of draggedElements) {
+      if (!this.validate(tagElement, dropElement)) continue;
+
+      // MOVE tag to zone (DOM manipulation, not recreation)
+      tagCollection.appendChild(tagElement);
+      tagElement.classList.remove('tag-cloud');
+      tagElement.classList.add('tag-active');
+    }
+  }
+
+  mutatesTagsInPlay() {
+    return true; // Adds tags to zone
+  }
+
+  requiresRerender() {
+    return true;
+  }
+}
+
+/**
+ * Tag → Card Tags Handler
+ * ADD representation to card, keep original tag in place
+ */
+class TagToCardHandler extends DropHandler {
+  constructor(system) {
+    super();
+    this.system = system;
+  }
+
+  canHandle(dragType, dropType, dragElement, dropElement) {
+    return dragType === 'tag' && dropType === 'card-tags';
+  }
+
+  validate(dragElement, dropElement) {
+    const card = dropElement.closest('.card-item');
+    if (!card || !card.dataset.cardId) return false;
+
+    // Check if tag already on card
+    const tagName = dragElement.dataset.tag;
+    if (dropElement.querySelector(`[data-tag="${tagName}"]`)) return false;
+
+    return true;
+  }
+
+  async handleDrop(event, dropElement, draggedElements) {
+    event.preventDefault();
+    dropElement.classList.remove('drag-over');
+
+    const card = dropElement.closest('.card-item');
+    const cardId = card?.dataset.cardId;
+    if (!cardId) {
+      console.error('TagToCardHandler: No cardId found');
+      return;
+    }
+
+    for (const tagElement of draggedElements) {
+      if (!this.validate(tagElement, dropElement)) {
+        continue;
+      }
+
+      const tagName = tagElement.getAttribute('data-tag');
+      const tagId = tagElement.getAttribute('data-tag-id');
+
+      if (tagName && tagId) {
+        window.dispatchEvent(new CustomEvent('cardTagDrop', {
+          detail: { cardId, tagId, tagName, cardTags: dropElement }
+        }));
+      } else {
+        console.error('TagToCardHandler: Missing tagName or tagId', { tagName, tagId });
+      }
+    }
+  }
+
+  mutatesTagsInPlay() {
+    return false; // Does not affect tagsInPlay
+  }
+
+  requiresRerender() {
+    return false; // No card re-render needed
+  }
+}
+
+/**
+ * Tag Group → Tag Cloud Handler
+ * MOVE all group members to cloud, REMOVE from tagsInPlay
+ */
+class GroupToCloudHandler extends DropHandler {
+  constructor(system) {
+    super();
+    this.system = system;
+  }
+
+  canHandle(dragType, dropType, dragElement, dropElement) {
+    return dragType === 'tag-group' && dropType === 'tag-cloud';
+  }
+
+  async handleDrop(event, dropElement, draggedElements) {
+    event.preventDefault();
+    dropElement.classList.remove('drag-over');
+
+    for (const groupElement of draggedElements) {
+      // Expand group to individual tags
+      const memberTags = this.system.expandGroupTag(groupElement);
+
+      // Move each member to cloud
+      for (const tagElement of memberTags) {
+        const tagToCloud = new TagToCloudHandler(this.system);
+        await tagToCloud.handleDrop(event, dropElement, [tagElement]);
+      }
+    }
+  }
+
+  mutatesTagsInPlay() {
+    return true;
+  }
+
+  requiresRerender() {
+    return true;
+  }
+}
+
+/**
+ * Tag Group → Drop Zone Handler
+ * MOVE all group members to zone, ADD to tagsInPlay
+ */
+class GroupToZoneHandler extends DropHandler {
+  constructor(system) {
+    super();
+    this.system = system;
+  }
+
+  canHandle(dragType, dropType, dragElement, dropElement) {
+    return dragType === 'tag-group' && dropType === 'drop-zone';
+  }
+
+  async handleDrop(event, dropElement, draggedElements) {
+    event.preventDefault();
+    dropElement.classList.remove('drag-over');
+
+    for (const groupElement of draggedElements) {
+      // Expand group to individual tags
+      const memberTags = this.system.expandGroupTag(groupElement);
+
+      // Move each member to zone
+      for (const tagElement of memberTags) {
+        const tagToZone = new TagToZoneHandler(this.system);
+        await tagToZone.handleDrop(event, dropElement, [tagElement]);
+      }
+    }
+  }
+
+  mutatesTagsInPlay() {
+    return true;
+  }
+
+  requiresRerender() {
+    return true;
+  }
+}
+
+/**
+ * Tag Group → Card Tags Handler
+ * ADD all group members to card
+ */
+class GroupToCardHandler extends DropHandler {
+  constructor(system) {
+    super();
+    this.system = system;
+  }
+
+  canHandle(dragType, dropType, dragElement, dropElement) {
+    return dragType === 'tag-group' && dropType === 'card-tags';
+  }
+
+  async handleDrop(event, dropElement, draggedElements) {
+    event.preventDefault();
+    dropElement.classList.remove('drag-over');
+
+    for (const groupElement of draggedElements) {
+      // Expand group to individual tags
+      const memberTags = this.system.expandGroupTag(groupElement);
+
+      // Add each member to card
+      for (const tagElement of memberTags) {
+        const tagToCard = new TagToCardHandler(this.system);
+        await tagToCard.handleDrop(event, dropElement, [tagElement]);
+      }
+    }
+  }
+
+  mutatesTagsInPlay() {
+    return false;
+  }
+
+  requiresRerender() {
+    return false;
+  }
+}
 
 class SpatialDragDrop {
   constructor() {
@@ -13,6 +510,7 @@ class SpatialDragDrop {
     this.listeners = new WeakMap();
     this.renderDebounceTimer = null;
     this.DEBOUNCE_DELAY = 100;
+    this.registry = new DropTargetRegistry(this); // Polymorphic handler registry
   }
 
   // Initialize the entire system
@@ -20,6 +518,8 @@ class SpatialDragDrop {
     this.initializeZones();
     this.initializeControls();
     this.initializeTagDragging();
+    this.setupCardTagEventDelegation();
+    this.startTagCountPolling();
     this.observeZoneChanges();
 
     // Initial render
@@ -148,40 +648,95 @@ class SpatialDragDrop {
     return controls;
   }
 
-  // Initialize zones with event delegation
+  // Initialize zones with polymorphic event delegation
   initializeZones() {
-    // Use event delegation on container
-    const zoneContainer = document.querySelector('.zones-wrapper') ||
-                         document.querySelector('.spatial-grid') ||
-                         document.body;
+    const container = document.body; // Universal delegation
 
-    zoneContainer.addEventListener('drop', (e) => {
-      const zone = e.target.closest('[data-zone-type]:not([data-zone-type="tag-cloud"])');
-      if (zone) this.handleZoneDrop(e, zone);
-    });
+    // Drop handler with debouncing to prevent rapid repeated drops
+    const handleDrop = debounce(async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    zoneContainer.addEventListener('dragover', (e) => {
-      const zone = e.target.closest('[data-zone-type]:not([data-zone-type="tag-cloud"])');
-      if (zone) this.handleZoneDragOver(e, zone);
-    });
+      if (!this.draggedElements || this.draggedElements.length === 0) {
+        return;
+      }
 
-    zoneContainer.addEventListener('dragleave', (e) => {
-      const zone = e.target.closest('[data-zone-type]:not([data-zone-type="tag-cloud"])');
-      if (zone) this.handleZoneDragLeave(e, zone);
-    });
+      const dropTarget = this.findDropTarget(e.target);
+      if (!dropTarget) {
+        return;
+      }
 
-    // Handle cloud drops for returning tags
-    const clouds = document.querySelectorAll('.cloud');
-    clouds.forEach(cloud => {
-      cloud.addEventListener('drop', (e) => this.handleCloudDrop(e));
-      cloud.addEventListener('dragover', (e) => {
+      const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
+
+      if (handler && handler.validate(this.draggedElements[0], dropTarget)) {
+        await handler.handleDrop(e, dropTarget, this.draggedElements);
+
+        // Cleanup dragged elements
+        this.draggedElements.forEach(el => {
+          el.classList.remove('dragging');
+          el.setAttribute('aria-grabbed', 'false');
+        });
+        this.draggedElements = [];
+        this.clearSelection();
+
+        // Update state if handler mutates tagsInPlay
+        if (handler.mutatesTagsInPlay() || handler.requiresRerender()) {
+          this.invalidateCache();
+          this.updateStateAndRender();
+        }
+      }
+    }, 100); // 100ms debounce
+
+    // Drop event - polymorphic dispatch
+    container.addEventListener('drop', handleDrop, false);
+
+    // Dragover event - polymorphic dispatch
+    container.addEventListener('dragover', (e) => {
+      if (!this.draggedElements || this.draggedElements.length === 0) return;
+
+      const dropTarget = this.findDropTarget(e.target);
+      if (!dropTarget) return;
+
+      const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
+
+      if (handler && handler.validate(this.draggedElements[0], dropTarget)) {
         e.preventDefault();
-        e.currentTarget.classList.add('drag-over');
-      });
-      cloud.addEventListener('dragleave', (e) => {
-        e.currentTarget.classList.remove('drag-over');
-      });
+        e.stopPropagation();
+        if (e.dataTransfer) {
+          e.dataTransfer.dropEffect = 'move';
+        }
+        dropTarget.classList.add('drag-over');
+      }
     });
+
+    // Dragleave event - polymorphic dispatch
+    container.addEventListener('dragleave', (e) => {
+      const dropTarget = this.findDropTarget(e.target);
+      if (!dropTarget) return;
+
+      const handler = this.registry.findHandler(
+        this.draggedElements[0],
+        dropTarget
+      );
+
+      if (handler) {
+        handler.handleDragLeave(e, dropTarget, this.draggedElements);
+      }
+    });
+  }
+
+  // Find closest droppable element
+  findDropTarget(element) {
+    // Check for specific drop targets in priority order
+    const target = element.closest('.cloud') ||
+                   element.closest('.card-tags') ||
+                   element.closest('[data-zone-type]:not([data-zone-type="tag-cloud"])') ||
+                   element.closest('.control-area-container') ||
+                   element.closest('[data-type="group-tag"]') ||
+                   element.closest('.grid-cell') ||
+                   null;
+
+    return target;
   }
 
   // Initialize tag dragging with event delegation
@@ -291,130 +846,10 @@ class SpatialDragDrop {
     this.selectedTags.clear();
   }
 
-  // Zone drag over handler
-  handleZoneDragOver(event, zone) {
-    event.preventDefault();
-    zone.classList.add('drag-over');
-
-    if (this.draggedElements.length > 1) {
-      zone.dataset.dropCount = this.draggedElements.length;
-    }
-  }
-
-  // Zone drag leave handler
-  handleZoneDragLeave(event, zone) {
-    zone.classList.remove('drag-over');
-    delete zone.dataset.dropCount;
-  }
-
-  // Zone drop handler
-  handleZoneDrop(event, zone) {
-    event.preventDefault();
-    zone.classList.remove('drag-over');
-    delete zone.dataset.dropCount;
-
-    if (!this.draggedElements || this.draggedElements.length === 0) return;
-
-    const targetZone = zone.dataset.zoneType;
-    this.moveTags(this.draggedElements, targetZone);
-
-    // Cleanup
-    this.draggedElements.forEach(el => {
-      el.classList.remove('dragging');
-      el.setAttribute('aria-grabbed', 'false');
-    });
-    this.draggedElements = [];
-    this.clearSelection();
-  }
-
-  // Handle cloud drop (return to cloud)
-  handleCloudDrop(event) {
-    event.preventDefault();
-    event.currentTarget.classList.remove('drag-over');
-
-    if (!this.draggedElements || this.draggedElements.length === 0) return;
-
-    this.moveTags(this.draggedElements, 'cloud');
-
-    // Cleanup
-    this.draggedElements.forEach(el => {
-      el.classList.remove('dragging');
-      el.setAttribute('aria-grabbed', 'false');
-    });
-    this.draggedElements = [];
-    this.clearSelection();
-  }
-
-  // Move tags with validation
+  // Legacy method kept for backwards compatibility (now uses polymorphic handlers)
   moveTags(tagElements, targetZone) {
-    // Validate tag elements
-    const validTags = tagElements.filter(el =>
-      el && el.dataset && el.dataset.tag && el.nodeType === Node.ELEMENT_NODE
-    );
-
-    if (validTags.length === 0) return;
-
-    if (targetZone === 'cloud') {
-      this.returnTagsToCloud(validTags);
-    } else {
-      const targetZoneElement = document.querySelector(`[data-zone-type="${targetZone}"]`);
-      if (!targetZoneElement) {
-        console.error(`Zone not found: ${targetZone}`);
-        return;
-      }
-
-      const targetContainer = targetZoneElement.querySelector('.tag-collection');
-      if (!targetContainer) {
-        console.error(`No tag collection in zone: ${targetZone}`);
-        return;
-      }
-
-      // Check max tags constraint
-      const maxTags = this.parseMaxTags(targetZoneElement.dataset.maxTags);
-      if (maxTags && targetContainer.children.length + validTags.length > maxTags) {
-        console.warn(`Zone ${targetZone} would exceed max tags: ${maxTags}`);
-        return;
-      }
-
-      // Move tags
-      validTags.forEach(tag => {
-        if (!targetContainer.contains(tag)) {
-          targetContainer.appendChild(tag);
-          tag.classList.remove('tag-cloud');
-          tag.classList.add('tag-active');
-        }
-      });
-    }
-
-    // Invalidate cache and update
-    this.invalidateCache();
-    this.updateStateAndRender();
-  }
-
-  // Return tags to cloud
-  returnTagsToCloud(tagElements) {
-    const tagsByType = {};
-
-    tagElements.forEach(tag => {
-      const type = tag.dataset.type || 'tag';
-      if (!tagsByType[type]) tagsByType[type] = [];
-      tagsByType[type].push(tag);
-    });
-
-    for (const [tagType, tags] of Object.entries(tagsByType)) {
-      const cloudSelector = tagType === 'ai-tag' ? '.cloud-ai .tags-wrapper' : '.cloud-user .tags-wrapper';
-      const cloudContainer = document.querySelector(cloudSelector);
-
-      if (cloudContainer) {
-        tags.forEach(tag => {
-          if (!cloudContainer.contains(tag)) {
-            cloudContainer.appendChild(tag);
-            tag.classList.remove('tag-active', 'selected');
-            tag.classList.add('tag-cloud');
-          }
-        });
-      }
-    }
+    // This method is deprecated - polymorphic handlers now handle all drops
+    console.warn('moveTags() is deprecated - using polymorphic handler system');
   }
 
   // Expand group tag to individual tags
@@ -516,7 +951,6 @@ class SpatialDragDrop {
       if (!completedLessons.includes(lessonNumber)) {
         completedLessons.push(lessonNumber);
         localStorage.setItem('completedLessons', JSON.stringify(completedLessons));
-        console.log(`Lesson ${lessonNumber} marked as complete!`);
       }
     } catch (error) {
       console.warn('Failed to save lesson completion:', error);
@@ -580,6 +1014,7 @@ class SpatialDragDrop {
 
   // Observe zone changes with scoped observer
   observeZoneChanges() {
+    // With universal event delegation, we only need to observe for ARIA updates
     const container = document.querySelector('.zones-wrapper') ||
                      document.querySelector('.spatial-grid') ||
                      document.body;
@@ -589,13 +1024,7 @@ class SpatialDragDrop {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach(node => {
             if (node.nodeType === 1 && node.dataset?.zoneType) {
-              this.attachZoneListeners(node);
-            }
-          });
-
-          mutation.removedNodes.forEach(node => {
-            if (node.nodeType === 1 && node.dataset?.zoneType) {
-              this.detachZoneListeners(node);
+              this.addZoneARIA(node);
             }
           });
         }
@@ -608,38 +1037,11 @@ class SpatialDragDrop {
     });
   }
 
-  // Attach zone listeners
-  attachZoneListeners(zoneElement) {
-    if (!zoneElement || this.listeners.has(zoneElement)) return;
-
-    const handlers = {
-      drop: (e) => this.handleZoneDrop(e, zoneElement),
-      dragover: (e) => this.handleZoneDragOver(e, zoneElement),
-      dragleave: (e) => this.handleZoneDragLeave(e, zoneElement)
-    };
-
-    zoneElement.addEventListener('drop', handlers.drop);
-    zoneElement.addEventListener('dragover', handlers.dragover);
-    zoneElement.addEventListener('dragleave', handlers.dragleave);
-
-    // Add ARIA attributes
+  // Add ARIA attributes to zones
+  addZoneARIA(zoneElement) {
+    if (!zoneElement) return;
     zoneElement.setAttribute('role', 'region');
     zoneElement.setAttribute('aria-label', zoneElement.dataset.zoneType + ' drop zone');
-
-    // Store handlers for cleanup
-    this.listeners.set(zoneElement, handlers);
-  }
-
-  // Detach zone listeners
-  detachZoneListeners(zoneElement) {
-    if (!zoneElement || !this.listeners.has(zoneElement)) return;
-
-    const handlers = this.listeners.get(zoneElement);
-    zoneElement.removeEventListener('drop', handlers.drop);
-    zoneElement.removeEventListener('dragover', handlers.dragover);
-    zoneElement.removeEventListener('dragleave', handlers.dragleave);
-
-    this.listeners.delete(zoneElement);
   }
 
   // Initialize controls
@@ -685,8 +1087,6 @@ class SpatialDragDrop {
 
   // Restore saved view by rearranging tags in DOM
   restoreView(tagsInPlay) {
-    console.log('Restoring view with tagsInPlay:', tagsInPlay);
-
     // First, move all tags back to their original clouds
     this.clearAllZones();
 
@@ -711,9 +1111,6 @@ class SpatialDragDrop {
             const tag = document.querySelector(`[data-tag="${tagName}"]`);
             if (tag) {
               zoneWrapper.appendChild(tag);
-              console.log(`Moved tag ${tagName} to zone ${zoneId}`);
-            } else {
-              console.warn(`Tag ${tagName} not found`);
             }
           });
         }
@@ -756,6 +1153,181 @@ class SpatialDragDrop {
       });
     });
   }
+
+  // Card and Tag Management Methods
+
+  async createTag(tagName, cloudType = 'user') {
+    try {
+      const response = await fetch('/api/v2/tags/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: tagName })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const cloud = document.querySelector(`.cloud-${cloudType} .tags-wrapper`);
+        if (cloud) {
+          const tagElement = document.createElement('span');
+          tagElement.className = `tag tag-${cloudType}`;
+          tagElement.setAttribute('data-tag', tagName);
+          tagElement.setAttribute('data-tag-id', data.tag_id);
+          tagElement.setAttribute('data-type', 'tag');
+          tagElement.setAttribute('draggable', 'true');
+          tagElement.id = `tag-${tagName}`;
+          tagElement.innerHTML = `${tagName} (0) <button class="tag-delete" data-tag-id="${data.tag_id}" title="Delete tag">×</button>`;
+          cloud.appendChild(tagElement);
+        }
+        return data;
+      }
+    } catch (error) {
+      console.error('Failed to create tag:', error);
+    }
+  }
+
+  async removeTagFromCard(cardId, tagId, removeButton) {
+    try {
+      const response = await fetch('/api/v2/cards/remove-tag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ card_id: cardId, tag_id: tagId })
+      });
+
+      if (response.ok) {
+        const tagRep = removeButton.closest('.card-tag');
+        const tagName = tagRep?.getAttribute('data-tag');
+        const card = removeButton.closest('.card-item');
+        if (tagRep) tagRep.remove();
+
+        // Update card tag count
+        if (card) {
+          const cardTagsLabel = card.querySelector('.card-tags-label');
+          if (cardTagsLabel) {
+            const cardTagsContainer = card.querySelector('.card-tags');
+            const remainingTagCount = cardTagsContainer ? cardTagsContainer.querySelectorAll('.card-tag').length : 0;
+            const arrowSpan = cardTagsLabel.querySelector('.card-tags-arrow');
+            if (arrowSpan) {
+              cardTagsLabel.childNodes[0].textContent = `tags (${remainingTagCount}) `;
+            } else {
+              cardTagsLabel.textContent = `tags (${remainingTagCount})`;
+            }
+          }
+        }
+
+        // Tag count will be updated automatically via polling service
+      }
+    } catch (error) {
+      console.error('Failed to remove tag from card:', error);
+    }
+  }
+
+  async deleteCard(cardId, deleteButton) {
+    if (!confirm('Delete this card?')) return;
+
+    try {
+      const cardElement = deleteButton.closest('.card-item');
+
+      const response = await fetch('/api/v2/cards/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ card_id: cardId })
+      });
+
+      if (response.ok) {
+        if (cardElement) cardElement.remove();
+
+        // Tag counts will be updated automatically via polling service
+      }
+    } catch (error) {
+      console.error('Failed to delete card:', error);
+    }
+  }
+
+  async deleteTag(tagId, deleteButton) {
+    if (!confirm('Delete this tag? It will be removed from all cards.')) return;
+
+    try {
+      const response = await fetch('/api/v2/tags/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tag_id: tagId })
+      });
+
+      if (response.ok) {
+        const tagElement = deleteButton.closest('.tag');
+        if (tagElement) tagElement.remove();
+        this.updateStateAndRender();
+      }
+    } catch (error) {
+      console.error('Failed to delete tag:', error);
+    }
+  }
+
+  startTagCountPolling() {
+    let cachedCounts = {};
+
+    const pollCounts = async () => {
+      try {
+        const response = await fetch('/api/v2/tags/counts');
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const counts = data.counts || {};
+
+        // Emit events for changed counts
+        Object.keys(counts).forEach(tagId => {
+          const newCount = counts[tagId];
+          const oldCount = cachedCounts[tagId];
+
+          if (oldCount !== newCount) {
+            window.tagCountEmitter.emit('tag-count-changed', { tagId, count: newCount });
+          }
+        });
+
+        cachedCounts = counts;
+      } catch (error) {
+        console.error('Failed to poll tag counts:', error);
+      }
+    };
+
+    // Poll every 2 seconds
+    pollCounts(); // Initial poll
+    setInterval(pollCounts, 2000);
+  }
+
+  setupCardTagEventDelegation() {
+    // Delegate card and tag button clicks
+    document.body.addEventListener('click', async (e) => {
+      // Tag delete button
+      if (e.target.classList.contains('tag-delete')) {
+        e.stopPropagation();
+        const tagId = e.target.dataset.tagId;
+        await this.deleteTag(tagId, e.target);
+        return;
+      }
+
+      // Tag remove button (on cards)
+      if (e.target.classList.contains('tag-remove')) {
+        e.stopPropagation();
+        const cardId = e.target.closest('.card-item')?.dataset.cardId;
+        const tagId = e.target.closest('.card-tag')?.dataset.tagId;
+        if (cardId && tagId) {
+          await this.removeTagFromCard(cardId, tagId, e.target);
+        }
+        return;
+      }
+
+      // Card delete button
+      if (e.target.classList.contains('card-delete')) {
+        e.stopPropagation();
+        const cardId = e.target.closest('.card-item')?.dataset.cardId;
+        if (cardId) {
+          await this.deleteCard(cardId, e.target);
+        }
+        return;
+      }
+    });
+  }
 }
 
 // Auto-initialize when DOM is ready
@@ -763,11 +1335,9 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     window.dragDropSystem = new SpatialDragDrop();
     window.dragDropSystem.initialize();
-    console.log('MultiCardz™ drag-drop system initialized');
   });
 } else {
   // DOM already loaded
   window.dragDropSystem = new SpatialDragDrop();
   window.dragDropSystem.initialize();
-  console.log('MultiCardz™ drag-drop system initialized');
 }
