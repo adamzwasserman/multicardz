@@ -178,8 +178,8 @@ def main():
     """Main population function."""
     logging.basicConfig(level=logging.INFO)
 
-    # Database path (default development database)
-    db_path = Path("/var/data/multicardz_dev.db")
+    # Database path (tutorial database)
+    db_path = Path("/var/data/tutorial_customer.db")
 
     logger.info(f"Populating lesson data in database: {db_path}")
 

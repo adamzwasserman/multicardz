@@ -40,7 +40,7 @@ logger = logging.getLogger(__name__)
 
 # Create default database configuration
 DEFAULT_DB_CONFIG = create_database_config(
-    db_path=Path("/var/data/multicardz_dev.db"),
+    db_path=Path("/var/data/tutorial_customer.db"),
     enable_foreign_keys=True,
     timeout=30.0,
     check_same_thread=False,

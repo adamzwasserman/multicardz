@@ -82,8 +82,14 @@ def create_app():
             try:
                 with sqlite3.connect(db_path) as conn:
                     cursor = conn.cursor()
-                    cursor.execute("SELECT tag_name FROM tag_index ORDER BY tag_name")
-                    available_tags = [row[0] for row in cursor.fetchall()]
+                    cursor.execute("""
+                        SELECT t.name, COUNT(ct.card_id) as card_count
+                        FROM tags t
+                        LEFT JOIN card_tags ct ON t.id = ct.tag_id
+                        GROUP BY t.id, t.name
+                        ORDER BY t.name
+                    """)
+                    available_tags = [{"name": row[0], "count": row[1]} for row in cursor.fetchall()]
 
                     # Debug: what tags are we loading?
                     logger.info(f"Tutorial database tags: {available_tags}")
@@ -92,7 +98,7 @@ def create_app():
                 logger.warning(f"Could not load tags from tutorial database: {db_e}")
                 # Fallback to lesson definitions
                 lesson_tags = get_lesson_tags(current_lesson)
-                available_tags = [tag.name for tag in lesson_tags]
+                available_tags = [{"name": tag.name, "count": 0} for tag in lesson_tags]
                 logger.info(f"Fallback to lesson {current_lesson} tags: {available_tags}")
 
             logger.info(f"Loading {len(available_tags)} tags")
@@ -100,7 +106,7 @@ def create_app():
         except Exception as e:
             logger.warning(f"Could not load lesson tags: {e}. Using fallback.")
             # Fallback to basic tags if lesson system fails
-            available_tags = ["drag me to first box"]
+            available_tags = [{"name": "drag me to first box", "count": 0}]
 
         response = templates.TemplateResponse("user_home.html", {
             "request": request,

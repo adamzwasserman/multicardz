@@ -127,7 +127,7 @@ class SpatialDragDrop {
     if (!controlElements || controlElements.length === 0) {
       return {
         startWithAllCards: false,
-        startWithCardsExpanded: false,
+        startWithCardsExpanded: true,
         showColors: true
       };
     }

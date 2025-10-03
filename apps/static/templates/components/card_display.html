@@ -13,7 +13,7 @@
             <button class="completion-dismiss" onclick="dismissLessonCompletion(this)">✕</button>
         </div>
     </div>
-    <div class="card-grid"
+    <div class="card-grid {% if show_expanded %}cards-expanded{% endif %}"
          data-layout="{{ layout_type | default('grid') }}"
          {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
          {% if htmx_enabled %}

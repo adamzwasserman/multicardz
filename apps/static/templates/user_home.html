@@ -26,12 +26,12 @@
                 <div class="tags-wrapper">
                     {% for tag in available_tags %}
                     <span class="tag tag-user"
-                          data-tag="{{ tag }}"
+                          data-tag="{{ tag.name }}"
                           data-type="tag"
                           draggable="true"
-                          id="tag-{{ tag }}"
+                          id="tag-{{ tag.name }}"
 >
-                        {{ tag }}
+                        {{ tag.name }} ({{ tag.count }})
                     </span>
                     {% endfor %}
                 </div>
@@ -155,7 +155,7 @@
                 <label for="startWithAllCards">start with all cards visible</label>
             </div>
             <div class="checkbox-group">
-                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
+                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" checked onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
                 <label for="startWithCardsExpanded">start with cards expanded</label>
             </div>
             <div class="checkbox-group">
@@ -324,10 +324,6 @@
     </div>
 
     <div class="card-display">
-        <p id="instructionalText" class="instructional-text"
-           hx-get="/api/v2/lessons/hint"
-           hx-trigger="load, dragdrop from:body"
-           hx-swap="innerHTML">drag a <em>tag</em> to a <em>zone</em> to see the cards that have that tag</p>
         <div class="card-container" id="cardContainer">
             <!-- Cards will be populated by JavaScript based on checkbox state and active filters -->
             <p id="emptyStateMessage">No cards to display</p>

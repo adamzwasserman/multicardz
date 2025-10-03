@@ -65,7 +65,7 @@ class ZoneData(BaseModel):
 class RenderControls(BaseModel):
     """UI controls that affect rendering."""
     startWithAllCards: bool = False
-    startWithCardsExpanded: bool = False
+    startWithCardsExpanded: bool = True
     showColors: bool = True
 
     # Add other controls as they're discovered dynamically
