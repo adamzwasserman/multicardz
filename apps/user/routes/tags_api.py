@@ -2,6 +2,8 @@
 
 import logging
 import sqlite3
+import uuid
+from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter
@@ -16,7 +18,10 @@ class CreateTagRequest(BaseModel):
     """Request model for tag creation."""
 
     name: str
-    type: str = "user"
+    user_id: str = "default-user"  # TODO: Get from auth
+    workspace_id: str = "default-workspace"  # TODO: Get from session
+    tag_type: int | None = None
+    color_hex: str | None = None
 
 
 class CreateTagResponse(BaseModel):
@@ -33,43 +38,61 @@ async def create_tag(request: CreateTagRequest) -> CreateTagResponse:
     Create a new tag and persist it to the database.
 
     Args:
-        request: Tag creation request containing name and type
+        request: Tag creation request containing name, user_id, workspace_id
 
     Returns:
-        CreateTagResponse with success status and tag_id
+        CreateTagResponse with success status and tag_id (UUID)
     """
     tag_name = request.name
-    tag_type = request.type
+    user_id = request.user_id
+    workspace_id = request.workspace_id
 
-    logger.info(f"Creating tag: {tag_name} (type: {tag_type})")
+    logger.info(f"Creating tag: {tag_name} for user {user_id} in workspace {workspace_id}")
 
     try:
-        # Get database path
         db_path = Path("/var/data/tutorial_customer.db")
 
-        # Insert tag into database
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
 
-            # Check if tag already exists
-            cursor.execute("SELECT id FROM tags WHERE name = ?", (tag_name,))
+            # Check if tag already exists for this user/workspace
+            cursor.execute(
+                "SELECT tag_id FROM tags WHERE tag = ? AND user_id = ? AND workspace_id = ? AND deleted IS NULL",
+                (tag_name, user_id, workspace_id),
+            )
             existing = cursor.fetchone()
 
             if existing:
                 return CreateTagResponse(
                     success=False,
-                    tag_id=str(existing[0]),
+                    tag_id=existing[0],
                     message=f"Tag '{tag_name}' already exists",
                 )
 
-            # Insert new tag
+            # Generate UUID for new tag
+            tag_id = str(uuid.uuid4())
+            now = datetime.utcnow().isoformat()
+
+            # Insert new tag with all required fields
             cursor.execute(
-                "INSERT INTO tags (name) VALUES (?)",
-                (tag_name,),
+                """
+                INSERT INTO tags (
+                    user_id, workspace_id, created, modified, deleted,
+                    tag_id, tag_bitmap, tag, card_count, tag_type, color_hex
+                ) VALUES (?, ?, ?, ?, NULL, ?, 0, ?, 0, ?, ?)
+                """,
+                (
+                    user_id,
+                    workspace_id,
+                    now,
+                    now,
+                    tag_id,
+                    tag_name,
+                    request.tag_type,
+                    request.color_hex,
+                ),
             )
             conn.commit()
-
-            tag_id = str(cursor.lastrowid)
 
             logger.info(f"Tag created successfully: {tag_name} (ID: {tag_id})")
 

@@ -256,6 +256,7 @@ async def render_cards(request: Request):
                     'modified_at': getattr(card, 'modified_at', ''),
                     'has_attachments': getattr(card, 'has_attachments', False)
                 }
+                logger.info(f"Rendering card {template_card['id']} with tags: {tags}")
                 template_cards.append(template_card)
 
             template = templates_env.get_template('components/card_display.html')
@@ -808,13 +809,14 @@ async def update_card_title(request: Request):
 
 @router.post("/cards/add-tag")
 async def add_tag_to_card(request: Request):
-    """Add a tag to a card."""
+    """Add a tag to a card (using zero-trust inverted index)."""
     import sqlite3
+    from datetime import datetime
     from pydantic import BaseModel
 
     class AddTagRequest(BaseModel):
-        card_id: str
-        tag_name: str
+        card_id: str  # UUID
+        tag_id: str  # UUID
 
     try:
         data = await request.json()
@@ -824,42 +826,32 @@ async def add_tag_to_card(request: Request):
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
 
-            # Get tag_id
-            cursor.execute("SELECT id FROM tags WHERE name = ?", (req.tag_name,))
-            tag_row = cursor.fetchone()
-            if not tag_row:
-                return {"success": False, "message": "Tag not found"}
+            # Get current tags from card
+            cursor.execute("SELECT tags FROM cards WHERE card_id = ?", (req.card_id,))
+            row = cursor.fetchone()
+            if not row:
+                return {"success": False, "message": "Card not found"}
 
-            tag_id = tag_row[0]
+            current_tags = row[0]
+            tag_ids = current_tags.split(",") if current_tags else []
 
-            # Check if already associated
-            cursor.execute(
-                "SELECT 1 FROM card_tags WHERE card_id = ? AND tag_id = ?",
-                (req.card_id, tag_id)
-            )
-            if cursor.fetchone():
+            # Check if tag already on card
+            if req.tag_id in tag_ids:
                 return {"success": False, "message": "Tag already on card"}
 
-            # Add association
-            cursor.execute(
-                "INSERT INTO card_tags (card_id, tag_id) VALUES (?, ?)",
-                (req.card_id, tag_id)
-            )
+            # Add tag to inverted index
+            tag_ids.append(req.tag_id)
+            new_tags = ",".join(tag_ids)
 
-            # Update card_summaries tags_json
+            # Update card (trigger will auto-update tag.card_count)
             cursor.execute(
                 """
-                UPDATE card_summaries
-                SET tags_json = (
-                    SELECT json_group_array(t.name)
-                    FROM card_tags ct
-                    JOIN tags t ON ct.tag_id = t.id
-                    WHERE ct.card_id = ?
-                ),
-                modified_at = datetime('now')
-                WHERE id = ?
-            """,
-                (req.card_id, req.card_id)
+                UPDATE cards
+                SET tags = ?,
+                    modified = ?
+                WHERE card_id = ?
+                """,
+                (new_tags, datetime.utcnow().isoformat(), req.card_id),
             )
 
             conn.commit()
@@ -872,13 +864,14 @@ async def add_tag_to_card(request: Request):
 
 @router.post("/cards/remove-tag")
 async def remove_tag_from_card(request: Request):
-    """Remove a tag from a card."""
+    """Remove a tag from a card (using zero-trust inverted index)."""
     import sqlite3
+    from datetime import datetime
     from pydantic import BaseModel
 
     class RemoveTagRequest(BaseModel):
-        card_id: str
-        tag_name: str
+        card_id: str  # UUID
+        tag_id: str  # UUID
 
     try:
         data = await request.json()
@@ -888,34 +881,34 @@ async def remove_tag_from_card(request: Request):
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
 
-            # Get tag_id
-            cursor.execute("SELECT id FROM tags WHERE name = ?", (req.tag_name,))
-            tag_row = cursor.fetchone()
-            if not tag_row:
-                return {"success": False, "message": "Tag not found"}
+            # Get current tags from card
+            cursor.execute("SELECT tags FROM cards WHERE card_id = ?", (req.card_id,))
+            row = cursor.fetchone()
+            if not row:
+                return {"success": False, "message": "Card not found"}
 
-            tag_id = tag_row[0]
+            current_tags = row[0]
+            if not current_tags:
+                return {"success": False, "message": "Card has no tags"}
 
-            # Remove association
-            cursor.execute(
-                "DELETE FROM card_tags WHERE card_id = ? AND tag_id = ?",
-                (req.card_id, tag_id)
-            )
+            tag_ids = current_tags.split(",")
 
-            # Update card_summaries tags_json
+            # Remove tag from inverted index
+            if req.tag_id not in tag_ids:
+                return {"success": False, "message": "Tag not on card"}
+
+            tag_ids.remove(req.tag_id)
+            new_tags = ",".join(tag_ids) if tag_ids else None
+
+            # Update card (trigger will auto-update tag.card_count)
             cursor.execute(
                 """
-                UPDATE card_summaries
-                SET tags_json = (
-                    SELECT COALESCE(json_group_array(t.name), '[]')
-                    FROM card_tags ct
-                    JOIN tags t ON ct.tag_id = t.id
-                    WHERE ct.card_id = ?
-                ),
-                modified_at = datetime('now')
-                WHERE id = ?
-            """,
-                (req.card_id, req.card_id)
+                UPDATE cards
+                SET tags = ?,
+                    modified = ?
+                WHERE card_id = ?
+                """,
+                (new_tags, datetime.utcnow().isoformat(), req.card_id),
             )
 
             conn.commit()
@@ -928,67 +921,51 @@ async def remove_tag_from_card(request: Request):
 
 @router.post("/cards/create")
 async def create_card(request: Request):
-    """Create a new card with tags."""
+    """Create a new card with tags (using zero-trust schema)."""
     import sqlite3
     import uuid
+    from datetime import datetime
     from pydantic import BaseModel
 
     class CreateCardRequest(BaseModel):
-        title: str
-        tags: list[str] = []
+        name: str
+        description: str = ""
+        tag_ids: list[str] = []  # List of tag UUIDs
+        user_id: str = "default-user"  # TODO: Get from auth
+        workspace_id: str = "default-workspace"  # TODO: Get from session
 
     try:
         data = await request.json()
         req = CreateCardRequest(**data)
 
-        card_id = str(uuid.uuid4())[:8]
+        card_id = str(uuid.uuid4())
+        now = datetime.utcnow().isoformat()
         db_path = Path("/var/data/tutorial_customer.db")
 
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
 
-            # Insert card
+            # Build tags inverted index (comma-separated tag_ids)
+            tags_inverted_index = ",".join(req.tag_ids) if req.tag_ids else None
+
+            # Insert card with all required fields
             cursor.execute(
                 """
-                INSERT INTO cards (id, title, content, created_at, modified_at)
-                VALUES (?, ?, '', datetime('now'), datetime('now'))
-            """,
-                (card_id, req.title)
-            )
-
-            # Add tags
-            tag_ids = []
-            for tag_name in req.tags:
-                # Get or create tag
-                cursor.execute("SELECT id FROM tags WHERE name = ?", (tag_name,))
-                tag_row = cursor.fetchone()
-
-                if tag_row:
-                    tag_id = tag_row[0]
-                else:
-                    cursor.execute(
-                        "INSERT INTO tags (name) VALUES (?)",
-                        (tag_name,)
-                    )
-                    tag_id = cursor.lastrowid
-
-                tag_ids.append(tag_id)
-
-                # Associate tag with card
-                cursor.execute(
-                    "INSERT INTO card_tags (card_id, tag_id) VALUES (?, ?)",
-                    (card_id, tag_id)
-                )
-
-            # Create card_summary with tags_json
-            import json
-            tags_json = json.dumps(req.tags)
-            cursor.execute(
-                """
-                INSERT INTO card_summaries (id, title, tags_json, created_at, modified_at, has_attachments)
-                VALUES (?, ?, ?, datetime('now'), datetime('now'), FALSE)
-            """,
-                (card_id, req.title, tags_json)
+                INSERT INTO cards (
+                    user_id, workspace_id, created, modified, deleted,
+                    card_id, card_bitmap, name, description, tags
+                ) VALUES (?, ?, ?, ?, NULL, ?, 0, ?, ?, ?)
+                """,
+                (
+                    req.user_id,
+                    req.workspace_id,
+                    now,
+                    now,
+                    card_id,
+                    req.name,
+                    req.description,
+                    tags_inverted_index,
+                ),
             )
 
             conn.commit()
