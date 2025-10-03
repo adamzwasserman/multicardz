@@ -10,7 +10,7 @@
             <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
-    <div class="debug-group collapsible-row row-1" style="position: relative;">
+    <div class="debug-group collapsible-row row-1" style="position: relative; display: none;">
         <label for="tagsInPlay">tags in play</label>
         <textarea class="tags-in-play" id="tagsInPlay" placeholder="waiting for zone activity..." aria-label="Tags in play" readonly rows="8">{"union":[],"intersection":[],"exclusion":[],"row":[],"column":[]}</textarea>
     </div>
@@ -544,17 +544,18 @@ async function createTag(tagName, cloudType = 'user') {
         const response = await fetch('/api/v2/tags/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: tagName, type: cloudType })
+            body: JSON.stringify({ name: tagName })
         });
 
         if (response.ok) {
             const data = await response.json();
-            // Add tag to DOM
+            // Add tag to DOM with UUID
             const cloud = document.querySelector(`.cloud-${cloudType} .tags-wrapper`);
             if (cloud) {
                 const tagElement = document.createElement('span');
                 tagElement.className = `tag tag-${cloudType}`;
                 tagElement.setAttribute('data-tag', tagName);
+                tagElement.setAttribute('data-tag-id', data.tag_id);  // Store UUID
                 tagElement.setAttribute('data-type', 'tag');
                 tagElement.setAttribute('draggable', 'true');
                 tagElement.id = `tag-${tagName}`;
@@ -570,23 +571,23 @@ async function createTag(tagName, cloudType = 'user') {
 
 // Create new card with tags from SHOW and FILTER zones
 async function createNewCard() {
-    // Get tags from SHOW and FILTER zones
+    // Get tag UUIDs from SHOW and FILTER zones
     const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'))
-        .map(t => t.getAttribute('data-tag')).filter(Boolean);
+        .map(t => t.getAttribute('data-tag-id')).filter(Boolean);
     const intersectionTags = Array.from(document.querySelectorAll('[data-zone-type="intersection"] .tag'))
-        .map(t => t.getAttribute('data-tag')).filter(Boolean);
-    const allTags = [...new Set([...unionTags, ...intersectionTags])];
+        .map(t => t.getAttribute('data-tag-id')).filter(Boolean);
+    const allTagIds = [...new Set([...unionTags, ...intersectionTags])];
 
-    // Prompt for title
-    const title = prompt('Enter card title:');
-    if (!title || !title.trim()) return;
+    // Prompt for name
+    const name = prompt('Enter card name:');
+    if (!name || !name.trim()) return;
 
     try {
-        // Create card in database immediately
+        // Create card in database immediately with tag UUIDs
         const response = await fetch('/api/v2/cards/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: title.trim(), tags: allTags })
+            body: JSON.stringify({ name: name.trim(), tag_ids: allTagIds })
         });
 
         if (response.ok) {
@@ -608,26 +609,29 @@ async function createNewCard() {
     }
 }
 
-// Remove tag from card
-async function removeTagFromCard(cardId, tagName, removeButton) {
+// Remove tag from card (using UUID)
+async function removeTagFromCard(cardId, tagId, removeButton) {
     try {
         const response = await fetch('/api/v2/cards/remove-tag', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ card_id: cardId, tag_name: tagName })
+            body: JSON.stringify({ card_id: cardId, tag_id: tagId })
         });
 
         if (response.ok) {
             // Remove tag representation from DOM
             const tagRep = removeButton.closest('.card-tag');
+            const tagName = tagRep?.getAttribute('data-tag');
             if (tagRep) tagRep.remove();
 
-            // Update tag count
-            const originalTag = document.getElementById(`tag-${tagName}`);
-            if (originalTag) {
-                const match = originalTag.textContent.match(/\((\d+)\)/);
-                const currentCount = match ? parseInt(match[1]) : 0;
-                originalTag.textContent = `${tagName} (${Math.max(0, currentCount - 1)})`;
+            // Update tag count (trigger handles this automatically now)
+            if (tagName) {
+                const originalTag = document.getElementById(`tag-${tagName}`);
+                if (originalTag) {
+                    const match = originalTag.textContent.match(/\((\d+)\)/);
+                    const currentCount = match ? parseInt(match[1]) : 0;
+                    originalTag.textContent = `${tagName} (${Math.max(0, currentCount - 1)})`;
+                }
             }
         }
     } catch (error) {
@@ -756,18 +760,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
             for (const tagElement of draggedElements) {
                 const tagName = tagElement.getAttribute('data-tag');
-                if (!tagName) continue;
+                const tagId = tagElement.getAttribute('data-tag-id');
+                if (!tagName || !tagId) continue;
 
                 // Check if tag already on card
                 if (cardTags.querySelector(`[data-tag="${tagName}"]`)) continue;
 
-                // Add tag to card in database
+                // Add tag to card in database using UUID
                 try {
-                    console.log('Adding tag to card:', { card_id: cardId, tag_name: tagName });
+                    console.log('Adding tag to card:', { card_id: cardId, tag_id: tagId });
                     const response = await fetch('/api/v2/cards/add-tag', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ card_id: cardId, tag_name: tagName })
+                        body: JSON.stringify({ card_id: cardId, tag_id: tagId })
                     });
 
                     const result = await response.json();
@@ -778,10 +783,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         const tagRep = document.createElement('span');
                         tagRep.className = 'card-tag';
                         tagRep.setAttribute('data-tag', tagName);
-                        tagRep.innerHTML = `${tagName} <span class="tag-remove" onclick="removeTagFromCard('${cardId}', '${tagName}', this)">×</span>`;
+                        tagRep.setAttribute('data-tag-id', tagId);
+                        tagRep.innerHTML = `${tagName} <span class="tag-remove" onclick="removeTagFromCard('${cardId}', '${tagId}', this)">×</span>`;
                         cardTags.appendChild(tagRep);
 
-                        // Update tag count
+                        // Update tag count (trigger handles this automatically now)
                         const originalTag = document.getElementById(`tag-${tagName}`);
                         if (originalTag) {
                             const match = originalTag.textContent.match(/\((\d+)\)/);

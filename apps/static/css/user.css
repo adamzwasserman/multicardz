@@ -2024,13 +2024,11 @@ body {
 
 /* Navigation Bar Learning Mode Styling */
 .learning-mode-container {
-    display: flex !important;
+    display: none !important;
     align-items: center !important;
-    background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 8px;
     padding: 6px 12px;
     margin: 0 8px;
-    animation: nav-highlight-pulse 4s ease-in-out infinite;
 }
 
 .learning-mode-menu.highlighted-menu {
@@ -2040,7 +2038,6 @@ body {
 }
 
 .learning-mode-label {
-    color: white;
     font-weight: 600;
     font-size: 0.9em;
     margin: 0;

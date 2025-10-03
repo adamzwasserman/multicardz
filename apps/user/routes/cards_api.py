@@ -136,38 +136,44 @@ async def render_cards(request: Request):
 
             logger.info(f"Loading cards for lesson {current_lesson}")
 
-            # Load only lesson cards for the current lesson to start with
-            lesson_cards_query = """
-                SELECT cs.id, cs.title, cs.tags_json, cs.created_at, cs.modified_at, cs.has_attachments
-                FROM card_summaries cs
-                JOIN cards c ON cs.id = c.id
-                WHERE c.card_type = 'lesson'
-                AND JSON_EXTRACT(c.lesson_metadata, '$.lesson_number') = ?
+            # Load cards from new schema (zero-trust)
+            cards_query = """
+                SELECT card_id, name, tags, created, modified
+                FROM cards
+                WHERE user_id = ? AND workspace_id = ? AND deleted IS NULL
             """
 
-            cursor = conn.execute(lesson_cards_query, (current_lesson,))
+            # TODO: For now using default user/workspace, will use real auth later
+            cursor = conn.execute(cards_query, ("default-user", "default-workspace"))
             lesson_cards = []
 
             for row in cursor.fetchall():
-                card_id, title, tags_json, created_at, modified_at, has_attachments = row
-                try:
-                    tags = frozenset(json.loads(tags_json))
-                except:
-                    tags = frozenset()
+                card_id, name, tags_inverted_index, created, modified = row
+
+                # Parse tags from inverted index and lookup tag names
+                tag_names = []
+                if tags_inverted_index:
+                    tag_uuids = tags_inverted_index.split(",")
+                    placeholders = ",".join("?" * len(tag_uuids))
+                    tag_cursor = conn.execute(
+                        f"SELECT tag FROM tags WHERE tag_id IN ({placeholders}) AND deleted IS NULL",
+                        tag_uuids
+                    )
+                    tag_names = [row[0] for row in tag_cursor.fetchall()]
 
                 # Create CardSummary-like object
                 card = type('CardSummary', (), {
                     'id': card_id,
-                    'title': title,
-                    'tags': tags,
-                    'created_at': created_at,
-                    'modified_at': modified_at,
-                    'has_attachments': has_attachments
+                    'title': name,
+                    'tags': frozenset(tag_names),
+                    'created_at': created,
+                    'modified_at': modified,
+                    'has_attachments': False
                 })()
                 lesson_cards.append(card)
 
             all_cards = lesson_cards
-            logger.info(f"Loaded {len(all_cards)} lesson {current_lesson} cards")
+            logger.info(f"Loaded {len(all_cards)} cards")
 
             # Apply temporal filters first if present
             if temporal_filters:
