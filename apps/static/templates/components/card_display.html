@@ -49,7 +49,7 @@
                         </div>
                         <div class="card-tags">
                             {% for tag in card.tags %}
-                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }}</span>
+                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                             {% endfor %}
                         </div>
                     </div>

@@ -2184,6 +2184,19 @@ body {
     letter-spacing: 0;
 }
 
+.tag-remove {
+    margin-left: 4px;
+    cursor: pointer;
+    opacity: 0.5;
+    font-weight: bold;
+    transition: opacity 0.2s ease;
+}
+
+.tag-remove:hover {
+    opacity: 1;
+    color: #e74c3c;
+}
+
 /* Show tags when colors/show colors is enabled - controlled by JavaScript */
 .show-colors .card-tags {
     display: block;
