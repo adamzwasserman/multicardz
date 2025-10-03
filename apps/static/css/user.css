@@ -3166,8 +3166,8 @@ body.earth-tones .floating-add-card {
 /* Card delete button */
 .card-delete {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: -8px;
+    right: -8px;
     background: none;
     color: #ef4444;
     border: none;
