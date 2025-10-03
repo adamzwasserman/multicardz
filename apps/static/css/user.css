@@ -593,13 +593,12 @@ body {
 /* Base Grid Container */
 .spatial-grid {
     display: grid;
-    grid-template-rows: auto auto auto 1fr auto;
+    grid-template-rows: auto auto 1fr auto;
     grid-template-columns: 0.67fr 2fr 0.67fr;
     grid-template-areas:
         ". tag-management ."
         "universal-control top-control ui-control"
-        "card-display card-display card-display"
-        "left-control right-control right-control"
+        "left-control card-display right-control"
         ". bottom-control .";
     gap: 1rem;
     width: 100%;
@@ -982,31 +981,31 @@ body {
 
 /* Grid adjustments when rows/columns are collapsed */
 .spatial-grid.row-1-collapsed {
-    grid-template-rows: 0 auto auto 1fr auto;
+    grid-template-rows: 0 auto 1fr auto;
 }
 
 .spatial-grid.row-2-collapsed {
-    grid-template-rows: auto 0 auto 1fr auto;
+    grid-template-rows: auto 0 1fr auto;
 }
 
 .spatial-grid.row-4-collapsed {
-    grid-template-rows: auto auto auto 1fr 0;
+    grid-template-rows: auto auto 1fr 0;
 }
 
 .spatial-grid.row-1-collapsed.row-2-collapsed {
-    grid-template-rows: 0 0 auto 1fr auto;
+    grid-template-rows: 0 0 1fr auto;
 }
 
 .spatial-grid.row-1-collapsed.row-4-collapsed {
-    grid-template-rows: 0 auto auto 1fr 0;
+    grid-template-rows: 0 auto 1fr 0;
 }
 
 .spatial-grid.row-2-collapsed.row-4-collapsed {
-    grid-template-rows: auto 0 auto 1fr 0;
+    grid-template-rows: auto 0 1fr 0;
 }
 
 .spatial-grid.row-1-collapsed.row-2-collapsed.row-4-collapsed {
-    grid-template-rows: 0 0 auto 1fr 0;
+    grid-template-rows: 0 0 1fr 0;
 }
 
 .spatial-grid.col-1-collapsed {
