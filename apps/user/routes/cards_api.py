@@ -845,6 +845,23 @@ async def add_tag_to_card(request: Request):
                 "INSERT INTO card_tags (card_id, tag_id) VALUES (?, ?)",
                 (req.card_id, tag_id)
             )
+
+            # Update card_summaries tags_json
+            cursor.execute(
+                """
+                UPDATE card_summaries
+                SET tags_json = (
+                    SELECT json_group_array(t.name)
+                    FROM card_tags ct
+                    JOIN tags t ON ct.tag_id = t.id
+                    WHERE ct.card_id = ?
+                ),
+                modified_at = datetime('now')
+                WHERE id = ?
+            """,
+                (req.card_id, req.card_id)
+            )
+
             conn.commit()
 
         return {"success": True, "message": "Tag added"}
@@ -884,6 +901,23 @@ async def remove_tag_from_card(request: Request):
                 "DELETE FROM card_tags WHERE card_id = ? AND tag_id = ?",
                 (req.card_id, tag_id)
             )
+
+            # Update card_summaries tags_json
+            cursor.execute(
+                """
+                UPDATE card_summaries
+                SET tags_json = (
+                    SELECT COALESCE(json_group_array(t.name), '[]')
+                    FROM card_tags ct
+                    JOIN tags t ON ct.tag_id = t.id
+                    WHERE ct.card_id = ?
+                ),
+                modified_at = datetime('now')
+                WHERE id = ?
+            """,
+                (req.card_id, req.card_id)
+            )
+
             conn.commit()
 
         return {"success": True, "message": "Tag removed"}
@@ -923,6 +957,7 @@ async def create_card(request: Request):
             )
 
             # Add tags
+            tag_ids = []
             for tag_name in req.tags:
                 # Get or create tag
                 cursor.execute("SELECT id FROM tags WHERE name = ?", (tag_name,))
@@ -937,11 +972,24 @@ async def create_card(request: Request):
                     )
                     tag_id = cursor.lastrowid
 
+                tag_ids.append(tag_id)
+
                 # Associate tag with card
                 cursor.execute(
                     "INSERT INTO card_tags (card_id, tag_id) VALUES (?, ?)",
                     (card_id, tag_id)
                 )
+
+            # Create card_summary with tags_json
+            import json
+            tags_json = json.dumps(req.tags)
+            cursor.execute(
+                """
+                INSERT INTO card_summaries (id, title, tags_json, created_at, modified_at, has_attachments)
+                VALUES (?, ?, ?, datetime('now'), datetime('now'), FALSE)
+            """,
+                (card_id, req.title, tags_json)
+            )
 
             conn.commit()
 
