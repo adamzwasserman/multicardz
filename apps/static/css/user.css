@@ -3166,28 +3166,21 @@ body.earth-tones .floating-add-card {
 /* Card delete button */
 .card-delete {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background-color: #ef4444;
-    color: white;
+    top: 0;
+    right: 0;
+    background: none;
+    color: #ef4444;
     border: none;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 1;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 6px;
     opacity: 0.7;
-    transition: opacity 0.2s ease, transform 0.1s ease;
+    transition: opacity 0.2s ease;
 }
 
 .card-delete:hover {
     opacity: 1;
-    transform: scale(1.1);
 }
 
 .card-content {
@@ -3196,27 +3189,20 @@ body.earth-tones .floating-add-card {
 
 /* Tag delete button */
 .tag-delete {
-    margin-left: 6px;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background-color: #ef4444;
-    color: white;
+    margin-left: 4px;
+    background: none;
+    color: #ef4444;
     border: none;
     cursor: pointer;
     font-size: 14px;
     line-height: 1;
     padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     opacity: 0.7;
-    transition: opacity 0.2s ease, transform 0.1s ease;
+    transition: opacity 0.2s ease;
 }
 
 .tag-delete:hover {
     opacity: 1;
-    transform: scale(1.1);
 }
 
 /* Ensure cards don't exceed container */
