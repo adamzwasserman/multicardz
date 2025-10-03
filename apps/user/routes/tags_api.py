@@ -64,10 +64,7 @@ async def create_tag(request: CreateTagRequest) -> CreateTagResponse:
 
             # Insert new tag
             cursor.execute(
-                """
-                INSERT INTO tags (name, created_at)
-                VALUES (?, datetime('now'))
-            """,
+                "INSERT INTO tags (name) VALUES (?)",
                 (tag_name,),
             )
             conn.commit()

@@ -156,7 +156,7 @@
             </div>
             <div class="checkbox-group">
                 <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" checked onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
-                <label for="startWithCardsExpanded">start with cards expanded</label>
+                <label for="startWithCardsExpanded">show tags on cards</label>
             </div>
             <div class="checkbox-group">
                 <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
@@ -577,94 +577,35 @@ async function createNewCard() {
         .map(t => t.getAttribute('data-tag')).filter(Boolean);
     const allTags = [...new Set([...unionTags, ...intersectionTags])];
 
-    // Create temporary card in DOM
-    const cardContainer = document.getElementById('cardContainer');
-    const emptyMessage = document.getElementById('emptyStateMessage');
-    if (emptyMessage) emptyMessage.style.display = 'none';
+    // Prompt for title
+    const title = prompt('Enter card title:');
+    if (!title || !title.trim()) return;
 
-    const tempCard = document.createElement('div');
-    tempCard.className = 'card-item';
-    tempCard.setAttribute('data-temp', 'true');
-    tempCard.innerHTML = `
-        <div class="card-content">
-            <div class="card-header">
-                <input type="text" class="card-title-input new-card-title"
-                       placeholder="Enter card title..."
-                       style="width: 100%; font: inherit; border: 1px solid #ccc; padding: 2px;">
-            </div>
-            <div class="card-footer">
-                <div class="card-tags-section">
-                    <div class="card-tags-header">
-                        <span class="card-tags-label">tags (${allTags.length})</span>
-                    </div>
-                    <div class="card-tags">
-                        ${allTags.map(tag => `<span class="card-tag" data-tag="${tag}">${tag}</span>`).join('')}
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    try {
+        // Create card in database immediately
+        const response = await fetch('/api/v2/cards/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: title.trim(), tags: allTags })
+        });
 
-    cardContainer.insertBefore(tempCard, cardContainer.firstChild);
-    const titleInput = tempCard.querySelector('.new-card-title');
-    titleInput.focus();
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Card created:', data);
 
-    const saveCard = async () => {
-        const title = titleInput.value.trim();
-        if (!title) {
-            tempCard.remove();
-            if (cardContainer.querySelectorAll('.card-item').length === 0 && emptyMessage) {
-                emptyMessage.style.display = 'block';
+            // Call render API to properly show card in sets
+            if (typeof window.dragDropSystem !== 'undefined') {
+                await window.dragDropSystem.updateStateAndRender();
             }
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/v2/cards/create', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, tags: allTags })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                // Replace temp card with real card
-                tempCard.setAttribute('data-card-id', data.card_id);
-                tempCard.removeAttribute('data-temp');
-                titleInput.replaceWith(document.createTextNode(title));
-
-                // Update tag counts
-                allTags.forEach(tagName => {
-                    const originalTag = document.getElementById(`tag-${tagName}`);
-                    if (originalTag) {
-                        const match = originalTag.textContent.match(/\((\d+)\)/);
-                        const currentCount = match ? parseInt(match[1]) : 0;
-                        originalTag.textContent = `${tagName} (${currentCount + 1})`;
-                    }
-                });
-            } else {
-                tempCard.remove();
-                if (cardContainer.querySelectorAll('.card-item').length === 0 && emptyMessage) {
-                    emptyMessage.style.display = 'block';
-                }
-            }
-        } catch (error) {
+        } else {
+            const error = await response.json();
             console.error('Failed to create card:', error);
-            tempCard.remove();
-            if (cardContainer.querySelectorAll('.card-item').length === 0 && emptyMessage) {
-                emptyMessage.style.display = 'block';
-            }
+            alert('Failed to create card: ' + (error.message || 'Unknown error'));
         }
-    };
-
-    titleInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            saveCard();
-        }
-    });
-
-    titleInput.addEventListener('blur', saveCard);
+    } catch (error) {
+        console.error('Failed to create card:', error);
+        alert('Failed to create card');
+    }
 }
 
 // Remove tag from card
@@ -822,13 +763,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Add tag to card in database
                 try {
+                    console.log('Adding tag to card:', { card_id: cardId, tag_name: tagName });
                     const response = await fetch('/api/v2/cards/add-tag', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ card_id: cardId, tag_name: tagName })
                     });
 
-                    if (response.ok) {
+                    const result = await response.json();
+                    console.log('Add tag response:', result);
+
+                    if (response.ok && result.success) {
                         // Add tag representation to DOM
                         const tagRep = document.createElement('span');
                         tagRep.className = 'card-tag';
@@ -843,6 +788,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             const currentCount = match ? parseInt(match[1]) : 0;
                             originalTag.textContent = `${tagName} (${currentCount + 1})`;
                         }
+                    } else {
+                        console.error('Failed to add tag:', result.message);
                     }
                 } catch (error) {
                     console.error('Failed to add tag to card:', error);

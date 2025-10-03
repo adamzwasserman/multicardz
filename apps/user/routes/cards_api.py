@@ -932,7 +932,7 @@ async def create_card(request: Request):
                     tag_id = tag_row[0]
                 else:
                     cursor.execute(
-                        "INSERT INTO tags (name, created_at) VALUES (?, datetime('now'))",
+                        "INSERT INTO tags (name) VALUES (?)",
                         (tag_name,)
                     )
                     tag_id = cursor.lastrowid
