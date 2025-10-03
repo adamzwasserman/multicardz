@@ -572,42 +572,88 @@ async function createTag(tagName, cloudType = 'user') {
 
 // Create new card with tags from SHOW and FILTER zones
 async function createNewCard() {
-    // Get tag UUIDs from SHOW and FILTER zones
-    const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'))
-        .map(t => t.getAttribute('data-tag-id')).filter(Boolean);
-    const intersectionTags = Array.from(document.querySelectorAll('[data-zone-type="intersection"] .tag'))
-        .map(t => t.getAttribute('data-tag-id')).filter(Boolean);
-    const allTagIds = [...new Set([...unionTags, ...intersectionTags])];
+    // Get tag UUIDs and names from SHOW and FILTER zones
+    const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'));
+    const intersectionTags = Array.from(document.querySelectorAll('[data-zone-type="intersection"] .tag'));
+    const allTags = [...new Set([...unionTags, ...intersectionTags])];
 
-    // Prompt for name
-    const name = prompt('Enter card name:');
-    if (!name || !name.trim()) return;
+    const tagIds = allTags.map(t => t.getAttribute('data-tag-id')).filter(Boolean);
+    const tagNames = allTags.map(t => t.getAttribute('data-tag')).filter(Boolean);
 
-    try {
-        // Create card in database immediately with tag UUIDs
-        const response = await fetch('/api/v2/cards/create', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: name.trim(), tag_ids: allTagIds })
-        });
+    // Generate UUID for new card
+    const cardId = crypto.randomUUID();
 
-        if (response.ok) {
-            const data = await response.json();
-            console.log('Card created:', data);
+    // Create card element in DOM
+    const cardContainer = document.querySelector('.card-container');
+    const cardElement = document.createElement('div');
+    cardElement.className = 'card-item';
+    cardElement.setAttribute('data-card-id', cardId);
 
-            // Call render API to properly show card in sets
-            if (typeof window.dragDropSystem !== 'undefined') {
-                await window.dragDropSystem.updateStateAndRender();
-            }
-        } else {
-            const error = await response.json();
-            console.error('Failed to create card:', error);
-            alert('Failed to create card: ' + (error.message || 'Unknown error'));
+    cardElement.innerHTML = `
+        <div class="card-content">
+            <div class="card-header">
+                <h4 class="card-title" contenteditable="true" style="outline: 2px solid #3b82f6;"></h4>
+            </div>
+            <div class="card-footer">
+                <div class="card-tags-section">
+                    <div class="card-tags-header">
+                        <span class="card-tags-label">tags (${tagNames.length})</span>
+                    </div>
+                    <div class="card-tags">
+                        ${tagNames.map((name, i) =>
+                            `<span class="card-tag" data-tag="${name}" data-tag-id="${tagIds[i]}">${name} <span class="tag-remove" onclick="removeTagFromCard('${cardId}', '${tagIds[i]}', this)">×</span></span>`
+                        ).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    cardContainer.appendChild(cardElement);
+
+    // Focus on title for editing
+    const titleElement = cardElement.querySelector('.card-title');
+    titleElement.focus();
+
+    // Save to database when user presses Enter or loses focus
+    const saveCard = async () => {
+        const name = titleElement.textContent.trim();
+        if (!name) {
+            cardElement.remove();
+            return;
         }
-    } catch (error) {
-        console.error('Failed to create card:', error);
-        alert('Failed to create card');
-    }
+
+        titleElement.setAttribute('contenteditable', 'false');
+        titleElement.style.outline = 'none';
+
+        try {
+            const response = await fetch('/api/v2/cards/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, tag_ids: tagIds })
+            });
+
+            if (response.ok) {
+                console.log('Card saved to database');
+            } else {
+                const error = await response.json();
+                console.error('Failed to save card:', error);
+                alert('Failed to save card: ' + (error.message || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Failed to save card:', error);
+            alert('Failed to save card');
+        }
+    };
+
+    titleElement.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveCard();
+        }
+    });
+
+    titleElement.addEventListener('blur', saveCard);
 }
 
 // Remove tag from card (using UUID)
