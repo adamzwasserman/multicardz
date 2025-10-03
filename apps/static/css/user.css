@@ -3113,6 +3113,45 @@ body.font-berkeley-mono {
     overflow: visible;
 }
 
+/* Floating add card button */
+.floating-add-card {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.floating-add-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.floating-add-card:active {
+    transform: scale(0.95);
+}
+
+/* Theme-aware background for floating button */
+body.dark-mode .floating-add-card {
+    background-color: #2563eb;
+}
+
+body.earth-tones .floating-add-card {
+    background-color: #8b7355;
+}
 
 /* Ensure cards don't exceed container */
 .card-grid .card-item,

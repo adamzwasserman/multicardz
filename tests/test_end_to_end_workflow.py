@@ -252,6 +252,15 @@ class TestEndToEndWorkflow:
             print("\n👤 STEP 4: Setting up user preferences...")
 
             with create_card_service(db_path) as service:
+                # Create test user (required for FOREIGN KEY constraint)
+                from apps.shared.services.database_storage import save_user
+                save_user(service.connection, {
+                    'id': 'test_developer',
+                    'username': 'test_developer',
+                    'email': 'developer@example.com',
+                    'password_hash': 'test_hash'
+                })
+
                 # Create test user preferences
                 user_prefs = UserPreferences(user_id="test_developer")
                 service.save_user_preferences(user_prefs)

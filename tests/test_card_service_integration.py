@@ -193,6 +193,15 @@ class TestCardServiceIntegration:
             # Create cards
             service.bulk_import_cards(sample_cards_data)
 
+            # Create test user (required for FOREIGN KEY constraint)
+            from apps.shared.services.database_storage import save_user
+            save_user(service.connection, {
+                'id': 'test_user',
+                'username': 'test_user',
+                'email': 'test@example.com',
+                'password_hash': 'test_hash'
+            })
+
             # Create user preferences
             preferences = UserPreferences(user_id="test_user")
             service.save_user_preferences(preferences)

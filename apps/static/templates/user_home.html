@@ -324,6 +324,7 @@
     </div>
 
     <div class="card-display">
+        <button class="floating-add-card" id="floatingAddCard" onclick="createNewCard()" title="Create new card">+</button>
         <div class="card-container" id="cardContainer">
             <!-- Cards will be populated by JavaScript based on checkbox state and active filters -->
             <p id="emptyStateMessage">No cards to display</p>
@@ -537,8 +538,319 @@ function switchDatabase(databaseValue) {
     // TODO: Implement database switching logic
 }
 
+// Handle tag creation from input
+async function createTag(tagName, cloudType = 'user') {
+    try {
+        const response = await fetch('/api/v2/tags/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: tagName, type: cloudType })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            // Add tag to DOM
+            const cloud = document.querySelector(`.cloud-${cloudType} .tags-wrapper`);
+            if (cloud) {
+                const tagElement = document.createElement('span');
+                tagElement.className = `tag tag-${cloudType}`;
+                tagElement.setAttribute('data-tag', tagName);
+                tagElement.setAttribute('data-type', 'tag');
+                tagElement.setAttribute('draggable', 'true');
+                tagElement.id = `tag-${tagName}`;
+                tagElement.textContent = `${tagName} (0)`;
+                cloud.appendChild(tagElement);
+            }
+            return data;
+        }
+    } catch (error) {
+        console.error('Failed to create tag:', error);
+    }
+}
+
+// Create new card with tags from SHOW and FILTER zones
+async function createNewCard() {
+    // Get tags from SHOW and FILTER zones
+    const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'))
+        .map(t => t.getAttribute('data-tag')).filter(Boolean);
+    const intersectionTags = Array.from(document.querySelectorAll('[data-zone-type="intersection"] .tag'))
+        .map(t => t.getAttribute('data-tag')).filter(Boolean);
+    const allTags = [...new Set([...unionTags, ...intersectionTags])];
+
+    // Create temporary card in DOM
+    const cardContainer = document.getElementById('cardContainer');
+    const emptyMessage = document.getElementById('emptyStateMessage');
+    if (emptyMessage) emptyMessage.style.display = 'none';
+
+    const tempCard = document.createElement('div');
+    tempCard.className = 'card-item';
+    tempCard.setAttribute('data-temp', 'true');
+    tempCard.innerHTML = `
+        <div class="card-content">
+            <div class="card-header">
+                <input type="text" class="card-title-input new-card-title"
+                       placeholder="Enter card title..."
+                       style="width: 100%; font: inherit; border: 1px solid #ccc; padding: 2px;">
+            </div>
+            <div class="card-footer">
+                <div class="card-tags-section">
+                    <div class="card-tags-header">
+                        <span class="card-tags-label">tags (${allTags.length})</span>
+                    </div>
+                    <div class="card-tags">
+                        ${allTags.map(tag => `<span class="card-tag" data-tag="${tag}">${tag}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    cardContainer.insertBefore(tempCard, cardContainer.firstChild);
+    const titleInput = tempCard.querySelector('.new-card-title');
+    titleInput.focus();
+
+    const saveCard = async () => {
+        const title = titleInput.value.trim();
+        if (!title) {
+            tempCard.remove();
+            if (cardContainer.querySelectorAll('.card-item').length === 0 && emptyMessage) {
+                emptyMessage.style.display = 'block';
+            }
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/v2/cards/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, tags: allTags })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                // Replace temp card with real card
+                tempCard.setAttribute('data-card-id', data.card_id);
+                tempCard.removeAttribute('data-temp');
+                titleInput.replaceWith(document.createTextNode(title));
+
+                // Update tag counts
+                allTags.forEach(tagName => {
+                    const originalTag = document.getElementById(`tag-${tagName}`);
+                    if (originalTag) {
+                        const match = originalTag.textContent.match(/\((\d+)\)/);
+                        const currentCount = match ? parseInt(match[1]) : 0;
+                        originalTag.textContent = `${tagName} (${currentCount + 1})`;
+                    }
+                });
+            } else {
+                tempCard.remove();
+                if (cardContainer.querySelectorAll('.card-item').length === 0 && emptyMessage) {
+                    emptyMessage.style.display = 'block';
+                }
+            }
+        } catch (error) {
+            console.error('Failed to create card:', error);
+            tempCard.remove();
+            if (cardContainer.querySelectorAll('.card-item').length === 0 && emptyMessage) {
+                emptyMessage.style.display = 'block';
+            }
+        }
+    };
+
+    titleInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveCard();
+        }
+    });
+
+    titleInput.addEventListener('blur', saveCard);
+}
+
+// Remove tag from card
+async function removeTagFromCard(cardId, tagName, removeButton) {
+    try {
+        const response = await fetch('/api/v2/cards/remove-tag', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ card_id: cardId, tag_name: tagName })
+        });
+
+        if (response.ok) {
+            // Remove tag representation from DOM
+            const tagRep = removeButton.closest('.card-tag');
+            if (tagRep) tagRep.remove();
+
+            // Update tag count
+            const originalTag = document.getElementById(`tag-${tagName}`);
+            if (originalTag) {
+                const match = originalTag.textContent.match(/\((\d+)\)/);
+                const currentCount = match ? parseInt(match[1]) : 0;
+                originalTag.textContent = `${tagName} (${Math.max(0, currentCount - 1)})`;
+            }
+        }
+    } catch (error) {
+        console.error('Failed to remove tag from card:', error);
+    }
+}
+
+// Make card title editable
+function makeCardTitleEditable(cardElement) {
+    const titleElement = cardElement.querySelector('.card-title');
+    if (!titleElement || titleElement.querySelector('input')) return;
+
+    const currentTitle = titleElement.textContent;
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentTitle;
+    input.className = 'card-title-input';
+    input.style.width = '100%';
+    input.style.font = 'inherit';
+    input.style.border = '1px solid #ccc';
+    input.style.padding = '2px';
+
+    titleElement.textContent = '';
+    titleElement.appendChild(input);
+    input.focus();
+    input.select();
+
+    const saveTitle = async () => {
+        const newTitle = input.value.trim();
+        if (newTitle && newTitle !== currentTitle) {
+            const cardId = cardElement.getAttribute('data-card-id');
+            try {
+                const response = await fetch('/api/v2/cards/update-title', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ card_id: cardId, title: newTitle })
+                });
+                if (response.ok) {
+                    titleElement.textContent = newTitle;
+                } else {
+                    titleElement.textContent = currentTitle;
+                }
+            } catch (error) {
+                console.error('Failed to update card title:', error);
+                titleElement.textContent = currentTitle;
+            }
+        } else {
+            titleElement.textContent = currentTitle;
+        }
+        input.blur();
+    };
+
+    input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveTitle();
+        }
+    });
+
+    input.addEventListener('blur', saveTitle);
+}
+
 // Initialize cards on page load - always trigger initial render for lesson mode
 document.addEventListener('DOMContentLoaded', function() {
+    // Setup tag input handlers
+    document.querySelectorAll('.tag-input').forEach(input => {
+        input.addEventListener('keypress', async function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                const tagName = this.value.trim();
+                const cloudType = this.closest('.cloud-user') ? 'user' :
+                                 this.closest('.cloud-ai') ? 'ai' : 'user';
+                await createTag(tagName, cloudType);
+                this.value = '';
+            }
+        });
+    });
+
+    // Setup card title editing
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.card-title') && !e.target.closest('input')) {
+            const card = e.target.closest('.card-item');
+            if (card) makeCardTitleEditable(card);
+        }
+    });
+
+    document.addEventListener('keypress', (e) => {
+        if (e.key === 't' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+            const hoveredCard = document.elementFromPoint(e.clientX || 0, e.clientY || 0)?.closest('.card-item');
+            if (hoveredCard) {
+                e.preventDefault();
+                makeCardTitleEditable(hoveredCard);
+            }
+        }
+    });
+
+    // Setup card tag drop zones
+    document.addEventListener('dragover', (e) => {
+        const cardTags = e.target.closest('.card-tags');
+        if (cardTags) {
+            e.preventDefault();
+            cardTags.classList.add('drag-over');
+        }
+    });
+
+    document.addEventListener('dragleave', (e) => {
+        const cardTags = e.target.closest('.card-tags');
+        if (cardTags && !cardTags.contains(e.relatedTarget)) {
+            cardTags.classList.remove('drag-over');
+        }
+    });
+
+    document.addEventListener('drop', async (e) => {
+        const cardTags = e.target.closest('.card-tags');
+        if (cardTags) {
+            e.preventDefault();
+            e.stopPropagation();
+            cardTags.classList.remove('drag-over');
+
+            const card = cardTags.closest('.card-item');
+            const cardId = card?.getAttribute('data-card-id');
+            if (!cardId) return;
+
+            // Get dragged tag name from dragDropSystem
+            const draggedElements = window.dragDropSystem?.draggedElements || [];
+            if (draggedElements.length === 0) return;
+
+            for (const tagElement of draggedElements) {
+                const tagName = tagElement.getAttribute('data-tag');
+                if (!tagName) continue;
+
+                // Check if tag already on card
+                if (cardTags.querySelector(`[data-tag="${tagName}"]`)) continue;
+
+                // Add tag to card in database
+                try {
+                    const response = await fetch('/api/v2/cards/add-tag', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ card_id: cardId, tag_name: tagName })
+                    });
+
+                    if (response.ok) {
+                        // Add tag representation to DOM
+                        const tagRep = document.createElement('span');
+                        tagRep.className = 'card-tag';
+                        tagRep.setAttribute('data-tag', tagName);
+                        tagRep.innerHTML = `${tagName} <span class="tag-remove" onclick="removeTagFromCard('${cardId}', '${tagName}', this)">×</span>`;
+                        cardTags.appendChild(tagRep);
+
+                        // Update tag count
+                        const originalTag = document.getElementById(`tag-${tagName}`);
+                        if (originalTag) {
+                            const match = originalTag.textContent.match(/\((\d+)\)/);
+                            const currentCount = match ? parseInt(match[1]) : 0;
+                            originalTag.textContent = `${tagName} (${currentCount + 1})`;
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to add tag to card:', error);
+                }
+            }
+        }
+    });
+
     // Wait a moment for drag-drop system to initialize
     setTimeout(function() {
         console.log('Initializing cards on page load for lesson mode...');

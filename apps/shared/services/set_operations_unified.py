@@ -261,15 +261,133 @@ class CardRegistrySingleton:
             self._registry_frozen = False
 
 
-def initialize_card_registry(cards: frozenset[CardSummaryTuple]) -> None:
+def initialize_card_registry(cards: frozenset[CardSummaryTuple], cache_path: str | None = None) -> None:
     """
     Initialize the card registry singleton with a batch of cards.
 
     This should be called once during application startup.
+
+    Args:
+        cards: Frozenset of CardSummaryTuple objects to register
+        cache_path: Optional path to cache file for persistence
     """
+    import pickle
+    import gzip
+    from pathlib import Path
+
     registry = CardRegistrySingleton()
+
+    # Try to load from cache if provided and exists
+    if cache_path and Path(cache_path).exists():
+        try:
+            with gzip.open(cache_path, 'rb') as f:
+                cached_data = pickle.load(f)
+                # Restore registry state from cache
+                with registry._lock:
+                    registry._tag_to_id = cached_data.get('tag_to_id', {})
+                    registry._id_to_tag = cached_data.get('id_to_tag', {})
+                    registry._next_tag_id = cached_data.get('next_tag_id', 0)
+                    registry._card_bitmaps = cached_data.get('card_bitmaps', {})
+                    registry._tag_to_cards = cached_data.get('tag_to_cards', {})
+                    registry._cards_registered = cached_data.get('cards_registered', 0)
+                    registry._registry_frozen = True
+                return
+        except Exception as e:
+            # Cache loading failed, fall back to normal initialization
+            pass
+
+    # Normal initialization
     registry.register_cards_batch(cards)
     registry.freeze_registry()
+
+    # Save to cache if path provided
+    if cache_path:
+        try:
+            cache_data = {
+                'tag_to_id': registry._tag_to_id,
+                'id_to_tag': registry._id_to_tag,
+                'next_tag_id': registry._next_tag_id,
+                'card_bitmaps': registry._card_bitmaps,
+                'tag_to_cards': registry._tag_to_cards,
+                'cards_registered': registry._cards_registered,
+            }
+            Path(cache_path).parent.mkdir(parents=True, exist_ok=True)
+            with gzip.open(cache_path, 'wb') as f:
+                pickle.dump(cache_data, f)
+        except Exception as e:
+            # Cache save failed, continue without caching
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to save cache: {e}")
+
+
+def handle_card_mutations(
+    added_cards: frozenset[CardSummaryTuple] | None = None,
+    updated_cards: frozenset[CardSummaryTuple] | None = None,
+    deleted_card_ids: frozenset[str] | None = None
+) -> None:
+    """
+    Handle incremental mutations to the card registry.
+
+    This function updates the registry with added, updated, or deleted cards
+    without requiring a full reinitialization.
+
+    Args:
+        added_cards: Cards to add to the registry
+        updated_cards: Cards to update in the registry
+        deleted_card_ids: Card IDs to remove from the registry
+    """
+    registry = CardRegistrySingleton()
+
+    with registry._lock:
+        # Temporarily unfreeze for mutations
+        was_frozen = registry._registry_frozen
+        registry._registry_frozen = False
+
+        # Handle deletions
+        if deleted_card_ids:
+            for card_id in deleted_card_ids:
+                # Remove from card bitmaps if exists
+                if card_id in registry._card_bitmaps:
+                    del registry._card_bitmaps[card_id]
+                registry._cards_registered -= 1
+
+        # Handle additions
+        if added_cards:
+            for card in added_cards:
+                # Register new tags
+                for tag in card.tags:
+                    if tag not in registry._tag_to_id:
+                        tag_id = registry._next_tag_id
+                        registry._tag_to_id[tag] = tag_id
+                        registry._id_to_tag[tag_id] = tag
+                        registry._next_tag_id += 1
+
+                    # Update inverted index
+                    if tag not in registry._tag_to_cards:
+                        registry._tag_to_cards[tag] = frozenset()
+                    registry._tag_to_cards[tag] = registry._tag_to_cards[tag] | {card.id}
+
+                registry._cards_registered += 1
+
+        # Handle updates
+        if updated_cards:
+            for card in updated_cards:
+                # Register any new tags from updated cards
+                for tag in card.tags:
+                    if tag not in registry._tag_to_id:
+                        tag_id = registry._next_tag_id
+                        registry._tag_to_id[tag] = tag_id
+                        registry._id_to_tag[tag_id] = tag
+                        registry._next_tag_id += 1
+
+                    # Update inverted index
+                    if tag not in registry._tag_to_cards:
+                        registry._tag_to_cards[tag] = frozenset()
+                    registry._tag_to_cards[tag] = registry._tag_to_cards[tag] | {card.id}
+
+        # Restore frozen state if it was frozen before
+        if was_frozen:
+            registry._registry_frozen = True
 
 
 # Pure Functions for Multiprocessing (zero state, explicit inputs)

@@ -9,6 +9,17 @@ from jinja2 import DictLoader, Environment
 # from fastapi.testclient import TestClient
 from apps.shared.models import Attachment, CardDetail, CardSummary, UserTier, Workspace
 
+# Import fixture modules to make them discoverable
+pytest_plugins = [
+    "tests.fixtures.model_fixtures",
+    "tests.fixtures.api_fixtures",
+    "tests.fixtures.bitmap_fixtures",
+    "tests.fixtures.connection_fixtures",
+    "tests.fixtures.tag_count_fixtures",
+    "tests.fixtures.template_fixtures",
+    "tests.fixtures.performance_fixtures",
+]
+
 
 @pytest.fixture
 def sample_card_summary():

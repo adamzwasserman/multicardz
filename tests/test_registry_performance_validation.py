@@ -16,6 +16,7 @@ from apps.shared.services.set_operations_unified import (
     CardRegistrySingleton,
     apply_unified_operations,
     initialize_card_registry,
+    handle_card_mutations,
 )
 from packages.shared.src.backend.models.card_models import CardSummary
 

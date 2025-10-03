@@ -775,3 +775,177 @@ async def get_lesson_hint(request: Request):
     except Exception as e:
         logger.error(f"Error getting lesson hint: {str(e)}")
         return HTMLResponse("drag a <em>tag</em> to a <em>zone</em> to see the cards that have that tag")
+
+
+@router.post("/cards/update-title")
+async def update_card_title(request: Request):
+    """Update a card's title."""
+    import sqlite3
+    from pydantic import BaseModel
+
+    class UpdateTitleRequest(BaseModel):
+        card_id: str
+        title: str
+
+    try:
+        data = await request.json()
+        req = UpdateTitleRequest(**data)
+
+        db_path = Path("/var/data/tutorial_customer.db")
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE cards SET title = ?, modified_at = datetime('now') WHERE id = ?",
+                (req.title, req.card_id)
+            )
+            conn.commit()
+
+        return {"success": True, "message": "Title updated"}
+    except Exception as e:
+        logger.error(f"Error updating card title: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/cards/add-tag")
+async def add_tag_to_card(request: Request):
+    """Add a tag to a card."""
+    import sqlite3
+    from pydantic import BaseModel
+
+    class AddTagRequest(BaseModel):
+        card_id: str
+        tag_name: str
+
+    try:
+        data = await request.json()
+        req = AddTagRequest(**data)
+
+        db_path = Path("/var/data/tutorial_customer.db")
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+
+            # Get tag_id
+            cursor.execute("SELECT id FROM tags WHERE name = ?", (req.tag_name,))
+            tag_row = cursor.fetchone()
+            if not tag_row:
+                return {"success": False, "message": "Tag not found"}
+
+            tag_id = tag_row[0]
+
+            # Check if already associated
+            cursor.execute(
+                "SELECT 1 FROM card_tags WHERE card_id = ? AND tag_id = ?",
+                (req.card_id, tag_id)
+            )
+            if cursor.fetchone():
+                return {"success": False, "message": "Tag already on card"}
+
+            # Add association
+            cursor.execute(
+                "INSERT INTO card_tags (card_id, tag_id) VALUES (?, ?)",
+                (req.card_id, tag_id)
+            )
+            conn.commit()
+
+        return {"success": True, "message": "Tag added"}
+    except Exception as e:
+        logger.error(f"Error adding tag to card: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/cards/remove-tag")
+async def remove_tag_from_card(request: Request):
+    """Remove a tag from a card."""
+    import sqlite3
+    from pydantic import BaseModel
+
+    class RemoveTagRequest(BaseModel):
+        card_id: str
+        tag_name: str
+
+    try:
+        data = await request.json()
+        req = RemoveTagRequest(**data)
+
+        db_path = Path("/var/data/tutorial_customer.db")
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+
+            # Get tag_id
+            cursor.execute("SELECT id FROM tags WHERE name = ?", (req.tag_name,))
+            tag_row = cursor.fetchone()
+            if not tag_row:
+                return {"success": False, "message": "Tag not found"}
+
+            tag_id = tag_row[0]
+
+            # Remove association
+            cursor.execute(
+                "DELETE FROM card_tags WHERE card_id = ? AND tag_id = ?",
+                (req.card_id, tag_id)
+            )
+            conn.commit()
+
+        return {"success": True, "message": "Tag removed"}
+    except Exception as e:
+        logger.error(f"Error removing tag from card: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/cards/create")
+async def create_card(request: Request):
+    """Create a new card with tags."""
+    import sqlite3
+    import uuid
+    from pydantic import BaseModel
+
+    class CreateCardRequest(BaseModel):
+        title: str
+        tags: list[str] = []
+
+    try:
+        data = await request.json()
+        req = CreateCardRequest(**data)
+
+        card_id = str(uuid.uuid4())[:8]
+        db_path = Path("/var/data/tutorial_customer.db")
+
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+
+            # Insert card
+            cursor.execute(
+                """
+                INSERT INTO cards (id, title, content, created_at, modified_at)
+                VALUES (?, ?, '', datetime('now'), datetime('now'))
+            """,
+                (card_id, req.title)
+            )
+
+            # Add tags
+            for tag_name in req.tags:
+                # Get or create tag
+                cursor.execute("SELECT id FROM tags WHERE name = ?", (tag_name,))
+                tag_row = cursor.fetchone()
+
+                if tag_row:
+                    tag_id = tag_row[0]
+                else:
+                    cursor.execute(
+                        "INSERT INTO tags (name, created_at) VALUES (?, datetime('now'))",
+                        (tag_name,)
+                    )
+                    tag_id = cursor.lastrowid
+
+                # Associate tag with card
+                cursor.execute(
+                    "INSERT INTO card_tags (card_id, tag_id) VALUES (?, ?)",
+                    (card_id, tag_id)
+                )
+
+            conn.commit()
+
+        return {"success": True, "card_id": card_id, "message": "Card created"}
+    except Exception as e:
+        logger.error(f"Error creating card: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

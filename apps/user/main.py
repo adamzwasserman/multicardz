@@ -14,6 +14,7 @@ from fastapi.templating import Jinja2Templates
 
 # Import routers
 from .routes.cards_api import router as cards_router
+from .routes.tags_api import router as tags_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -53,6 +54,7 @@ def create_app():
 
     # Include routers
     app.include_router(cards_router)
+    app.include_router(tags_router)
 
     # Main interface route (no authentication)
     @app.get("/", response_class=HTMLResponse)

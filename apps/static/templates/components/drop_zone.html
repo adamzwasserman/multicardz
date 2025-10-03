@@ -18,7 +18,7 @@
     </div>
     <div class="zone-content">
         {% if zone_content %}
-            {{ zone_content | safe }}
+            {{ zone_content }}
         {% endif %}
         {% if show_drop_hint %}
         <div class="drop-hint">{{ drop_hint_text | default('Drop items here') }}</div>

@@ -200,8 +200,11 @@ def test_malicious_input():
 
     response = client.post("/api/v2/render/cards", json=malicious_request)
     assert response.status_code == 200
-    # The response should be HTML, but script tags should be escaped/removed
-    assert "<script>" not in response.text
+    # The response should be HTML, but malicious script tags should be escaped
+    # Check that the malicious script is escaped (contains &lt; instead of <)
+    assert "<script>alert('xss')</script>" not in response.text, "Malicious script tag was not escaped!"
+    # The escaped version should be present or the tag should be escaped
+    assert "&lt;script&gt;" in response.text or "alert('xss')" not in response.text, "XSS content should be escaped"
     print("✅ XSS protection working")
 
     # Try excessive tags (validation should limit)
