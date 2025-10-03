@@ -84,14 +84,14 @@ def create_app():
             try:
                 with sqlite3.connect(db_path) as conn:
                     cursor = conn.cursor()
+                    # Use new zero-trust schema with UUID and card_count field
                     cursor.execute("""
-                        SELECT t.name, COUNT(ct.card_id) as card_count
-                        FROM tags t
-                        LEFT JOIN card_tags ct ON t.id = ct.tag_id
-                        GROUP BY t.id, t.name
-                        ORDER BY t.name
-                    """)
-                    available_tags = [{"name": row[0], "count": row[1]} for row in cursor.fetchall()]
+                        SELECT tag_id, tag, card_count
+                        FROM tags
+                        WHERE user_id = ? AND workspace_id = ? AND deleted IS NULL
+                        ORDER BY tag
+                    """, ("default-user", "default-workspace"))
+                    available_tags = [{"id": row[0], "name": row[1], "count": row[2]} for row in cursor.fetchall()]
 
                     # Debug: what tags are we loading?
                     logger.info(f"Tutorial database tags: {available_tags}")

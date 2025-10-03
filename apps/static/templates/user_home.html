@@ -27,6 +27,7 @@
                     {% for tag in available_tags %}
                     <span class="tag tag-user"
                           data-tag="{{ tag.name }}"
+                          data-tag-id="{{ tag.id }}"
                           data-type="tag"
                           draggable="true"
                           id="tag-{{ tag.name }}"
