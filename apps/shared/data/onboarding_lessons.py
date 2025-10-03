@@ -50,7 +50,7 @@ LESSON_1_CARDS = [
         content="""<div class="lesson-card">
             <p>Now drag a SECOND tag into the same box.</p>
         </div>""",
-        tags=["lesson1", "drag me to the SHOW box"],
+        tags=["lesson1"],
         lesson_number=1,
         step_number=2,
         success_criteria="tag_in_show_zone",
@@ -92,7 +92,7 @@ LESSON_2_CARDS = [
         content="""<div class="lesson-card">
             <p>Now drag the 'ALL' tag to the FILTER box. This will remove the previous instruction cards and show only the new instruction card that has 'lesson2' and 'ALL' tags.</p>
         </div>""",
-        tags=["lesson2", "drag me next"],
+        tags=["lesson2"],
         lesson_number=2,
         step_number=2,
         success_criteria="two_tags_in_show",
