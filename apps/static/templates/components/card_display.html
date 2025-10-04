@@ -29,7 +29,7 @@
             <div class="card-content">
                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                 <div class="card-header">
-                    <h4 class="card-title">{{ card.title }}</h4>
+                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
                     {% if card.subtitle %}
                     <div class="card-subtitle">{{ card.subtitle }}</div>
                     {% endif %}
@@ -39,7 +39,7 @@
                     {% if card.content.startswith('<div') %}
                         {{ card.content | safe }}
                     {% else %}
-                        <p class="card-description">{{ card.content }}</p>
+                        <p class="card-description" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardContent(this)">{{ card.content }}</p>
                     {% endif %}
                 </div>
                 {% endif %}

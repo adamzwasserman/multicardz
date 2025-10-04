@@ -813,6 +813,35 @@ async def update_card_title(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/cards/update-content")
+async def update_card_content(request: Request):
+    """Update a card's description/content."""
+    from pydantic import BaseModel
+    from apps.shared.repositories import CardRepository
+
+    class UpdateContentRequest(BaseModel):
+        card_id: str
+        content: str
+        workspace_id: str = "default-workspace"  # TODO: Get from session
+
+    try:
+        data = await request.json()
+        req = UpdateContentRequest(**data)
+
+        card_repo = CardRepository()
+        success = card_repo.update_content(req.card_id, req.workspace_id, req.content)
+
+        if success:
+            return {"success": True, "message": "Content updated"}
+        else:
+            raise HTTPException(status_code=404, detail="Card not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating card content: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/cards/add-tag")
 async def add_tag_to_card(request: Request):
     """Add a tag to a card (using zero-trust inverted index)."""

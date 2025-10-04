@@ -1215,6 +1215,9 @@ class SpatialDragDrop {
         }
 
         // Tag count will be updated automatically via polling service
+
+        // Re-render cards because spatial relationships may have changed
+        this.updateStateAndRender();
       }
     } catch (error) {
       console.error('Failed to remove tag from card:', error);
@@ -1329,6 +1332,21 @@ class SpatialDragDrop {
     });
   }
 }
+
+// Global function wrappers for HTML onclick handlers
+window.removeTagFromCard = function(cardId, tagName, removeButton) {
+  if (window.dragDropSystem) {
+    // Look up tag ID from the tag cloud
+    const tagInCloud = document.querySelector(`[data-tag="${tagName}"][data-tag-id]`);
+    const tagId = tagInCloud?.dataset.tagId;
+
+    if (tagId) {
+      window.dragDropSystem.removeTagFromCard(cardId, tagId, removeButton);
+    } else {
+      console.error('Could not find tag ID for tag:', tagName);
+    }
+  }
+};
 
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {

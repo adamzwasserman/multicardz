@@ -123,48 +123,7 @@
             <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
-    <div class="universal-control collapsible-section collapsible-row row-2" style="position: relative;">
-        <div class="section-header">
-            <h3>global settings</h3>
-            <button class="collapse-toggle collapse-universal" onclick="toggleSection('universal')" title="Toggle Universal Control" aria-label="Toggle universal control">
-                <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
-                    <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-        </div>
-        <div class="controls">
-
-            <div class="database-group">
-                <select id="databaseSelector" class="database-selector" aria-label="Database selector"
-                        onchange="switchDatabase(this.value)">
-                    <option value="">select a project...</option>
-                </select>
-                <label for="fontSelector">pick a project</label>
-                <!-- <label for="databaseSelector">active database</label>
-                <div class="database-info">
-                    <span id="currentDatabaseInfo"
-                          hx-get="/api/current-database-info"
-                          hx-trigger="load"
-                          hx-swap="innerHTML">Loading...</span>
-                </div> -->
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
-                <label for="startWithAllCards">show all cards</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" checked onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
-                <label for="startWithCardsExpanded">show tags on cards</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
-                <label for="showColors">show colors on tags/card</label>
-            </div>
-
-
-        </div>
-    </div>
+    <!-- Global settings section removed - controls moved to settings drawer -->
 
     <div class="top-control collapsible-row row-2" style="position: relative;">
         <!-- Control areas are DROP TARGETS for zones -->
@@ -230,72 +189,7 @@
         </div>
     </div>
 
-    <div class="ui-control collapsible-section collapsible-row row-2" style="position: relative;">
-        <div class="section-header">
-            <h3>user interface</h3>
-            <button class="collapse-toggle collapse-ui" onclick="toggleSection('ui')" title="Toggle User Interface" aria-label="Toggle user interface">
-                <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
-                    <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
-        </div>
-
-        <div class="controls">
-            <!-- Theme Switcher -->
-            <div class="theme-switch-group">
-                <label class="theme-label">theme picker</label>
-                <div class="theme-radio-group">
-                    <div class="theme-radio-item">
-                        <input type="radio" id="theme-system" name="theme" value="system" checked
-                               onclick="document.documentElement.style.colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); saveThemeChoice('system');">
-                        <label for="theme-system">system</label>
-                    </div>
-                    <div class="theme-radio-item">
-                        <input type="radio" id="theme-light" name="theme" value="light"
-                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); saveThemeChoice('light');">
-                        <label for="theme-light">light</label>
-                    </div>
-                    <div class="theme-radio-item">
-                        <input type="radio" id="theme-dark" name="theme" value="dark"
-                               onclick="document.documentElement.style.colorScheme = 'dark'; document.body.classList.add('dark-mode'); document.body.classList.remove('earth-tones'); saveThemeChoice('dark');">
-                        <label for="theme-dark">dark</label>
-                    </div>
-                    <div class="theme-radio-item">
-                        <input type="radio" id="theme-earth" name="theme" value="earth"
-                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.add('earth-tones'); document.body.classList.remove('dark-mode'); saveThemeChoice('earth');">
-                        <label for="theme-earth">earth tones</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="font-group">
-                <div class="font-dropdown-wrapper">
-                    <label class="theme-label">font picker</label>
-                    <div class="font-dropdown-current font-system" tabindex="0">System Sans</div>
-                    <div class="font-dropdown-options">
-                        <div class="font-dropdown-option font-system" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'System Sans'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-system'; document.body.className = document.body.className.replace(/font-\w+/g, ''); saveFontChoice('font-system'); this.parentNode.parentNode.classList.remove('active');">System Sans</div>
-                        <div class="font-dropdown-option font-inconsolata" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Inconsolata 200'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-inconsolata'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-inconsolata'; saveFontChoice('font-inconsolata'); this.parentNode.parentNode.classList.remove('active');">Inconsolata 200</div>
-                        <div class="font-dropdown-option font-optima" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Lato'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-optima'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-optima'; saveFontChoice('font-optima'); this.parentNode.parentNode.classList.remove('active');">Lato</div>
-                        <div class="font-dropdown-option font-helvetica" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Libre Franklin'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-helvetica'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-helvetica'; saveFontChoice('font-helvetica'); this.parentNode.parentNode.classList.remove('active');">Libre Franklin</div>
-                        <div class="font-dropdown-option font-merriweather" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Merriweather Sans Light'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-merriweather'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-merriweather'; saveFontChoice('font-merriweather'); this.parentNode.parentNode.classList.remove('active');">Merriweather Sans Light</div>
-                        <div class="font-dropdown-option font-avenir" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Mulish'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-avenir'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-avenir'; saveFontChoice('font-avenir'); this.parentNode.parentNode.classList.remove('active');">Mulish</div>
-                        <div class="font-dropdown-option font-sanfrancisco" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Roboto'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-sanfrancisco'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-sanfrancisco'; saveFontChoice('font-sanfrancisco'); this.parentNode.parentNode.classList.remove('active');">Roboto</div>
-                        <div class="font-dropdown-option font-akzidenz" onclick="this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Work Sans'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-akzidenz'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-akzidenz'; saveFontChoice('font-akzidenz'); this.parentNode.parentNode.classList.remove('active');">Work Sans</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="advancedView" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
-                <label for="advancedView">separate user tags / ai tags</label>
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="verticalLayout" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
-                <label for="verticalLayout">stack tags vertically</label>
-            </div>
-        </div>
-    </div>
+    <!-- User interface section removed - controls moved to settings drawer -->
 
     <!-- Row 3: Main Content (All 3 Columns) -->
     <div class="left-control collapsible-col col-1" style="position: relative;">

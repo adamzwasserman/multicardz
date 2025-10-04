@@ -95,6 +95,26 @@ class CardRepository(BaseRepository):
         rowcount = self.execute_command(command, (title, card_id, workspace_id))
         return rowcount > 0
 
+    def update_content(self, card_id: str, workspace_id: str, content: str) -> bool:
+        """
+        Update card description/content. Trigger auto-updates modified timestamp.
+
+        Args:
+            card_id: Card UUID
+            workspace_id: Workspace UUID
+            content: New description/content
+
+        Returns:
+            True if updated, False if not found
+        """
+        command = """
+            UPDATE cards
+            SET description = ?
+            WHERE card_id = ? AND workspace_id = ? AND deleted IS NULL
+        """
+        rowcount = self.execute_command(command, (content, card_id, workspace_id))
+        return rowcount > 0
+
     def add_tag(self, card_id: str, workspace_id: str, tag_id: str) -> bool:
         """
         Add tag to card (updates comma-separated tags column). Trigger auto-updates modified.
