@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/v2/tags", tags=["tags"])
+router = APIRouter(prefix="/api/tags", tags=["tags"])
 
 
 class CreateTagRequest(BaseModel):
@@ -52,7 +52,8 @@ async def create_tag(request: CreateTagRequest) -> CreateTagResponse:
     try:
         db_path = Path("/var/data/tutorial_customer.db")
 
-        with sqlite3.connect(db_path) as conn:
+        from apps.shared.config.database import DATABASE_PATH
+        with sqlite3.connect(DATABASE_PATH) as conn:
             cursor = conn.cursor()
 
             # Check if tag already exists for this user/workspace
@@ -119,7 +120,8 @@ async def delete_tag(request: Request):
     try:
         db_path = Path("/var/data/tutorial_customer.db")
 
-        with sqlite3.connect(db_path) as conn:
+        from apps.shared.config.database import DATABASE_PATH
+        with sqlite3.connect(DATABASE_PATH) as conn:
             cursor = conn.cursor()
 
             # Soft delete - set deleted timestamp

@@ -231,7 +231,7 @@ Each card can have multiple card_contents entries of different types, enabling r
 | 4     | Week 7-8   | Turso [with SQLite backup]  WASM Integration | Browser-based local storage with multi-demo DBs       |
 | 5     | Week 9-10  | Hybrid Rendering & Communication             | Implement fixed drag-drop flow with content injection |
 | 6     | Week 11-12 | Dimensional Sets & Multiplicity              | N-dimensional grids with card multiplicity            |
-| 7     | Week 13    | Event Sourcing Integration                   | Kafka middleware with comprehensive logging           |
+| 7     | Week 13    | Event Sourcing Integration                   | Redpanda middleware with comprehensive logging           |
 | 8     | Week 14-15 | Testing & Validation                         | Comprehensive test suite with dimensional tests       |
 | 9     | Week 16    | Migration & Documentation                    | Customer data portability with updated patterns       |
 
@@ -4096,13 +4096,13 @@ async def exclusion_none_zones(
 ### Objectives
 
 - **[NEW]** Will implement comprehensive event sourcing (no audit logging currently exists)
-- **[NEW]** Will implement middleware-based event capture to Kafka
+- **[NEW]** Will implement middleware-based event capture to Redpanda
 - **[NEW]** Will create complete request/response/timing/user context logging
 - **[NEW]** Will establish immutable audit trail for all system operations
 
 ### Tasks
 
-#### Week 13: Kafka Event Sourcing Implementation
+#### Week 13: Redpanda Event Sourcing Implementation
 
 **Day 1-2: Event Schema and Middleware**
 
@@ -4133,7 +4133,7 @@ async def capture_system_event(
     user_context: dict
 ) -> None:
     """
-    Pure function for streaming events to Kafka.
+    Pure function for streaming events to Redpanda.
     Called from FastAPI middleware on every request.
     """
     event = SystemEvent(
@@ -4149,8 +4149,8 @@ async def capture_system_event(
         duration_ms=metadata["duration"]
     )
 
-    # Stream to Kafka topic
-    await kafka_producer.send("multicardz-events", event)
+    # Stream to Redpanda topic
+    await Redpanda_producer.send("multicardz-events", event)
 ```
 
 **Day 3-4: FastAPI Middleware Integration**
@@ -4208,7 +4208,7 @@ def classify_operation(path: str) -> str:
 # Event stream processing for real-time analytics
 async def process_event_stream():
     """Process events for real-time monitoring and alerting."""
-    async for event in kafka_consumer("multicardz-events"):
+    async for event in Redpanda_consumer("multicardz-events"):
         # Real-time dashboards
         await update_performance_metrics(event)
 
@@ -4223,7 +4223,7 @@ async def process_event_stream():
 
 ### Deliverables
 
-- [x] Comprehensive event sourcing system with Kafka integration
+- [x] Comprehensive event sourcing system with Redpanda integration
 - [x] FastAPI middleware capturing all operations automatically
 - [x] Event classification and real-time processing
 - [x] Immutable audit trail with complete request/response logging
@@ -4232,7 +4232,7 @@ async def process_event_stream():
 ### Success Criteria
 
 - Every API operation captured as immutable event
-- Kafka streaming handles high-volume event processing
+- Redpanda streaming handles high-volume event processing
 - Real-time analytics and alerting functional
 - Zero impact on API performance (events streamed asynchronously)
 - Complete audit trail available for compliance and debugging
@@ -4539,7 +4539,7 @@ async def import_workspace_data(
 
 ### Event Sourcing Integration
 - **Comprehensive Logging**: Middleware will capture all request/response/timing/context
-- **Kafka Streaming**: Will add real-time event processing for analytics and monitoring
+- **Redpanda Streaming**: Will add real-time event processing for analytics and monitoring
 - **Immutable Audit**: Will maintain complete event history for compliance and debugging
 ```
 
@@ -4604,7 +4604,7 @@ def deployment_checklist():
 | 7-8   | SQLite WASM Integration          | Multi-demo DBs, browser storage                        | <3s initialization, <100ms injection           |
 | 9-10  | Hybrid Rendering & Communication | Implement fixed drag-drop flow, content injection      | <200ms end-to-end, proper separation           |
 | 11-12 | Dimensional Sets & Multiplicity  | N-dimensional grids, card multiplicity                 | Unlimited dimensions, <16ms performance        |
-| 13    | Event Sourcing Integration       | Kafka middleware, comprehensive logging                | Complete audit trail, zero performance impact  |
+| 13    | Event Sourcing Integration       | Redpanda middleware, comprehensive logging                | Complete audit trail, zero performance impact  |
 | 14-15 | Testing & Validation             | Architectural compliance, dimensional tests            | 100% coverage, all patterns validated          |
 | 16    | Migration & Documentation        | Updated patterns, portability tools                    | Zero-downtime transitions, complete guides     |
 

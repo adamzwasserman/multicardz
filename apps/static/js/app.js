@@ -73,7 +73,7 @@ function toggleSection(section) {
 // Switch lesson
 async function switchLesson(lessonValue) {
   try {
-    const response = await fetch('/api/v2/lessons/switch', {
+    const response = await fetch('/api/lessons/switch', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ lessonId: lessonValue })
@@ -122,36 +122,8 @@ async function createNewCard() {
   const tagNames = allTags.map(t => t.getAttribute('data-tag')).filter(Boolean);
   const cardId = crypto.randomUUID();
 
-  const cardContainer = document.querySelector('.card-container');
-  const cardElement = document.createElement('div');
-  cardElement.className = 'card-item';
-  cardElement.setAttribute('data-card-id', cardId);
-
-  cardElement.innerHTML = `
-    <div class="card-content">
-      <button class="card-delete" title="Delete card">×</button>
-      <div class="card-header">
-        <h4 class="card-title" contenteditable="true" style="outline: 2px solid #3b82f6;"></h4>
-      </div>
-      <div class="card-footer">
-        <div class="card-tags-section">
-          <div class="card-tags-header">
-            <span class="card-tags-label">tags (${tagNames.length})</span>
-          </div>
-          <div class="card-tags" style="display: block;">
-            ${tagNames.map((name, i) =>
-              `<span class="card-tag" data-tag="${name}" data-tag-id="${tagIds[i]}">${name} <span class="tag-remove">×</span></span>`
-            ).join('')}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  cardContainer.appendChild(cardElement);
-
   try {
-    const response = await fetch('/api/v2/cards/create', {
+    const response = await fetch('/api/cards/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'Untitled', tag_ids: tagIds })
@@ -161,77 +133,32 @@ async function createNewCard() {
       const error = await response.json();
       console.error('Failed to create card:', error);
       alert('Failed to create card: ' + (error.message || 'Unknown error'));
-      cardElement.remove();
       return;
     }
 
-    // Update tag counts for tags in zones
-    const tagsInPlayElement = document.getElementById('tagsInPlay');
-    if (tagsInPlayElement) {
-      try {
-        const tagsInPlay = JSON.parse(tagsInPlayElement.value);
-        const tagsToUpdate = new Set([
-          ...(tagsInPlay.union || []),
-          ...(tagsInPlay.intersection || [])
-        ]);
+    const result = await response.json();
+    const createdCardId = result.card_id || cardId;
 
-        // Tag counts will be updated automatically via polling service
-      } catch (e) {
-        console.error('Failed to update tag counts:', e);
-      }
+    // Trigger re-render to update dimensional grid with new card
+    if (window.dragDropSystem) {
+      await window.dragDropSystem.updateStateAndRender();
     }
+
+    // Focus on the newly created card's title
+    setTimeout(() => {
+      const newCard = document.querySelector(`[data-card-id="${createdCardId}"]`);
+      if (newCard) {
+        const titleElement = newCard.querySelector('.card-title');
+        if (titleElement) {
+          titleElement.focus();
+        }
+      }
+    }, 100);
   } catch (error) {
     console.error('Failed to create card:', error);
     alert('Failed to create card');
-    cardElement.remove();
     return;
   }
-
-  // Setup title editing
-  const titleElement = cardElement.querySelector('.card-title');
-  titleElement.focus();
-
-  let titleSaved = false;
-  const saveTitle = async () => {
-    if (titleSaved) return;
-
-    const name = titleElement.textContent.trim();
-    if (!name) {
-      titleElement.textContent = 'Untitled';
-      return;
-    }
-
-    titleSaved = true;
-    titleElement.setAttribute('contenteditable', 'false');
-    titleElement.style.outline = 'none';
-
-    try {
-      const response = await fetch('/api/v2/cards/update-title', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ card_id: cardId, title: name })
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('Failed to update title:', error);
-        titleSaved = false;
-      }
-    } catch (error) {
-      console.error('Failed to update title:', error);
-      titleSaved = false;
-    }
-  };
-
-  titleElement.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      saveTitle();
-      titleElement.blur();
-    }
-  });
-
-  titleElement.addEventListener('blur', saveTitle);
 }
 
 // Make card title editable (legacy function - keeping for compatibility)
@@ -261,7 +188,7 @@ function makeCardTitleEditable(cardElement) {
     if (newTitle && newTitle !== currentTitle) {
       const cardId = cardElement.getAttribute('data-card-id');
       try {
-        const response = await fetch('/api/v2/cards/update-title', {
+        const response = await fetch('/api/cards/update-title', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ card_id: cardId, title: newTitle })
@@ -301,24 +228,8 @@ function initializeApp() {
     });
   });
 
-  // Setup card title editing
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('.card-title') && !e.target.closest('input')) {
-      const card = e.target.closest('.card-item');
-      if (card) makeCardTitleEditable(card);
-    }
-  });
-
-  // Keyboard shortcut for title editing
-  document.addEventListener('keypress', (e) => {
-    if (e.key === 't' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-      const hoveredCard = document.elementFromPoint(e.clientX || 0, e.clientY || 0)?.closest('.card-item');
-      if (hoveredCard) {
-        e.preventDefault();
-        makeCardTitleEditable(hoveredCard);
-      }
-    }
-  });
+  // Card titles are now contenteditable - no need for click handler
+  // The onblur="updateCardTitle(this)" in the template handles saving
 
   // Card tag drop handling
   window.addEventListener('cardTagDrop', async (e) => {
@@ -329,7 +240,7 @@ function initializeApp() {
     }
 
     try {
-      const response = await fetch('/api/v2/cards/add-tag', {
+      const response = await fetch('/api/cards/add-tag', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ card_id: cardId, tag_id: tagId })

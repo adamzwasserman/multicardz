@@ -922,7 +922,7 @@ class SpatialDragDrop {
       }
 
       // Fetch updated hint
-      const response = await fetch(`/api/v2/lessons/hint?${params}`);
+      const response = await fetch(`/api/lessons/hint?${params}`);
       if (response.ok) {
         const hintHtml = await response.text();
         const instructionalText = document.getElementById('instructionalText');
@@ -988,7 +988,7 @@ class SpatialDragDrop {
         headers['X-Workspace-Id'] = workspaceId;
       }
 
-      const response = await fetch('/api/v2/render/cards', {
+      const response = await fetch('/api/render/cards', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ tagsInPlay })
@@ -1158,7 +1158,7 @@ class SpatialDragDrop {
 
   async createTag(tagName, cloudType = 'user') {
     try {
-      const response = await fetch('/api/v2/tags/create', {
+      const response = await fetch('/api/tags/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: tagName })
@@ -1187,7 +1187,7 @@ class SpatialDragDrop {
 
   async removeTagFromCard(cardId, tagId, removeButton) {
     try {
-      const response = await fetch('/api/v2/cards/remove-tag', {
+      const response = await fetch('/api/cards/remove-tag', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ card_id: cardId, tag_id: tagId })
@@ -1230,7 +1230,7 @@ class SpatialDragDrop {
     try {
       const cardElement = deleteButton.closest('.card-item');
 
-      const response = await fetch('/api/v2/cards/delete', {
+      const response = await fetch('/api/cards/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ card_id: cardId })
@@ -1250,7 +1250,7 @@ class SpatialDragDrop {
     if (!confirm('Delete this tag? It will be removed from all cards.')) return;
 
     try {
-      const response = await fetch('/api/v2/tags/delete', {
+      const response = await fetch('/api/tags/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tag_id: tagId })
@@ -1271,7 +1271,7 @@ class SpatialDragDrop {
 
     const pollCounts = async () => {
       try {
-        const response = await fetch('/api/v2/tags/counts');
+        const response = await fetch('/api/tags/counts');
         if (!response.ok) return;
 
         const data = await response.json();

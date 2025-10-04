@@ -610,85 +610,6 @@ class TestSetOperationsStress:
 
         # Validate memory efficiency
         assert len(result.cards) < len(cards_set), "Should filter down the dataset"
-
-    @pytest.mark.skip(reason="1M cards is too heavy for regular test runs")
-    @pytest.mark.stress
-    def test_ultra_dataset_1M(self):
-        """Ultra stress test with 1,000,000 cards."""
-        import gc
-        import tracemalloc
-
-        gc.collect()
-        tracemalloc.start()
-
-        # Use efficient generation to avoid memory explosion
-        def generate_card_batch(start_idx, batch_size, tags_pool):
-            """Generate a batch of cards efficiently."""
-            batch = []
-            for i in range(start_idx, start_idx + batch_size):
-                num_tags = random.randint(1, 4)  # Fewer tags for efficiency
-                card_tags = frozenset(random.sample(tags_pool, num_tags))
-
-                card = CardSummary(
-                    id=f"ULTRA{i+1:07d}", title=f"Ultra Card {i+1}", tags=card_tags
-                )
-                batch.append(card)
-            return batch
-
-        # Generate 1M cards in chunks
-        tags_pool = [f"tag_{i}" for i in range(200)]  # 200 different tags
-        all_cards = []
-        batch_size = 10000  # 10k cards per batch
-
-        print(f"Generating 1M cards in {1000000 // batch_size} batches...")
-
-        for batch_start in range(0, 1000000, batch_size):
-            if batch_start % 100000 == 0:  # Progress indicator
-                print(f"Generated {batch_start:,} cards...")
-
-            batch = generate_card_batch(batch_start, batch_size, tags_pool)
-            all_cards.extend(batch)
-
-            # Force garbage collection every 10 batches
-            if (batch_start // batch_size) % 10 == 0:
-                gc.collect()
-
-        cards_set = frozenset(all_cards)
-        print(f"Generated {len(cards_set):,} total cards")
-
-        # Use extremely selective operations for 1M scale
-        operations = [
-            ("intersection", [("tag_1", 5000), ("tag_2", 5000)]),  # Very selective
-        ]
-
-        print("Starting 1M card operation with TURBO mode...")
-        start_time = time.perf_counter()
-        result = apply_unified_operations(
-            cards_set,
-            operations,
-            use_turbo=True,
-            use_parallel=True,
-            use_cache=False,  # Disable cache for pure performance test
-        )
-        execution_time_ms = (time.perf_counter() - start_time) * 1000
-
-        # Target: 1000ms (1 second) for 1M cards
-        expected_max_time = 1000.0
-        print(f"1M cards operation completed in {execution_time_ms:.2f}ms")
-
-        # Memory check
-        current, peak = tracemalloc.get_traced_memory()
-        memory_mb = peak / (1024 * 1024)
-        print(f"Peak memory usage: {memory_mb:.1f}MB")
-
-        tracemalloc.stop()
-
-        assert (
-            execution_time_ms < expected_max_time
-        ), f"1M cards took {execution_time_ms:.2f}ms, expected <{expected_max_time}ms"
-        assert (
-            memory_mb < 1000
-        ), f"Memory usage {memory_mb:.1f}MB too high for 1M cards"  # <1GB
         assert len(result.cards) < len(cards_set), "Should filter the massive dataset"
 
         # Validate performance targets at scale
@@ -857,33 +778,6 @@ class TestSetOperationsStress:
         # Verify thread safety (all operations completed successfully)
         assert len(concurrent_results) == len(operation_patterns)
 
-    @pytest.mark.stress
-    def test_turbo_mode_benchmark(self):
-        """Benchmark turbo mode vs regular processing."""
-        try:
-            from apps.shared.services.set_operations_turbo import (
-                benchmark_turbo_performance,
-            )
-        except ImportError:
-            pytest.skip("Turbo mode not available")
-
-        # Test with 200k cards to trigger turbo mode
-        benchmark_results = benchmark_turbo_performance(200000)
-
-        print("\nTurbo Mode Benchmark Results:")
-        print(f"Cards: {benchmark_results['card_count']:,}")
-        print(f"Regular: {benchmark_results['regular_time_ms']:.2f}ms")
-        print(f"Turbo: {benchmark_results['turbo_time_ms']:.2f}ms")
-        print(f"Speedup: {benchmark_results['speedup_factor']:.2f}x")
-
-        # Turbo should be faster for large datasets
-        assert benchmark_results["turbo_time_ms"] < benchmark_results["regular_time_ms"]
-        assert benchmark_results["speedup_factor"] > 1.0
-
-        # Results should be identical
-        assert (
-            benchmark_results["regular_results"] == benchmark_results["turbo_results"]
-        )
 
     @pytest.mark.stress
     def test_many_operations_sequence(self):

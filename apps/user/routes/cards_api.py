@@ -34,13 +34,16 @@ templates_env = Environment(
 )
 
 # Create router
-router = APIRouter(prefix="/api/v2", tags=["cards"])
+router = APIRouter(prefix="/api", tags=["cards"])
 
 logger = logging.getLogger(__name__)
 
-# Create default database configuration
+# Import single source of truth for database path
+from apps.shared.config.database import DATABASE_PATH
+
+# Create default database configuration using single source of truth
 DEFAULT_DB_CONFIG = create_database_config(
-    db_path=Path("/var/data/tutorial_customer.db"),
+    db_path=DATABASE_PATH,
     enable_foreign_keys=True,
     timeout=30.0,
     check_same_thread=False,
@@ -150,6 +153,8 @@ async def render_cards(request: Request):
             for row in cursor.fetchall():
                 card_id, name, tags_inverted_index, created, modified = row
 
+                logger.info(f"DB READ: card_id={card_id}, name={name}")
+
                 # Parse tags from inverted index and lookup tag names
                 tag_names = []
                 if tags_inverted_index:
@@ -170,6 +175,7 @@ async def render_cards(request: Request):
                     'modified_at': modified,
                     'has_attachments': False
                 })()
+                logger.info(f"CARD OBJECT: id={card.id}, title={card.title}, tags={card.tags}")
                 lesson_cards.append(card)
 
             all_cards = lesson_cards
@@ -356,17 +362,42 @@ def apply_boost_ranking(cards, boost_tags):
 
 def render_dimensional_grid(cards, row_tags=None, column_tags=None, **kwargs):
     """Render cards in a dimensional grid layout."""
-    # This is a placeholder - implement dimensional rendering as needed
+    logger.info(f"Rendering dimensional grid: {len(cards)} cards, rows={row_tags}, cols={column_tags}")
+
+    # Convert Card objects to template-friendly dicts
+    template_cards = []
+    for card in cards:
+        # Convert frozenset tags to list for template
+        tags = list(card.tags) if hasattr(card, 'tags') else []
+        card_id = getattr(card, 'id', '')
+        card_title = getattr(card, 'title', 'Untitled')
+
+        logger.info(f"Card {card_id}: title={card_title}, tags={tags}")
+
+        template_card = {
+            'id': card_id,
+            'title': card_title,
+            'tags': tags,
+            'created_at': getattr(card, 'created_at', ''),
+            'modified_at': getattr(card, 'modified_at', ''),
+        }
+        template_cards.append(template_card)
+
+    logger.info(f"Converted {len(template_cards)} cards to template format")
+
     try:
         template = templates_env.get_template('components/dimensional_grid.html')
-        return template.render(
-            cards=cards,
+        html = template.render(
+            cards=template_cards,
             row_tags=row_tags or [],
             column_tags=column_tags or [],
             **kwargs
         )
-    except:
-        # Fallback to simple list if dimensional template not found
+        logger.info(f"Successfully rendered dimensional grid HTML ({len(html)} chars)")
+        return html
+    except Exception as e:
+        logger.error(f"Error rendering dimensional grid: {e}", exc_info=True)
+        # Fallback to simple list if template rendering fails
         return render_simple_card_list(cards)
 
 

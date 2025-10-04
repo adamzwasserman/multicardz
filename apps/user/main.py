@@ -29,6 +29,10 @@ def create_app():
         version="1.0.0"
     )
 
+    # Add request interceptor middleware (intercepts ALL routes before execution)
+    from apps.shared.middleware.request_interceptor import RequestInterceptorMiddleware
+    app.add_middleware(RequestInterceptorMiddleware)
+
     # Add GZip compression middleware (79KB savings!)
     app.add_middleware(GZipMiddleware, minimum_size=1000)
 
@@ -79,10 +83,10 @@ def create_app():
 
             # Get tags from tutorial database
             import sqlite3
+            from apps.shared.config.database import DATABASE_PATH
 
-            db_path = "/var/data/tutorial_customer.db"
             try:
-                with sqlite3.connect(db_path) as conn:
+                with sqlite3.connect(DATABASE_PATH) as conn:
                     cursor = conn.cursor()
                     # Use new zero-trust schema with UUID and card_count field
                     cursor.execute("""

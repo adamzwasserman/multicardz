@@ -100,7 +100,7 @@
                             <label for="navLessonSelector" class="learning-mode-label">Learning Mode:</label>
                             <input type="hidden" id="completedLessons" name="completed" data-completed-lessons value="[]">
                             <select id="navLessonSelector" class="nav-lesson-selector"
-                                    hx-get="/api/v2/lessons/options"
+                                    hx-get="/api/lessons/options"
                                     hx-trigger="load"
                                     hx-swap="innerHTML"
                                     hx-include="#completedLessons"
@@ -363,13 +363,16 @@
             const cardId = element.dataset.cardId;
             const newTitle = element.textContent.trim();
 
+            console.log('updateCardTitle called:', {cardId, newTitle});
+
             if (!newTitle) {
                 console.warn('Card title cannot be empty');
                 return;
             }
 
             try {
-                const response = await fetch('/api/v2/cards/update-title', {
+                console.log('Sending update request to /api/cards/update-title');
+                const response = await fetch('/api/cards/update-title', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -379,8 +382,13 @@
                     })
                 });
 
+                console.log('Response status:', response.status);
                 if (!response.ok) {
-                    console.error('Failed to update card title');
+                    console.error('Failed to update card title', await response.text());
+                } else {
+                    console.log('Card title updated successfully:', cardId, newTitle);
+                    // Update the element's text to ensure it displays correctly
+                    element.textContent = newTitle;
                 }
             } catch (error) {
                 console.error('Error updating card title:', error);
@@ -393,7 +401,7 @@
             const newContent = element.textContent.trim();
 
             try {
-                const response = await fetch('/api/v2/cards/update-content', {
+                const response = await fetch('/api/cards/update-content', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

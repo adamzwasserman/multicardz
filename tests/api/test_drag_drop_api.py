@@ -28,7 +28,7 @@ def test_basic_routes():
     print("✅ Main route working")
 
     # Test health check
-    response = client.get("/api/v2/health")
+    response = client.get("/api/health")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
@@ -64,7 +64,7 @@ def test_pydantic_validation():
         }
     }
 
-    response = client.post("/api/v2/render/cards", json=valid_request)
+    response = client.post("/api/render/cards", json=valid_request)
     assert response.status_code == 200
     print("✅ Valid request accepted")
 
@@ -76,13 +76,13 @@ def test_pydantic_validation():
         }
     }
 
-    response = client.post("/api/v2/render/cards", json=invalid_request)
+    response = client.post("/api/render/cards", json=invalid_request)
     # Should still work because controls has defaults
     assert response.status_code == 200
     print("✅ Request with defaults handled")
 
     # Completely invalid request
-    response = client.post("/api/v2/render/cards", json={"invalid": "data"})
+    response = client.post("/api/render/cards", json={"invalid": "data"})
     assert response.status_code in [400, 422]  # Validation error (400 or 422 both valid)
     print("✅ Invalid request rejected")
 
@@ -117,7 +117,7 @@ def test_different_zone_behaviors():
             }
         }
 
-        response = client.post("/api/v2/render/cards", json=request)
+        response = client.post("/api/render/cards", json=request)
         assert response.status_code == 200
         print(f"✅ {behavior} behavior handled")
 
@@ -137,7 +137,7 @@ def test_edge_cases():
         }
     }
 
-    response = client.post("/api/v2/render/cards", json=empty_request)
+    response = client.post("/api/render/cards", json=empty_request)
     assert response.status_code == 200
     print("✅ Empty zones handled")
 
@@ -156,7 +156,7 @@ def test_edge_cases():
         }
     }
 
-    response = client.post("/api/v2/render/cards", json=big_request)
+    response = client.post("/api/render/cards", json=big_request)
     assert response.status_code == 200
     print("✅ Many zones handled")
 
@@ -173,7 +173,7 @@ def test_edge_cases():
         }
     }
 
-    response = client.post("/api/v2/render/cards", json=long_request)
+    response = client.post("/api/render/cards", json=long_request)
     assert response.status_code == 200
     print("✅ Long tag names handled")
 
@@ -198,7 +198,7 @@ def test_malicious_input():
         }
     }
 
-    response = client.post("/api/v2/render/cards", json=malicious_request)
+    response = client.post("/api/render/cards", json=malicious_request)
     assert response.status_code == 200
     # The response should be HTML, but malicious script tags should be escaped
     # Check that the malicious script is escaped (contains &lt; instead of <)
@@ -221,7 +221,7 @@ def test_malicious_input():
             }
         }
 
-        response = client.post("/api/v2/render/cards", json=excessive_request)
+        response = client.post("/api/render/cards", json=excessive_request)
         # Should be rejected by validation
         assert response.status_code == 422
         print("✅ Excessive tags rejected")

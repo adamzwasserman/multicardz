@@ -2124,7 +2124,7 @@ Each task includes:
 ### Future Enhancements
 - WASM browser database
 - Privacy mode implementation
-- Event sourcing with Kafka
+- Event sourcing with Redpanda
 - Multi-dimensional filtering
 
 ---

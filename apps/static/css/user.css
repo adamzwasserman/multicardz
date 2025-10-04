@@ -3167,6 +3167,134 @@ body.font-berkeley-mono {
     }
 }
 
+/* ========================================
+   DIMENSIONAL GRID LAYOUT
+   ======================================== */
+
+.dimensional-grid-container {
+    width: 100%;
+    padding: 1rem;
+}
+
+.dimensional-grid {
+    display: grid;
+    gap: 1px;
+    background: var(--color-muji-border);
+    border: 1px solid var(--color-muji-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* 2D Grid Layout */
+.dimensional-grid.two-dimensional {
+    grid-template-columns: auto repeat(var(--col-count, 1), 1fr);
+}
+
+.grid-header {
+    display: contents;
+}
+
+.grid-corner {
+    background: var(--color-neutral-100);
+    border: 1px solid var(--color-muji-border);
+}
+
+.grid-col-header {
+    background: transparent;
+    padding: 0.25rem 0.5rem;
+    font-weight: 400;
+    font-size: 0.8rem;
+    text-align: center;
+    color: var(--color-text-secondary);
+    border: none;
+}
+
+.grid-col-header-other {
+    font-style: italic;
+    opacity: 0.6;
+}
+
+.grid-row {
+    display: contents;
+}
+
+.grid-row-header {
+    background: transparent;
+    padding: 0.75rem;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+    border: none;
+    display: flex;
+    align-items: center;
+}
+
+.grid-row-header-other {
+    font-style: italic;
+    opacity: 0.6;
+}
+
+.grid-cell {
+    background: var(--color-muji-bg);
+    padding: 1rem;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border: 1px solid var(--color-muji-border);
+}
+
+.empty-cell {
+    color: var(--color-text-tertiary);
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    min-height: 60px;
+    opacity: 0.5;
+}
+
+/* 1D Grid: Columns Only */
+.dimensional-grid.columns-only {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.dimensional-grid.columns-only .grid-header {
+    display: flex;
+    gap: 1px;
+}
+
+.dimensional-grid.columns-only .grid-row {
+    display: flex;
+    gap: 1px;
+}
+
+.dimensional-grid.columns-only .grid-col-header,
+.dimensional-grid.columns-only .grid-cell {
+    flex: 1;
+    min-width: 100px;
+}
+
+/* 1D Grid: Rows Only */
+.dimensional-grid.rows-only {
+    grid-template-columns: auto 1fr;
+}
+
+.dimensional-grid.rows-only .grid-row {
+    display: contents;
+}
+
+/* Empty State */
+.dimensional-grid-container .empty-state {
+    text-align: center;
+    color: var(--color-text-tertiary);
+    padding: 2rem;
+    font-style: italic;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .tag,

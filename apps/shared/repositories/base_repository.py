@@ -5,6 +5,7 @@ import sqlite3
 from pathlib import Path
 from typing import Optional, Any
 from contextlib import contextmanager
+from apps.shared.config.database import DATABASE_PATH
 
 
 class BaseRepository:
@@ -15,9 +16,9 @@ class BaseRepository:
         Initialize repository.
 
         Args:
-            db_path: Path to SQLite database. Defaults to /var/data/tutorial_customer.db
+            db_path: Path to SQLite database. Uses single source of truth from config.
         """
-        self.db_path = db_path or Path("/var/data/tutorial_customer.db")
+        self.db_path = db_path or DATABASE_PATH
 
     @contextmanager
     def get_connection(self):

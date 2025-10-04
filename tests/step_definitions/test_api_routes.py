@@ -59,7 +59,7 @@ def request_get_cards(context, test_client):
         mock_conn.return_value = mock_connection
 
         context['response'] = test_client.get(
-            "/api/v2/cards",
+            "/api/cards",
             headers=context['headers']
         )
 
@@ -121,7 +121,7 @@ def post_card_without_workspace(context, test_client):
         mock_create.return_value = "new-card-id"
 
         context['response'] = test_client.post(
-            "/api/v2/cards",
+            "/api/cards",
             json=card_data,
             headers=context['headers']
         )
@@ -184,7 +184,7 @@ def try_access_workspace_b(context, test_client):
         mock_conn.return_value = mock_connection
 
         context['response'] = test_client.get(
-            f"/api/v2/cards/{workspace_b_card_id}",
+            f"/api/cards/{workspace_b_card_id}",
             headers=context['headers']
         )
 

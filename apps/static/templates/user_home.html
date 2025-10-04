@@ -198,7 +198,7 @@
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
              ondragleave="this.classList.remove('zone-drag-over')"
              ondrop="if(event.dataTransfer.types.includes('text/zone')) { handleZoneDrop(event, this); }">
-            <!-- Drop zones are DRAGGABLE ONLY - NO drop handlers -->
+            <!-- Drop zones accept both tags and can be dragged to move -->
             <div class="drop-zone row-zone"
                  id="rows"
                  data-zone-type="row"
@@ -209,6 +209,7 @@
                     <span class="drag-grip">⋮⋮</span>
                 </div>
                 <span class="zone-label">rows</span>
+                <div class="tag-collection" id="row-tags-container"></div>
                 <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>
@@ -230,7 +231,7 @@
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
              ondragleave="this.classList.remove('zone-drag-over')"
              ondrop="if(event.dataTransfer.types.includes('text/zone')) { handleZoneDrop(event, this); }">
-            <!-- Drop zones are DRAGGABLE ONLY - NO drop handlers -->
+            <!-- Drop zones accept both tags and can be dragged to move -->
             <div class="drop-zone column-zone"
                  id="columns"
                  data-zone-type="column"
@@ -241,6 +242,7 @@
                     <span class="drag-grip">⋮⋮</span>
                 </div>
                 <span class="zone-label">columns</span>
+                <div class="tag-collection" id="column-tags-container"></div>
                 <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>

@@ -1,0 +1,346 @@
+<!-- Dimensional Grid Component -->
+<div class="dimensional-grid-container">
+    {% if column_tags and row_tags %}
+        <!-- 2D Grid: Both rows and columns -->
+        <div class="dimensional-grid two-dimensional">
+            <!-- Header row with column labels -->
+            <div class="grid-header">
+                <div class="grid-corner"></div>
+                {% for col_tag in column_tags %}
+                <div class="grid-col-header">{{ col_tag }}</div>
+                {% endfor %}
+                <div class="grid-col-header grid-col-header-other">other</div>
+            </div>
+
+            <!-- Data rows -->
+            {% for row_tag in row_tags %}
+            <div class="grid-row">
+                <div class="grid-row-header">{{ row_tag }}</div>
+                {% for col_tag in column_tags %}
+                <div class="grid-cell" data-row="{{ row_tag }}" data-col="{{ col_tag }}">
+                    {% set cell_cards = [] %}
+                    {% for card in cards %}
+                        {% if row_tag in card.tags and col_tag in card.tags %}
+                            {% set _ = cell_cards.append(card) %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if cell_cards %}
+                        {% for card in cell_cards %}
+                        <div class="card-item" data-card-id="{{ card.id }}">
+                            <div class="card-content">
+                                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                                <div class="card-header">
+                                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-tags-section">
+                                        <div class="card-tags-header">
+                                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                        </div>
+                                        <div class="card-tags">
+                                            {% for tag in card.tags %}
+                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-cell">∅</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <!-- Other column: cards with row tag but no column tag -->
+                <div class="grid-cell grid-cell-other" data-row="{{ row_tag }}" data-col="other">
+                    {% set other_cards = [] %}
+                    {% for card in cards %}
+                        {% if row_tag in card.tags %}
+                            {% set has_col_tag = false %}
+                            {% for col_tag in column_tags %}
+                                {% if col_tag in card.tags %}
+                                    {% set has_col_tag = true %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if not has_col_tag %}
+                                {% set _ = other_cards.append(card) %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if other_cards %}
+                        {% for card in other_cards %}
+                        <div class="card-item" data-card-id="{{ card.id }}">
+                            <div class="card-content">
+                                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                                <div class="card-header">
+                                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-tags-section">
+                                        <div class="card-tags-header">
+                                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                        </div>
+                                        <div class="card-tags">
+                                            {% for tag in card.tags %}
+                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-cell">∅</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Other row: cards with no row tag -->
+            <div class="grid-row">
+                <div class="grid-row-header grid-row-header-other">other</div>
+                {% for col_tag in column_tags %}
+                <div class="grid-cell grid-cell-other" data-row="other" data-col="{{ col_tag }}">
+                    {% set other_cards = [] %}
+                    {% for card in cards %}
+                        {% if col_tag in card.tags %}
+                            {% set has_row_tag = false %}
+                            {% for row_tag in row_tags %}
+                                {% if row_tag in card.tags %}
+                                    {% set has_row_tag = true %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if not has_row_tag %}
+                                {% set _ = other_cards.append(card) %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if other_cards %}
+                        {% for card in other_cards %}
+                        <div class="card-item" data-card-id="{{ card.id }}">
+                            <div class="card-content">
+                                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                                <div class="card-header">
+                                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-tags-section">
+                                        <div class="card-tags-header">
+                                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                        </div>
+                                        <div class="card-tags">
+                                            {% for tag in card.tags %}
+                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-cell">∅</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <!-- Other-other cell: cards with neither row nor column tags -->
+                <div class="grid-cell grid-cell-other" data-row="other" data-col="other">
+                    {% set other_other_cards = [] %}
+                    {% for card in cards %}
+                        {% set has_row_tag = false %}
+                        {% set has_col_tag = false %}
+                        {% for row_tag in row_tags %}
+                            {% if row_tag in card.tags %}
+                                {% set has_row_tag = true %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for col_tag in column_tags %}
+                            {% if col_tag in card.tags %}
+                                {% set has_col_tag = true %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if not has_row_tag and not has_col_tag %}
+                            {% set _ = other_other_cards.append(card) %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if other_other_cards %}
+                        {% for card in other_other_cards %}
+                        <div class="card-item" data-card-id="{{ card.id }}">
+                            <div class="card-content">
+                                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                                <div class="card-header">
+                                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-tags-section">
+                                        <div class="card-tags-header">
+                                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                        </div>
+                                        <div class="card-tags">
+                                            {% for tag in card.tags %}
+                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-cell">∅</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    {% elif column_tags %}
+        <!-- 1D Grid: Columns only (horizontal) -->
+        <div class="dimensional-grid columns-only">
+            <div class="grid-header">
+                {% for col_tag in column_tags %}
+                <div class="grid-col-header">{{ col_tag }}</div>
+                {% endfor %}
+                <div class="grid-col-header grid-col-header-other">other</div>
+            </div>
+            <div class="grid-row">
+                {% for col_tag in column_tags %}
+                <div class="grid-cell" data-col="{{ col_tag }}">
+                    {% set col_cards = [] %}
+                    {% for card in cards %}
+                        {% if col_tag in card.tags %}
+                            {% set _ = col_cards.append(card) %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if col_cards %}
+                        {% for card in col_cards %}
+                        <div class="card-item" data-card-id="{{ card.id }}">
+                            <div class="card-content">
+                                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                                <div class="card-header">
+                                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-tags-section">
+                                        <div class="card-tags-header">
+                                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                        </div>
+                                        <div class="card-tags">
+                                            {% for tag in card.tags %}
+                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-cell">∅</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <!-- Other column: cards not in any column tag -->
+                <div class="grid-cell grid-cell-other" data-col="other">
+                    {% set other_cards = [] %}
+                    {% for card in cards %}
+                        {% set has_col_tag = false %}
+                        {% for col_tag in column_tags %}
+                            {% if col_tag in card.tags %}
+                                {% set has_col_tag = true %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if not has_col_tag %}
+                            {% set _ = other_cards.append(card) %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if other_cards %}
+                        {% for card in other_cards %}
+                        <div class="card-item" data-card-id="{{ card.id }}">
+                            <div class="card-content">
+                                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                                <div class="card-header">
+                                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-tags-section">
+                                        <div class="card-tags-header">
+                                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                        </div>
+                                        <div class="card-tags">
+                                            {% for tag in card.tags %}
+                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-cell">∅</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    {% elif row_tags %}
+        <!-- 1D Grid: Rows only (vertical) -->
+        <div class="dimensional-grid rows-only">
+            {% for row_tag in row_tags %}
+            <div class="grid-row">
+                <div class="grid-row-header">{{ row_tag }}</div>
+                <div class="grid-cell" data-row="{{ row_tag }}">
+                    {% set row_cards = [] %}
+                    {% for card in cards %}
+                        {% if row_tag in card.tags %}
+                            {% set _ = row_cards.append(card) %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if row_cards %}
+                        {% for card in row_cards %}
+                        <div class="card-item" data-card-id="{{ card.id }}">
+                            <div class="card-content">
+                                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                                <div class="card-header">
+                                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-tags-section">
+                                        <div class="card-tags-header">
+                                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                        </div>
+                                        <div class="card-tags">
+                                            {% for tag in card.tags %}
+                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-cell">∅</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <!-- No dimensional tags -->
+        <p class="empty-state">Add tags to row or column zones to create a dimensional grid</p>
+    {% endif %}
+</div>
