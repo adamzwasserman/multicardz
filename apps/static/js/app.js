@@ -293,9 +293,76 @@ function initializeApp() {
   }
 }
 
+// Initialize column resizing
+function initializeColumnResize() {
+  const grid = document.querySelector('.spatial-grid');
+  const leftControl = document.querySelector('.left-control');
+  const rightControl = document.querySelector('.right-control');
+
+  if (!grid || !leftControl || !rightControl) return;
+
+  let isResizing = null; // 'left' or 'right'
+  let startX = 0;
+  let startLeftWidth = 0;
+  let startRightWidth = 0;
+
+  // Left control resize (right edge)
+  leftControl.addEventListener('mousedown', (e) => {
+    const rect = leftControl.getBoundingClientRect();
+    if (e.clientX >= rect.right - 8) {
+      isResizing = 'left';
+      startX = e.clientX;
+      startLeftWidth = rect.width;
+      document.body.style.cursor = 'ew-resize';
+      e.preventDefault();
+    }
+  });
+
+  // Right control resize (left edge)
+  rightControl.addEventListener('mousedown', (e) => {
+    const rect = rightControl.getBoundingClientRect();
+    if (e.clientX <= rect.left + 8) {
+      isResizing = 'right';
+      startX = e.clientX;
+      startRightWidth = rect.width;
+      document.body.style.cursor = 'ew-resize';
+      e.preventDefault();
+    }
+  });
+
+  // Mouse move - resize
+  document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+
+    if (isResizing === 'left') {
+      const diff = e.clientX - startX;
+      const newWidth = Math.max(100, Math.min(600, startLeftWidth + diff));
+      const currentRight = grid.style.gridTemplateColumns.match(/\s(\d+)px$/)?.[1] || '250';
+      grid.style.gridTemplateColumns = `${newWidth}px 1fr ${currentRight}px`;
+    } else if (isResizing === 'right') {
+      const diff = startX - e.clientX; // Reversed for right edge
+      const newWidth = Math.max(100, Math.min(600, startRightWidth + diff));
+      const currentLeft = grid.style.gridTemplateColumns.match(/^(\d+)px/)?.[1] || '250';
+      grid.style.gridTemplateColumns = `${currentLeft}px 1fr ${newWidth}px`;
+    }
+  });
+
+  // Mouse up - stop resizing
+  document.addEventListener('mouseup', () => {
+    if (isResizing) {
+      isResizing = null;
+      document.body.style.cursor = '';
+    }
+  });
+}
+
 // Run when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+    initializeColumnResize();
+  });
 } else {
   initializeApp();
+  initializeColumnResize();
 }

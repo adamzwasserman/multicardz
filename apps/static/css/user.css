@@ -684,7 +684,7 @@ body {
 .spatial-grid {
     display: grid;
     grid-template-rows: auto auto 1fr auto;
-    grid-template-columns: 0.67fr 2fr 0.67fr;
+    grid-template-columns: 250px 1fr 250px;
     grid-template-areas:
         ". tag-management ."
         "universal-control top-control ui-control"
@@ -702,9 +702,58 @@ body {
 .universal-control { grid-area: universal-control; }
 .top-control { grid-area: top-control; }
 .ui-control { grid-area: ui-control; }
-.left-control { grid-area: left-control; }
-.card-display { grid-area: card-display; }
-.right-control { grid-area: right-control; }
+.left-control {
+    grid-area: left-control;
+    position: relative;
+    min-width: 100px;
+    max-width: 600px;
+}
+
+.left-control::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: ew-resize;
+    background: transparent;
+    z-index: 10;
+}
+
+.left-control::after:hover {
+    background: var(--color-primary);
+    opacity: 0.3;
+}
+
+.card-display {
+    grid-area: card-display;
+    min-width: 0;
+}
+
+.right-control {
+    grid-area: right-control;
+    position: relative;
+    min-width: 100px;
+    max-width: 600px;
+}
+
+.right-control::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: ew-resize;
+    background: transparent;
+    z-index: 10;
+}
+
+.right-control::before:hover {
+    background: var(--color-primary);
+    opacity: 0.3;
+}
 .bottom-control { grid-area: bottom-control; }
 
 /* Row 1: Tag Management Area (Middle Column Only) */
