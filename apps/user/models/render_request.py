@@ -67,6 +67,7 @@ class RenderControls(BaseModel):
     startWithAllCards: bool = False
     startWithCardsExpanded: bool = True
     showColors: bool = True
+    databasePath: str | None = None  # Dynamic database path for multi-user environment
 
     # Add other controls as they're discovered dynamically
     class Config:

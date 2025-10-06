@@ -193,6 +193,15 @@
                         <label for="showColors">Show colors on tags/cards</label>
                     </div>
                 </div>
+                <div class="settings-item">
+                    <label for="colorPalette">Color palette</label>
+                    <select id="colorPalette" data-affects-rendering="true" class="settings-select" onchange="if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
+                        <option value="muji" selected>Muji (earth tones)</option>
+                        <option value="vibrant">Vibrant</option>
+                        <option value="pastel">Pastel</option>
+                        <option value="professional">Professional</option>
+                    </select>
+                </div>
             </div>
             <div class="settings-section">
                 <h4 class="settings-section-title">Layout</h4>

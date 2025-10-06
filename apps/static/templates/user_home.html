@@ -31,8 +31,9 @@
                           data-type="tag"
                           draggable="true"
                           id="tag-{{ tag.name }}"
+                          style="--tag-index: {{ loop.index0 }}"
 >
-                        {{ tag.name }} ({{ tag.count }})
+                        <span class="tag-color-dot"></span>{{ tag.name }} ({{ tag.count }})
                         <button class="tag-delete" onclick="deleteTag('{{ tag.id }}', this)" title="Delete tag">×</button>
                     </span>
                     {% endfor %}

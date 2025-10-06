@@ -628,7 +628,8 @@ class SpatialDragDrop {
       return {
         startWithAllCards: false,
         startWithCardsExpanded: true,
-        showColors: true
+        showColors: true,
+        colorPalette: 'muji'
       };
     }
 
@@ -644,6 +645,18 @@ class SpatialDragDrop {
         controls[control.name] = control.value || '';
       }
     });
+
+    // Apply show-colors class to body when showColors is enabled
+    if (controls.showColors) {
+      document.body.classList.add('show-colors');
+    } else {
+      document.body.classList.remove('show-colors');
+    }
+
+    // Apply color palette data attribute to body
+    if (controls.colorPalette) {
+      document.body.setAttribute('data-palette', controls.colorPalette);
+    }
 
     return controls;
   }
@@ -1168,6 +1181,10 @@ class SpatialDragDrop {
         const data = await response.json();
         const cloud = document.querySelector(`.cloud-${cloudType} .tags-wrapper`);
         if (cloud) {
+          // Count existing tags to determine color index
+          const existingTags = cloud.querySelectorAll('.tag');
+          const tagIndex = existingTags.length;
+
           const tagElement = document.createElement('span');
           tagElement.className = `tag tag-${cloudType}`;
           tagElement.setAttribute('data-tag', tagName);
@@ -1175,7 +1192,8 @@ class SpatialDragDrop {
           tagElement.setAttribute('data-type', 'tag');
           tagElement.setAttribute('draggable', 'true');
           tagElement.id = `tag-${tagName}`;
-          tagElement.innerHTML = `${tagName} (0) <button class="tag-delete" data-tag-id="${data.tag_id}" title="Delete tag">×</button>`;
+          tagElement.style.setProperty('--tag-index', tagIndex);
+          tagElement.innerHTML = `<span class="tag-color-dot"></span>${tagName} (0) <button class="tag-delete" data-tag-id="${data.tag_id}" title="Delete tag">×</button>`;
           cloud.appendChild(tagElement);
         }
         return data;
@@ -1267,35 +1285,9 @@ class SpatialDragDrop {
   }
 
   startTagCountPolling() {
-    let cachedCounts = {};
-
-    const pollCounts = async () => {
-      try {
-        const response = await fetch('/api/tags/counts');
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const counts = data.counts || {};
-
-        // Emit events for changed counts
-        Object.keys(counts).forEach(tagId => {
-          const newCount = counts[tagId];
-          const oldCount = cachedCounts[tagId];
-
-          if (oldCount !== newCount) {
-            window.tagCountEmitter.emit('tag-count-changed', { tagId, count: newCount });
-          }
-        });
-
-        cachedCounts = counts;
-      } catch (error) {
-        console.error('Failed to poll tag counts:', error);
-      }
-    };
-
-    // Poll every 2 seconds
-    pollCounts(); // Initial poll
-    setInterval(pollCounts, 2000);
+    // Tag counts are managed locally via DOM updates
+    // Backend changes will be handled via WebSocket/SSE when implemented
+    // No promiscuous polling for multi-user scalability
   }
 
   setupCardTagEventDelegation() {

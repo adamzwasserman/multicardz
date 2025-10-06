@@ -3194,6 +3194,10 @@ body.font-berkeley-mono {
     display: contents;
 }
 
+.grid-row {
+    display: contents;
+}
+
 .grid-corner {
     background: var(--color-neutral-100);
     border: 1px solid var(--color-muji-border);
@@ -3212,10 +3216,6 @@ body.font-berkeley-mono {
 .grid-col-header-other {
     font-style: italic;
     opacity: 0.6;
-}
-
-.grid-row {
-    display: contents;
 }
 
 .grid-row-header {
@@ -3491,6 +3491,12 @@ body.earth-tones .floating-add-card {
     padding: 0 2px;
     opacity: 0.7;
     transition: opacity 0.2s ease;
+    display: none; /* Hidden by default */
+}
+
+/* Only show delete button in tag clouds */
+.cloud .tag-delete {
+    display: inline-block;
 }
 
 .tag-delete:hover {
@@ -3708,3 +3714,130 @@ body.earth-tones .floating-add-card {
     cursor: pointer;
     font-weight: 400;
 }
+
+/* ========================================
+   TAG COLOR SYSTEM
+   ======================================== */
+
+/* Tag Color Dot - 8px circle before tag text */
+.tag-color-dot {
+    display: none; /* Hidden by default - only show in zones when colors enabled */
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+/* Show color dots on tags in zones (tagsInPlay) AND on card tags when showColors is enabled */
+.show-colors .drop-zone .tag .tag-color-dot,
+.show-colors .union-zone .tag .tag-color-dot,
+.show-colors .intersection-zone .tag .tag-color-dot,
+.show-colors .exclusion-zone .tag .tag-color-dot,
+.show-colors .column-zone .tag .tag-color-dot,
+.show-colors .row-zone .tag .tag-color-dot,
+.show-colors .card-tag .tag-color-dot {
+    display: inline-block;
+}
+
+/* Default Muji Palette (16 colors) - Earth tones with strong hue contrast */
+:root {
+    --tag-color-0: light-dark(#8B5A2B, #B5774B);   /* Rich brown */
+    --tag-color-1: light-dark(#3B6B4F, #5B8B6F);   /* Forest green */
+    --tag-color-2: light-dark(#A0522D, #C0724D);   /* Sienna */
+    --tag-color-3: light-dark(#4682B4, #66A2D4);   /* Steel blue */
+    --tag-color-4: light-dark(#8B7355, #AB936F);   /* Warm tan */
+    --tag-color-5: light-dark(#2F4F4F, #4F6F6F);   /* Dark slate */
+    --tag-color-6: light-dark(#BC8F8F, #DCAFAF);   /* Rosy brown */
+    --tag-color-7: light-dark(#556B2F, #758B4F);   /* Dark olive */
+    --tag-color-8: light-dark(#A0826D, #C0A28D);   /* Light terracotta */
+    --tag-color-9: light-dark(#5F9EA0, #7FBEC0);   /* Cadet blue */
+    --tag-color-10: light-dark(#8B7765, #AB9785);  /* Sandy brown */
+    --tag-color-11: light-dark(#6B8E23, #8BAE43);  /* Olive drab */
+    --tag-color-12: light-dark(#A0715E, #C0917E);  /* Clay */
+    --tag-color-13: light-dark(#468284, #66A2A4);  /* Teal */
+    --tag-color-14: light-dark(#8B6F5E, #AB8F7E);  /* Warm gray */
+    --tag-color-15: light-dark(#4A6B7B, #6A8B9B);  /* Muted blue */
+}
+
+/* Vibrant Palette (16 colors) - Bold saturated with maximum hue separation */
+body[data-palette="vibrant"],
+[data-palette="vibrant"] {
+    --tag-color-0: light-dark(#E63946, #FF5A66);   /* Red (0°) */
+    --tag-color-1: light-dark(#118AB2, #31AACE);   /* Cyan (180°) */
+    --tag-color-2: light-dark(#8AC926, #AAE946);   /* Lime (90°) */
+    --tag-color-3: light-dark(#7209B7, #9229D7);   /* Purple (270°) */
+    --tag-color-4: light-dark(#F77F00, #FF9920);   /* Orange (30°) */
+    --tag-color-5: light-dark(#06A77D, #26C79D);   /* Emerald (150°) */
+    --tag-color-6: light-dark(#FCBF49, #FFD670);   /* Yellow (60°) */
+    --tag-color-7: light-dark(#4361EE, #6381FF);   /* Royal blue (240°) */
+    --tag-color-8: light-dark(#D62828, #F64848);   /* Crimson (15°) */
+    --tag-color-9: light-dark(#00B4D8, #20D4F8);   /* Sky blue (195°) */
+    --tag-color-10: light-dark(#C724B1, #E744D1);  /* Magenta (300°) */
+    --tag-color-11: light-dark(#06D6A0, #26F6C0);  /* Mint (165°) */
+    --tag-color-12: light-dark(#F72585, #FF45A5);  /* Hot pink (330°) */
+    --tag-color-13: light-dark(#5E60CE, #7E80EE);  /* Indigo (255°) */
+    --tag-color-14: light-dark(#B5179E, #D537BE);  /* Magenta (315°) */
+    --tag-color-15: light-dark(#073B4C, #275B6C);  /* Navy (210°) */
+}
+
+/* Pastel Palette (16 colors) - Soft muted with maximum hue separation */
+body[data-palette="pastel"],
+[data-palette="pastel"] {
+    --tag-color-0: light-dark(#FFB3BA, #FFC7CD);   /* Pale pink (0°) */
+    --tag-color-1: light-dark(#BAFFEE, #CDFFF5);   /* Aqua (180°) */
+    --tag-color-2: light-dark(#E7FFBA, #F1FFCD);   /* Pale lime (90°) */
+    --tag-color-3: light-dark(#C9BAFF, #DBCDFF);   /* Lavender (270°) */
+    --tag-color-4: light-dark(#FFDFBA, #FFEBCD);   /* Peach (30°) */
+    --tag-color-5: light-dark(#BAFFC9, #CDFFDB);   /* Mint (150°) */
+    --tag-color-6: light-dark(#FFFFBA, #FFFFCD);   /* Pale yellow (60°) */
+    --tag-color-7: light-dark(#BAE1FF, #CDEEFF);   /* Sky blue (240°) */
+    --tag-color-8: light-dark(#FFC9BA, #FFDBCD);   /* Coral (15°) */
+    --tag-color-9: light-dark(#BAFFF3, #CDFFF7);   /* Seafoam (195°) */
+    --tag-color-10: light-dark(#FFBAF3, #FFCDF7);  /* Pink lavender (300°) */
+    --tag-color-11: light-dark(#DFFFBA, #EBFFCD);  /* Celery (75°) */
+    --tag-color-12: light-dark(#FFBAD4, #FFCDE1);  /* Rose (330°) */
+    --tag-color-13: light-dark(#D4BAFF, #E1CDFF);  /* Periwinkle (255°) */
+    --tag-color-14: light-dark(#E1BAFF, #EECDFF);  /* Lilac (285°) */
+    --tag-color-15: light-dark(#FFD4BA, #FFE1CD);  /* Apricot (45°) */
+}
+
+/* Professional Palette (16 colors) - Corporate with strong contrast */
+body[data-palette="professional"],
+[data-palette="professional"] {
+    --tag-color-0: light-dark(#0F4C81, #2F6CA1);   /* Deep blue */
+    --tag-color-1: light-dark(#2D5016, #4D7036);   /* Forest green */
+    --tag-color-2: light-dark(#6B4423, #8B6443);   /* Espresso brown */
+    --tag-color-3: light-dark(#008B8B, #20ABAB);   /* Dark cyan */
+    --tag-color-4: light-dark(#4B0082, #6B20A2);   /* Indigo */
+    --tag-color-5: light-dark(#556B2F, #758B4F);   /* Dark olive */
+    --tag-color-6: light-dark(#2F4F4F, #4F6F6F);   /* Dark slate gray */
+    --tag-color-7: light-dark(#8B4513, #AB6533);   /* Saddle brown */
+    --tag-color-8: light-dark(#191970, #393990);   /* Midnight blue */
+    --tag-color-9: light-dark(#2E8B57, #4EAB77);   /* Sea green */
+    --tag-color-10: light-dark(#483D8B, #685DAB);  /* Dark slate blue */
+    --tag-color-11: light-dark(#4A4A4A, #6A6A6A);  /* Dim gray */
+    --tag-color-12: light-dark(#006400, #208420);  /* Dark green */
+    --tag-color-13: light-dark(#4682B4, #66A2D4);  /* Steel blue */
+    --tag-color-14: light-dark(#696969, #898989);  /* Dim gray 2 */
+    --tag-color-15: light-dark(#2F4F4F, #4F6F6F);  /* Dark slate gray 2 */
+}
+
+/* Dynamic color assignment based on --tag-index CSS variable */
+[style*="--tag-index: 0"] .tag-color-dot { background-color: var(--tag-color-0); }
+[style*="--tag-index: 1"] .tag-color-dot { background-color: var(--tag-color-1); }
+[style*="--tag-index: 2"] .tag-color-dot { background-color: var(--tag-color-2); }
+[style*="--tag-index: 3"] .tag-color-dot { background-color: var(--tag-color-3); }
+[style*="--tag-index: 4"] .tag-color-dot { background-color: var(--tag-color-4); }
+[style*="--tag-index: 5"] .tag-color-dot { background-color: var(--tag-color-5); }
+[style*="--tag-index: 6"] .tag-color-dot { background-color: var(--tag-color-6); }
+[style*="--tag-index: 7"] .tag-color-dot { background-color: var(--tag-color-7); }
+[style*="--tag-index: 8"] .tag-color-dot { background-color: var(--tag-color-8); }
+[style*="--tag-index: 9"] .tag-color-dot { background-color: var(--tag-color-9); }
+[style*="--tag-index: 10"] .tag-color-dot { background-color: var(--tag-color-10); }
+[style*="--tag-index: 11"] .tag-color-dot { background-color: var(--tag-color-11); }
+[style*="--tag-index: 12"] .tag-color-dot { background-color: var(--tag-color-12); }
+[style*="--tag-index: 13"] .tag-color-dot { background-color: var(--tag-color-13); }
+[style*="--tag-index: 14"] .tag-color-dot { background-color: var(--tag-color-14); }
+[style*="--tag-index: 15"] .tag-color-dot { background-color: var(--tag-color-15); }

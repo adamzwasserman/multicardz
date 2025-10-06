@@ -2,7 +2,7 @@
 <div class="dimensional-grid-container">
     {% if column_tags and row_tags %}
         <!-- 2D Grid: Both rows and columns -->
-        <div class="dimensional-grid two-dimensional">
+        <div class="dimensional-grid two-dimensional {% if show_expanded %}cards-expanded{% endif %} {% if show_colors %}show-colors{% endif %}" style="--col-count: {{ column_tags|length + 1 }}" data-palette="{{ color_palette|default('muji') }}">
             <!-- Header row with column labels -->
             <div class="grid-header">
                 <div class="grid-corner"></div>
@@ -40,7 +40,7 @@
                                         </div>
                                         <div class="card-tags">
                                             {% for tag in card.tags %}
-                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -54,20 +54,13 @@
                 </div>
                 {% endfor %}
 
-                <!-- Other column: cards with row tag but no column tag -->
+                <!-- Other column: cards with row tag AND no column tags (complement of all column sets) -->
                 <div class="grid-cell grid-cell-other" data-row="{{ row_tag }}" data-col="other">
                     {% set other_cards = [] %}
                     {% for card in cards %}
-                        {% if row_tag in card.tags %}
-                            {% set has_col_tag = false %}
-                            {% for col_tag in column_tags %}
-                                {% if col_tag in card.tags %}
-                                    {% set has_col_tag = true %}
-                                {% endif %}
-                            {% endfor %}
-                            {% if not has_col_tag %}
-                                {% set _ = other_cards.append(card) %}
-                            {% endif %}
+                        {# Card must have the row tag AND none of the column tags #}
+                        {% if row_tag in card.tags and not (column_tags | select('in', card.tags) | list) %}
+                            {% set _ = other_cards.append(card) %}
                         {% endif %}
                     {% endfor %}
 
@@ -86,7 +79,7 @@
                                         </div>
                                         <div class="card-tags">
                                             {% for tag in card.tags %}
-                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -101,23 +94,16 @@
             </div>
             {% endfor %}
 
-            <!-- Other row: cards with no row tag -->
+            <!-- Other row: cards with column tag AND no row tags (complement of all row sets) -->
             <div class="grid-row">
                 <div class="grid-row-header grid-row-header-other">other</div>
                 {% for col_tag in column_tags %}
                 <div class="grid-cell grid-cell-other" data-row="other" data-col="{{ col_tag }}">
                     {% set other_cards = [] %}
                     {% for card in cards %}
-                        {% if col_tag in card.tags %}
-                            {% set has_row_tag = false %}
-                            {% for row_tag in row_tags %}
-                                {% if row_tag in card.tags %}
-                                    {% set has_row_tag = true %}
-                                {% endif %}
-                            {% endfor %}
-                            {% if not has_row_tag %}
-                                {% set _ = other_cards.append(card) %}
-                            {% endif %}
+                        {# Card must have the column tag AND none of the row tags #}
+                        {% if col_tag in card.tags and not (row_tags | select('in', card.tags) | list) %}
+                            {% set _ = other_cards.append(card) %}
                         {% endif %}
                     {% endfor %}
 
@@ -136,7 +122,7 @@
                                         </div>
                                         <div class="card-tags">
                                             {% for tag in card.tags %}
-                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -150,23 +136,12 @@
                 </div>
                 {% endfor %}
 
-                <!-- Other-other cell: cards with neither row nor column tags -->
+                <!-- Other-other cell: complement of all row AND column sets -->
                 <div class="grid-cell grid-cell-other" data-row="other" data-col="other">
                     {% set other_other_cards = [] %}
                     {% for card in cards %}
-                        {% set has_row_tag = false %}
-                        {% set has_col_tag = false %}
-                        {% for row_tag in row_tags %}
-                            {% if row_tag in card.tags %}
-                                {% set has_row_tag = true %}
-                            {% endif %}
-                        {% endfor %}
-                        {% for col_tag in column_tags %}
-                            {% if col_tag in card.tags %}
-                                {% set has_col_tag = true %}
-                            {% endif %}
-                        {% endfor %}
-                        {% if not has_row_tag and not has_col_tag %}
+                        {# Card must have NONE of the row tags AND NONE of the column tags #}
+                        {% if not (row_tags | select('in', card.tags) | list) and not (column_tags | select('in', card.tags) | list) %}
                             {% set _ = other_other_cards.append(card) %}
                         {% endif %}
                     {% endfor %}
@@ -186,7 +161,7 @@
                                         </div>
                                         <div class="card-tags">
                                             {% for tag in card.tags %}
-                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -203,7 +178,7 @@
 
     {% elif column_tags %}
         <!-- 1D Grid: Columns only (horizontal) -->
-        <div class="dimensional-grid columns-only">
+        <div class="dimensional-grid columns-only {% if show_expanded %}cards-expanded{% endif %} {% if show_colors %}show-colors{% endif %}" data-palette="{{ color_palette|default('muji') }}">
             <div class="grid-header">
                 {% for col_tag in column_tags %}
                 <div class="grid-col-header">{{ col_tag }}</div>
@@ -235,7 +210,7 @@
                                         </div>
                                         <div class="card-tags">
                                             {% for tag in card.tags %}
-                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -249,17 +224,11 @@
                 </div>
                 {% endfor %}
 
-                <!-- Other column: cards not in any column tag -->
+                <!-- Other column: complement of all column sets (cards with NONE of the column tags) -->
                 <div class="grid-cell grid-cell-other" data-col="other">
                     {% set other_cards = [] %}
                     {% for card in cards %}
-                        {% set has_col_tag = false %}
-                        {% for col_tag in column_tags %}
-                            {% if col_tag in card.tags %}
-                                {% set has_col_tag = true %}
-                            {% endif %}
-                        {% endfor %}
-                        {% if not has_col_tag %}
+                        {% if not (column_tags | select('in', card.tags) | list) %}
                             {% set _ = other_cards.append(card) %}
                         {% endif %}
                     {% endfor %}
@@ -279,7 +248,7 @@
                                         </div>
                                         <div class="card-tags">
                                             {% for tag in card.tags %}
-                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -296,7 +265,7 @@
 
     {% elif row_tags %}
         <!-- 1D Grid: Rows only (vertical) -->
-        <div class="dimensional-grid rows-only">
+        <div class="dimensional-grid rows-only {% if show_expanded %}cards-expanded{% endif %} {% if show_colors %}show-colors{% endif %}" data-palette="{{ color_palette|default('muji') }}">
             {% for row_tag in row_tags %}
             <div class="grid-row">
                 <div class="grid-row-header">{{ row_tag }}</div>
@@ -323,7 +292,7 @@
                                         </div>
                                         <div class="card-tags">
                                             {% for tag in card.tags %}
-                                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                            <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                                             {% endfor %}
                                         </div>
                                     </div>
@@ -337,10 +306,75 @@
                 </div>
             </div>
             {% endfor %}
+
+            <!-- Other row: complement of all row sets (cards with NONE of the row tags) -->
+            <div class="grid-row">
+                <div class="grid-row-header grid-row-header-other">other</div>
+                <div class="grid-cell grid-cell-other" data-row="other">
+                    {% set other_cards = [] %}
+                    {% for card in cards %}
+                        {% if not (row_tags | select('in', card.tags) | list) %}
+                            {% set _ = other_cards.append(card) %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if other_cards %}
+                        {% for card in other_cards %}
+                        <div class="card-item" data-card-id="{{ card.id }}">
+                            <div class="card-content">
+                                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                                <div class="card-header">
+                                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-tags-section">
+                                        <div class="card-tags-header">
+                                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                        </div>
+                                        <div class="card-tags">
+                            {% for tag in card.tags %}
+                            <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-cell">∅</div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
     {% else %}
-        <!-- No dimensional tags -->
-        <p class="empty-state">Add tags to row or column zones to create a dimensional grid</p>
+        <!-- 0D Grid: No dimensional tags - single cell for all cards -->
+        <div class="dimensional-grid zero-dimensional {% if show_expanded %}cards-expanded{% endif %} {% if show_colors %}show-colors{% endif %}" data-palette="{{ color_palette|default('muji') }}">
+            <div class="grid-cell" data-row="all" data-col="all">
+                {% for card in cards %}
+                <div class="card-item" data-card-id="{{ card.id }}">
+                    <div class="card-content">
+                        <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
+                        <div class="card-header">
+                            <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
+                        </div>
+                        <div class="card-footer">
+                            <div class="card-tags-section">
+                                <div class="card-tags-header">
+                                    <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                                </div>
+                                <div class="card-tags">
+                                    {% for tag in card.tags %}
+                                    <span class="card-tag" data-tag="{{ tag }}" style="--tag-index: {{ tag_order.index(tag) if tag in tag_order else 0 }}"><span class="tag-color-dot"></span>{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
     {% endif %}
 </div>

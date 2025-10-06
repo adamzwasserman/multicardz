@@ -28,6 +28,11 @@ class ViewSettings(BaseModel):
     show_tag_colors: bool = Field(
         default=True, description="Whether to show colors on tags and cards"
     )
+    color_palette: str = Field(
+        default="muji",
+        pattern="^(muji|vibrant|pastel|professional)$",
+        description="Tag color palette style",
+    )
     card_density: str = Field(
         default="comfortable",
         pattern="^(compact|comfortable|spacious)$",
@@ -184,6 +189,7 @@ class UserPreferences(BaseModel):
             "cards_expanded": self.view_settings.cards_start_expanded,
             "tag_layout": self.view_settings.tag_layout,
             "show_tag_colors": self.view_settings.show_tag_colors,
+            "color_palette": self.view_settings.color_palette,
             "card_density": self.view_settings.card_density,
             "theme_class": f"theme-{self.theme_settings.theme}",
             "font_class": f"font-{self.theme_settings.font_family.lower()}",
