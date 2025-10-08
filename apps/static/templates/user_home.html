@@ -39,7 +39,7 @@
                     {% endfor %}
                 </div>
                 <div class="input-wrapper">
-                    <input type="text" class="tag-input" placeholder="Add user tag..." aria-label="Add user tag"
+                    <input type="text" class="tag-input" placeholder="Add user tag..." aria-label="add user tag"
 >
                 </div>
             </div>
@@ -56,29 +56,31 @@
                     <div class="tags-wrapper">
                         <span class="tag tag-ai"
                               data-tag="machine-learning"
+                              data-tag-id="ai-ml"
                               data-type="ai-tag"
                               draggable="true"
 >
                             machine-learning
+                            <button class="tag-delete" onclick="deleteTag('ai-ml', this)" title="Delete tag">×</button>
                         </span>
                         <span class="tag tag-ai"
                               data-tag="data-processing"
+                              data-tag-id="ai-dp"
                               data-type="ai-tag"
                               draggable="true"
 >
                             data-processing
+                            <button class="tag-delete" onclick="deleteTag('ai-dp', this)" title="Delete tag">×</button>
                         </span>
                         <span class="tag tag-ai"
                               data-tag="automation"
+                              data-tag-id="ai-auto"
                               data-type="ai-tag"
                               draggable="true"
 >
                             automation
+                            <button class="tag-delete" onclick="deleteTag('ai-auto', this)" title="Delete tag">×</button>
                         </span>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="text" class="tag-input" placeholder="Add AI tag..." aria-label="Add AI tag"
->
                     </div>
                 </div>
 
@@ -219,7 +221,6 @@
     </div>
 
     <div class="card-display">
-        <button class="floating-add-card" id="floatingAddCard" onclick="createNewCard()" title="Create new card">+</button>
         <div class="card-container" id="cardContainer">
             <!-- Cards will be populated by JavaScript based on checkbox state and active filters -->
             <p id="emptyStateMessage">No cards to display</p>
@@ -258,18 +259,6 @@
         </svg>
     </button>
 
-    <!-- Column collapse toggles - positioned at outer edges -->
-    <button class="collapse-toggle collapse-col1" onclick="toggleColumn(1)" title="Toggle Column 1" aria-label="Toggle column 1">
-        <svg class="chevron chevron-left" width="16" height="16" viewBox="0 0 16 16">
-            <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </button>
-
-    <button class="collapse-toggle collapse-col3" onclick="toggleColumn(3)" title="Toggle Column 3" aria-label="Toggle column 3">
-        <svg class="chevron chevron-right" width="16" height="16" viewBox="0 0 16 16">
-            <path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    </button>
 
     <!-- Row 4: Bottom Area (Middle Column Only) -->
     <div class="bottom-control collapsible-row row-4">

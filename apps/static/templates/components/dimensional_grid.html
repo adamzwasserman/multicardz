@@ -51,6 +51,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
+                    <button class="grid-cell-add-button" onclick="createNewCard('{{ row_tag }}', '{{ col_tag }}')" title="Add card to this cell">+</button>
                 </div>
                 {% endfor %}
 
@@ -90,6 +91,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
+                    <button class="grid-cell-add-button" onclick="createNewCard('{{ row_tag }}', 'other')" title="Add card to this cell">+</button>
                 </div>
             </div>
             {% endfor %}
@@ -133,6 +135,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
+                    <button class="grid-cell-add-button" onclick="createNewCard('other', '{{ col_tag }}')" title="Add card to this cell">+</button>
                 </div>
                 {% endfor %}
 
@@ -172,6 +175,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
+                    <button class="grid-cell-add-button" onclick="createNewCard('other', 'other')" title="Add card to this cell">+</button>
                 </div>
             </div>
         </div>
@@ -221,6 +225,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
+                    <button class="grid-cell-add-button" onclick="createNewCard(null, '{{ col_tag }}')" title="Add card to this cell">+</button>
                 </div>
                 {% endfor %}
 
@@ -259,6 +264,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
+                    <button class="grid-cell-add-button" onclick="createNewCard(null, 'other')" title="Add card to this cell">+</button>
                 </div>
             </div>
         </div>
@@ -303,6 +309,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
+                    <button class="grid-cell-add-button" onclick="createNewCard('{{ row_tag }}', null)" title="Add card to this cell">+</button>
                 </div>
             </div>
             {% endfor %}
@@ -344,6 +351,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
+                    <button class="grid-cell-add-button" onclick="createNewCard('other', null)" title="Add card to this cell">+</button>
                 </div>
             </div>
         </div>
@@ -374,6 +382,7 @@
                     </div>
                 </div>
                 {% endfor %}
+                <button class="grid-cell-add-button" onclick="createNewCard(null, null)" title="Add card to this cell">+</button>
             </div>
         </div>
     {% endif %}

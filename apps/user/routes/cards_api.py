@@ -1053,3 +1053,168 @@ async def delete_card(request: Request):
         logger.error(f"Failed to delete card: {e}")
         return {"success": False, "message": str(e)}
 
+
+def _flatten_preferences_for_frontend(prefs: dict) -> dict:
+    """Flatten nested preferences structure for frontend consumption."""
+    view_settings = prefs.get('view_settings') or {}
+    theme_settings = prefs.get('theme_settings') or {}
+    tag_settings = prefs.get('tag_settings') or {}
+    workspace_settings = prefs.get('workspace_settings') or {}
+
+    return {
+        'startWithAllCards': view_settings.get('cards_start_visible', True),
+        'startWithCardsExpanded': view_settings.get('cards_start_expanded', False),
+        'showColors': view_settings.get('show_tag_colors', True),
+        'colorPalette': view_settings.get('color_palette', 'muji'),
+        'verticalLayout': view_settings.get('tag_layout', 'horizontal') == 'vertical',
+        'advancedView': tag_settings.get('separate_user_ai_tags', True),
+        'fontSelector': f"font-{theme_settings.get('font_family', 'Inter').lower()}",
+        'zoneLayout': workspace_settings.get('zone_layout', {}),
+        'collapsedSections': workspace_settings.get('collapsed_sections', []),
+        'collapsedRows': workspace_settings.get('collapsed_rows', []),
+        'collapsedColumns': workspace_settings.get('collapsed_columns', []),
+        'leftControlWidth': workspace_settings.get('left_control_width', 120),
+        'rightControlWidth': workspace_settings.get('right_control_width', 120),
+    }
+
+
+@router.get("/user/preferences")
+async def get_user_preferences(request: Request):
+    """Get user preferences from database."""
+    import json
+    import sqlite3
+    from pathlib import Path
+
+    user_id = "default-user"  # TODO: Get from session/auth
+    db_path = Path("/Users/adam/dev/multicardz/data/multicardz_dev.db")
+
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT preferences_json FROM user_preferences WHERE user_id = ?",
+                (user_id,)
+            )
+            row = cursor.fetchone()
+
+            if row:
+                # Return existing preferences - flatten for frontend
+                prefs = json.loads(row[0])
+                flattened = _flatten_preferences_for_frontend(prefs)
+                logger.info(f"Loaded preferences for user {user_id}: {flattened}")
+                return flattened
+            else:
+                # Return defaults from model
+                from apps.shared.models.user_preferences import UserPreferences, ViewSettings, ThemeSettings, TagSettings, WorkspaceSettings
+
+                default_prefs = UserPreferences(
+                    user_id=user_id,
+                    view_settings=ViewSettings(),
+                    theme_settings=ThemeSettings(),
+                    tag_settings=TagSettings(),
+                    workspace_settings=WorkspaceSettings()
+                )
+
+                prefs_dict = default_prefs.model_dump(mode='json')
+                flattened = _flatten_preferences_for_frontend(prefs_dict)
+                logger.info(f"Returning default preferences for user {user_id}")
+                return flattened
+
+    except Exception as e:
+        logger.error(f"Failed to get user preferences: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/user/preferences")
+async def save_user_preferences(request: Request):
+    """Save/update user preferences to database."""
+    import json
+    import sqlite3
+    from datetime import datetime
+    from pathlib import Path
+    from apps.shared.models.user_preferences import UserPreferences, ViewSettings, ThemeSettings, TagSettings, WorkspaceSettings
+
+    user_id = "default-user"  # TODO: Get from session/auth
+    db_path = Path("/Users/adam/dev/multicardz/data/multicardz_dev.db")
+
+    try:
+        data = await request.json()
+
+        # Map frontend keys to model structure
+        frontend_to_model = {
+            'startWithAllCards': ('view_settings', 'cards_start_visible'),
+            'startWithCardsExpanded': ('view_settings', 'cards_start_expanded'),
+            'showColors': ('view_settings', 'show_tag_colors'),
+            'colorPalette': ('view_settings', 'color_palette'),
+            'verticalLayout': ('view_settings', 'tag_layout'),  # boolean -> "vertical"/"horizontal"
+            'advancedView': ('tag_settings', 'separate_user_ai_tags'),
+            'fontSelector': ('theme_settings', 'font_family'),
+            'zoneLayout': ('workspace_settings', 'zone_layout'),  # dict of zone positions
+            'collapsedSections': ('workspace_settings', 'collapsed_sections'),  # list of collapsed section IDs
+            'collapsedRows': ('workspace_settings', 'collapsed_rows'),  # list of collapsed row numbers
+            'collapsedColumns': ('workspace_settings', 'collapsed_columns'),  # list of collapsed column numbers
+            'leftControlWidth': ('workspace_settings', 'left_control_width'),  # left panel width in pixels
+            'rightControlWidth': ('workspace_settings', 'right_control_width'),  # right panel width in pixels
+        }
+
+        # Load existing preferences or create defaults
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT preferences_json FROM user_preferences WHERE user_id = ?",
+                (user_id,)
+            )
+            row = cursor.fetchone()
+
+            if row:
+                prefs_dict = json.loads(row[0])
+            else:
+                # Create default structure
+                default_prefs = UserPreferences(
+                    user_id=user_id,
+                    view_settings=ViewSettings(),
+                    theme_settings=ThemeSettings(),
+                    tag_settings=TagSettings(),
+                    workspace_settings=WorkspaceSettings()
+                )
+                prefs_dict = default_prefs.model_dump(mode='json')
+
+            # Update with new values
+            for frontend_key, value in data.items():
+                if frontend_key in frontend_to_model:
+                    section, field = frontend_to_model[frontend_key]
+
+                    # Special handling for verticalLayout boolean -> tag_layout string
+                    if frontend_key == 'verticalLayout':
+                        value = "vertical" if value else "horizontal"
+
+                    # Special handling for fontSelector - extract font name from class
+                    if frontend_key == 'fontSelector':
+                        # value like "font-inconsolata" -> "Inconsolata"
+                        value = value.replace('font-', '').replace('-', ' ').title().replace(' ', '')
+
+                    prefs_dict[section][field] = value
+                    logger.info(f"Updated {section}.{field} = {value}")
+
+            # Update timestamp
+            prefs_dict['updated_at'] = datetime.utcnow().isoformat()
+
+            # Upsert to database
+            prefs_json = json.dumps(prefs_dict)
+            cursor.execute("""
+                INSERT INTO user_preferences (user_id, preferences_json, updated_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(user_id)
+                DO UPDATE SET
+                    preferences_json = excluded.preferences_json,
+                    updated_at = CURRENT_TIMESTAMP
+            """, (user_id, prefs_json))
+            conn.commit()
+
+            logger.info(f"Saved preferences for user {user_id}")
+            return {"success": True, "preferences": prefs_dict}
+
+    except Exception as e:
+        logger.error(f"Failed to save user preferences: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+

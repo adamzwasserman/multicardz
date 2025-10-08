@@ -756,12 +756,12 @@ class SpatialDragDrop {
   initializeTagDragging() {
     const tagContainer = document.body;
 
-    // Drag start
+    // Drag start - use capture phase to run before zone's inline handler
     tagContainer.addEventListener('dragstart', (e) => {
       if (e.target.matches('[data-tag]')) {
         this.handleTagDragStart(e);
       }
-    });
+    }, true); // Capture phase
 
     // Drag end
     tagContainer.addEventListener('dragend', (e) => {
@@ -792,6 +792,9 @@ class SpatialDragDrop {
 
     // Validate it's actually a tag
     if (!draggedTag.dataset.tag) return;
+
+    // Stop event from bubbling to zone's dragstart handler
+    event.stopPropagation();
 
     // Determine what's being dragged
     if (draggedTag.dataset.type === 'group-tag') {
@@ -1012,6 +1015,11 @@ class SpatialDragDrop {
         const container = document.getElementById('cardContainer');
         if (container) {
           container.innerHTML = html;
+
+          // Apply pending collapsed rows/columns after grid is rendered
+          if (window.settingsManager) {
+            window.settingsManager.applyPendingGridState();
+          }
         }
       }
     } catch (error) {
