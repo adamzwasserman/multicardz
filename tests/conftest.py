@@ -26,6 +26,7 @@ pytest_plugins = [
     "tests.fixtures.connection_logic_fixtures",
     "tests.fixtures.bitmap_filter_fixtures",
     "tests.fixtures.card_creation_fixtures",
+    "tests.fixtures.ui_mode_switching_fixtures",
 ]
 
 
