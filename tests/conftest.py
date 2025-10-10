@@ -21,6 +21,7 @@ pytest_plugins = [
     "tests.fixtures.database_mode_fixtures",
     "tests.fixtures.browser_service_fixtures",
     "tests.fixtures.bitmap_sync_fixtures",
+    "tests.fixtures.query_routing_fixtures",
 ]
 
 
