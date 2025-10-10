@@ -23,6 +23,8 @@ pytest_plugins = [
     "tests.fixtures.bitmap_sync_fixtures",
     "tests.fixtures.query_routing_fixtures",
     "tests.fixtures.integration_fixtures",
+    "tests.fixtures.connection_logic_fixtures",
+    "tests.fixtures.bitmap_filter_fixtures",
 ]
 
 
