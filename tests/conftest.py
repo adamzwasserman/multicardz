@@ -18,6 +18,9 @@ pytest_plugins = [
     "tests.fixtures.tag_count_fixtures",
     "tests.fixtures.template_fixtures",
     "tests.fixtures.performance_fixtures",
+    "tests.fixtures.database_mode_fixtures",
+    "tests.fixtures.browser_service_fixtures",
+    "tests.fixtures.bitmap_sync_fixtures",
 ]
 
 
