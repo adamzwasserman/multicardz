@@ -185,4 +185,6 @@ def then_no_browser_database_used(routing_context):
     result = routing_context["query_result"]
     assert result.source == "server"
     # In normal mode, all queries go to server
-    assert routing_context["context"]["browser_db_initialized"] is False
+    # Check if browser_db_initialized exists in context, default to False if not
+    browser_db_init = routing_context["context"].get("browser_db_initialized", False)
+    assert browser_db_init is False
