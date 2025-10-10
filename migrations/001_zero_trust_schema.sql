@@ -158,3 +158,51 @@ BEGIN
         modified = datetime('now')
     WHERE tag_id IN (SELECT value FROM json_each('["' || replace(OLD.tags, ',', '","') || '"]'));
 END;
+
+-- ============================================================================
+-- BITMAP SEQUENCE TRACKING
+-- ============================================================================
+
+-- Bitmap sequence tracking table for auto-generating sequential integer bitmaps
+CREATE TABLE bitmap_sequences (
+    sequence_name TEXT PRIMARY KEY,
+    current_value INTEGER NOT NULL DEFAULT 0,
+    CHECK (current_value >= 0)
+);
+
+-- Initialize sequences for cards and tags
+INSERT INTO bitmap_sequences (sequence_name, current_value) VALUES ('card_bitmap_seq', 0);
+INSERT INTO bitmap_sequences (sequence_name, current_value) VALUES ('tag_bitmap_seq', 0);
+
+-- ============================================================================
+-- TRIGGERS FOR AUTO-CALCULATING BITMAPS
+-- ============================================================================
+
+-- Auto-calculate card_bitmap using sequential integers
+-- Note: SQLite triggers cannot use SELECT INTO, so we use a two-step process
+CREATE TRIGGER auto_calculate_card_bitmap
+AFTER INSERT ON cards
+WHEN NEW.card_bitmap = 0
+BEGIN
+    UPDATE bitmap_sequences
+    SET current_value = current_value + 1
+    WHERE sequence_name = 'card_bitmap_seq';
+
+    UPDATE cards
+    SET card_bitmap = (SELECT current_value FROM bitmap_sequences WHERE sequence_name = 'card_bitmap_seq')
+    WHERE card_id = NEW.card_id;
+END;
+
+-- Auto-calculate tag_bitmap using sequential integers
+CREATE TRIGGER auto_calculate_tag_bitmap
+AFTER INSERT ON tags
+WHEN NEW.tag_bitmap = 0
+BEGIN
+    UPDATE bitmap_sequences
+    SET current_value = current_value + 1
+    WHERE sequence_name = 'tag_bitmap_seq';
+
+    UPDATE tags
+    SET tag_bitmap = (SELECT current_value FROM bitmap_sequences WHERE sequence_name = 'tag_bitmap_seq')
+    WHERE tag_id = NEW.tag_id;
+END;

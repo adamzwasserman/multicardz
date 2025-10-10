@@ -144,12 +144,13 @@ def create_card(card_id: str, name: str, workspace_id: str, tag_ids: list[str], 
     Returns:
         Created card dict
     """
+    # Convert tag_ids list to comma-separated string for inverted index
     tags_csv = ",".join(tag_ids) if tag_ids else ""
 
-    # Triggers will auto-fill created and modified
+    # Insert card - trigger auto-calculates card_bitmap, triggers auto-maintain tag.card_count
     command = """
-        INSERT INTO cards (card_id, name, workspace_id, tags, user_id, card_bitmap, created, modified)
-        VALUES (?, ?, ?, ?, 'default-user', 0, datetime('now'), datetime('now'))
+        INSERT INTO cards (card_id, name, workspace_id, tags, user_id, created, modified)
+        VALUES (?, ?, ?, ?, 'default-user', datetime('now'), datetime('now'))
     """
     execute_card_command(command, (card_id, name, workspace_id, tags_csv), db_path)
 

@@ -25,6 +25,42 @@ function handleZoneDrop(event, container) {
   }
 }
 
+// Toggle AI tags cloud visibility
+function toggleAICloud(show) {
+  const aiCloud = document.getElementById('aiTagsCloud');
+  if (aiCloud) {
+    aiCloud.style.display = show ? 'block' : 'none';
+  }
+
+  // Save preference
+  fetch('/api/user/preferences', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ advancedView: show })
+  }).catch(err => console.error('Failed to save advancedView preference:', err));
+}
+
+// Save collapsed rows state to preferences
+function saveCollapsedRows() {
+  const grid = document.getElementById('spatialGrid');
+  if (!grid) return;
+
+  const collapsedRows = [];
+  const gridClasses = Array.from(grid.classList);
+  gridClasses.forEach(className => {
+    const match = className.match(/^row-(\d+)-collapsed$/);
+    if (match) {
+      collapsedRows.push(parseInt(match[1], 10));
+    }
+  });
+
+  fetch('/api/user/preferences', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ collapsedRows })
+  }).catch(err => console.error('Failed to save collapsed rows:', err));
+}
+
 // Toggle grid row visibility
 function toggleRow(rowNum) {
   const grid = document.getElementById('spatialGrid');
@@ -38,6 +74,9 @@ function toggleRow(rowNum) {
 
   grid.classList[action]('row-' + rowNum + '-collapsed');
   toggles.forEach(toggle => toggle.classList[action]('is-collapsed'));
+
+  // Save collapsed rows state
+  saveCollapsedRows();
 }
 
 // Toggle grid column visibility
@@ -112,14 +151,36 @@ async function createTag(tagName, cloudType = 'user') {
   }
 }
 
-// Create new card with tags from zones
-async function createNewCard() {
-  const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'));
-  const intersectionTags = Array.from(document.querySelectorAll('[data-zone-type="intersection"] .tag'));
-  const allTags = [...new Set([...unionTags, ...intersectionTags])];
+// Create new card with tags from zones or from specific grid cell
+async function createNewCard(rowTag = null, colTag = null) {
+  let tagNames = [];
+  let tagIds = [];
 
-  const tagIds = allTags.map(t => t.getAttribute('data-tag-id')).filter(Boolean);
-  const tagNames = allTags.map(t => t.getAttribute('data-tag')).filter(Boolean);
+  // If called from grid cell with dimensional tags, use those
+  if (rowTag || colTag) {
+    if (rowTag && rowTag !== 'other') tagNames.push(rowTag);
+    if (colTag && colTag !== 'other') tagNames.push(colTag);
+
+    // Also include any filter tags from union/intersection zones
+    const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'));
+    const intersectionTags = Array.from(document.querySelectorAll('[data-zone-type="intersection"] .tag'));
+    const filterTags = [...new Set([...unionTags, ...intersectionTags])];
+
+    const filterTagNames = filterTags.map(t => t.getAttribute('data-tag')).filter(Boolean);
+    const filterTagIds = filterTags.map(t => t.getAttribute('data-tag-id')).filter(Boolean);
+
+    tagNames = [...new Set([...tagNames, ...filterTagNames])];
+    tagIds = filterTagIds;
+  } else {
+    // Legacy behavior: use union/intersection zone tags only
+    const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'));
+    const intersectionTags = Array.from(document.querySelectorAll('[data-zone-type="intersection"] .tag'));
+    const allTags = [...new Set([...unionTags, ...intersectionTags])];
+
+    tagIds = allTags.map(t => t.getAttribute('data-tag-id')).filter(Boolean);
+    tagNames = allTags.map(t => t.getAttribute('data-tag')).filter(Boolean);
+  }
+
   const cardId = crypto.randomUUID();
 
   try {
@@ -306,6 +367,36 @@ function initializeColumnResize() {
   let startLeftWidth = 0;
   let startRightWidth = 0;
 
+  // Load saved widths and preferences
+  fetch('/api/user/preferences')
+    .then(res => res.json())
+    .then(prefs => {
+      const leftWidth = prefs.leftControlWidth || 120;
+      const rightWidth = prefs.rightControlWidth || 120;
+      grid.style.gridTemplateColumns = `${leftWidth}px 1fr ${rightWidth}px`;
+
+      // Apply advancedView preference
+      const advancedViewCheckbox = document.getElementById('advancedView');
+      const advancedView = prefs.advancedView !== undefined ? prefs.advancedView : true;
+      if (advancedViewCheckbox) {
+        advancedViewCheckbox.checked = advancedView;
+      }
+      toggleAICloud(advancedView);
+
+      // Apply font preference
+      if (prefs.fontSelector) {
+        const fontSelector = document.getElementById('fontSelector');
+        if (fontSelector) {
+          fontSelector.value = prefs.fontSelector;
+        }
+        document.body.className = document.body.className.replace(/font-\w+/g, '');
+        if (prefs.fontSelector !== 'font-system') {
+          document.body.classList.add(prefs.fontSelector);
+        }
+      }
+    })
+    .catch(err => console.error('Failed to load control widths:', err));
+
   // Left control resize (right edge)
   leftControl.addEventListener('mousedown', (e) => {
     const rect = leftControl.getBoundingClientRect();
@@ -347,13 +438,49 @@ function initializeColumnResize() {
     }
   });
 
-  // Mouse up - stop resizing
+  // Mouse up - stop resizing and save
   document.addEventListener('mouseup', () => {
     if (isResizing) {
+      const gridCols = grid.style.gridTemplateColumns;
+      const leftMatch = gridCols.match(/^(\d+)px/);
+      const rightMatch = gridCols.match(/\s(\d+)px$/);
+
+      if (leftMatch && rightMatch) {
+        fetch('/api/user/preferences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            leftControlWidth: parseInt(leftMatch[1]),
+            rightControlWidth: parseInt(rightMatch[1])
+          })
+        }).catch(err => console.error('Failed to save control widths:', err));
+      }
+
       isResizing = null;
       document.body.style.cursor = '';
     }
   });
+}
+
+// Load and apply collapsed rows from preferences
+function loadCollapsedRows() {
+  fetch('/api/user/preferences')
+    .then(res => res.json())
+    .then(prefs => {
+      const collapsedRows = prefs.collapsedRows || [];
+      const grid = document.getElementById('spatialGrid');
+      if (!grid) return;
+
+      collapsedRows.forEach(rowNum => {
+        const rowElements = document.querySelectorAll('.row-' + rowNum);
+        const toggles = document.querySelectorAll('.collapse-row' + rowNum);
+
+        rowElements.forEach(elem => elem.classList.add('collapsed'));
+        grid.classList.add('row-' + rowNum + '-collapsed');
+        toggles.forEach(toggle => toggle.classList.add('is-collapsed'));
+      });
+    })
+    .catch(err => console.error('Failed to load collapsed rows:', err));
 }
 
 // Run when DOM is ready
@@ -361,8 +488,10 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
     initializeColumnResize();
+    loadCollapsedRows();
   });
 } else {
   initializeApp();
   initializeColumnResize();
+  loadCollapsedRows();
 }

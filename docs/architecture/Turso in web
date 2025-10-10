@@ -1,0 +1,52 @@
+Today, we're launching Turso in the Browser, bringing the full power of SQLite directly to your web applications via WebAssembly.
+
+npm install @tursodatabase/database-wasm
+Turso in the Browser represents the next evolution of SQLite. This isn't just SQLite compiled to WebAssembly, it's a complete rewrite focused on performance and browser-native capabilities.
+
+#Usage
+The database NPM package provides an API similar to better-sqlite3, but all execution methods are asynchronous (async) due to the way OPFS works in the browser.
+
+You can connect to a database using the dedicated connect helper or by explicitly creating a Database instance.
+
+The recommended approach is to use the connect helper. However, if you can't use it -- for example, when top-level await isn't available -- you can create a Database instance synchronously instead.
+
+import { connect, Database } from "@tursodatabase/database-wasm";
+
+// Recommended: use the connect helper
+const db = await connect("local.db");
+
+// Alternatively, create a Database instance manually
+const db = new Database("local.db");
+// and connect later
+await db.connect();
+
+console.info(await db.prepare("SELECT ?").run([42]));
+You can provide either a local filename or the special :memory: location, which creates an ephemeral in-memory database that is reset after a page reload.
+
+To explore more details and features — take a look at the examples !
+
+#Technical details
+
+
+The high-level components of the tursodatabase in the browsers includes the following:
+
+Main UI thread performs all compute operations for database queries
+Initially, we considered an option to offload CPU work to the separate worker — but from our benchmarks communication overhead were pretty significant so we decided to switch to another model
+Web-Worker works in parallel and responsible for all filesystem operations through synchronous OPFS interface
+Synchronous API will lock file to specific Web-Worker which will prevent usage of same database from different browser tab. This is important for current tursodatabase implementation to guarantee correctness
+For efficient comminucation Web-Worker and main thread share the memory through SharedArrayBuffer which allows to share internal buffers for IO operations without transferring them back and forth.
+This requires additional COEP / COOP headers to be set for document resource
+Main UI thread and Web-Worker share same database code compiled to the wasm32-wasip1-threads target with the help of napi-rs (yes, since v3 release, it can do both Node native bindings and WASM!)
+#Packaging
+The front-end ecosystem is very diverse — so we added extra ways to consume the library from different environments:
+
+If you use Vite or Turbopack as bundler — use dedicated export from the library: @tursodatbase/database-wasm/vite or @tursodatabase/database-wasm/turbopack
+The reason is that WASM modules and Web-Worker support sometimes doesn't work well with these bundlers (production build or dev-server) — so we decided to bundle necessary workarounds to improve end-user experiences
+If you want to use library without bundler — load already bundled version directly from a CDN (like unpkg, jsDelivr, hop.js, cdnjs)
+This approach is good for prototyping, demos, or simple applications, but comes with a price of higher bundle size (because WASM binary encoded as base64 and inlined in the source code)
+For any other bundler use default export @tursodatabase/database-wasm and let us know if there are any issues with the package!
+#Getting Started
+Turso in the Browser opens up new possibilities for web applications. From offline-first productivity tools to real-time collaborative applications that work regardless of connectivity.
+
+Whether you're building a local-only application or one that occasionally syncs with the cloud, Turso in the Browser provides the foundation for fast, reliable, and scalable web applications.
+

@@ -130,6 +130,34 @@ class WorkspaceSettings(BaseModel):
         pattern="^(summary|detail|grid)$",
         description="Default view mode for new workspaces",
     )
+    zone_layout: dict[str, str] = Field(
+        default_factory=dict,
+        description="Zone positions mapping zone IDs to container IDs (e.g., {'union-zone': 'left-panel'})",
+    )
+    collapsed_sections: list[str] = Field(
+        default_factory=list,
+        description="List of collapsed section IDs (e.g., ['universal-control', 'ui-control'])",
+    )
+    collapsed_rows: list[int] = Field(
+        default_factory=list,
+        description="List of collapsed row numbers in dimensional grid",
+    )
+    collapsed_columns: list[int] = Field(
+        default_factory=list,
+        description="List of collapsed column numbers in dimensional grid",
+    )
+    left_control_width: int = Field(
+        default=120,
+        ge=100,
+        le=600,
+        description="Width of left control panel in pixels",
+    )
+    right_control_width: int = Field(
+        default=120,
+        ge=100,
+        le=600,
+        description="Width of right control panel in pixels",
+    )
 
     model_config = {
         "frozen": True,

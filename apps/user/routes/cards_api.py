@@ -17,13 +17,8 @@ from ..models.render_request import RenderRequest
 
 # Import shared services (adjust paths as needed)
 try:
-    from apps.shared.services.card_service import CardServiceCompat as CardService
-    from apps.shared.services.card_service import create_database_config
-    from apps.shared.services.database_storage import (
-        create_database_connection,
-        load_all_card_summaries,
-    )
     from apps.shared.services.set_operations_unified import apply_unified_operations
+    from apps.shared.repositories.card_repository import get_card_db_connection
 except ImportError as e:
     logging.warning(f"Could not import shared services: {e}")
 
@@ -40,15 +35,6 @@ logger = logging.getLogger(__name__)
 
 # Import single source of truth for database path
 from apps.shared.config.database import DATABASE_PATH
-
-# Create default database configuration using single source of truth
-DEFAULT_DB_CONFIG = create_database_config(
-    db_path=DATABASE_PATH,
-    enable_foreign_keys=True,
-    timeout=30.0,
-    check_same_thread=False,
-    max_attachment_size_mb=10
-)
 
 
 # ============================================================================
@@ -144,7 +130,7 @@ def compute_card_sets(
         operations.append(('difference', [(tag, 1) for tag in exclude_tags]))
 
     # Load and filter cards using shared services
-    with create_database_connection(create_database_config(db_path=db_path)) as conn:
+    with get_card_db_connection(db_path) as conn:
         # Load lesson cards specifically for onboarding
         from apps.shared.services.lesson_service import (
             detect_lesson_progression,
