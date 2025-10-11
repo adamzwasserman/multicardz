@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turso WASM Demo</title>
+    <style>
+        body { font-family: system-ui; max-width: 800px; margin: 50px auto; padding: 20px; }
+        button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+        #output { background: #f5f5f5; padding: 15px; border-radius: 8px; margin-top: 20px; min-height: 200px; }
+        .success { color: #059669; }
+        .error { color: #dc2626; }
+        pre { background: #1e293b; color: #e2e8f0; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Turso WASM Browser Database Demo</h1>
+    
+    <div>
+        <button id="btn-init">1. Initialize Database</button>
+        <button id="btn-create">2. Create Table</button>
+        <button id="btn-insert">3. Insert Data</button>
+        <button id="btn-query">4. Query Data</button>
+        <button id="btn-stats">5. Get Stats</button>
+    </div>
+    
+    <div id="output">
+        <p>Click buttons to test Turso WASM...</p>
+    </div>
+
+    <!-- Import from source (Vite dev server handles this) -->
+    <script type="module">
+        import { initializeBrowserDatabase, executeQuery, getDatabaseStats } from './js/services/turso_browser_db.js';
+        
+        let db = null;
+
+        async function initDB() {
+            log('🚀 Initializing Turso WASM database...', 'info');
+            try {
+                db = await initializeBrowserDatabase();
+                log('✅ Database initialized successfully!', 'success');
+                log('Storage: OPFS (Origin Private File System)', 'info');
+            } catch (error) {
+                log('❌ Failed: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        async function createTable() {
+            log('📝 Creating cards table...', 'info');
+            try {
+                const result = await executeQuery(`
+                    CREATE TABLE IF NOT EXISTS cards (
+                        id TEXT PRIMARY KEY,
+                        title TEXT NOT NULL,
+                        description TEXT,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                `);
+                log('✅ Table created!', 'success');
+                log(JSON.stringify(result, null, 2), 'code');
+            } catch (error) {
+                log('❌ Failed: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        async function insertData() {
+            log('💾 Inserting test data...', 'info');
+            try {
+                // Generate unique ID for each card
+                const cardId = 'card-' + Math.random().toString(36).substr(2, 9);
+                const result = await executeQuery(
+                    'INSERT INTO cards (id, title, description) VALUES (?, ?, ?)',
+                    [cardId, 'Test Card', 'Created from browser WASM!']
+                );
+                log('✅ Data inserted!', 'success');
+                log(`Card ID: ${cardId}`, 'info');
+                log(JSON.stringify(result, null, 2), 'code');
+            } catch (error) {
+                log('❌ Failed: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        async function queryData() {
+            log('🔍 Querying data...', 'info');
+            try {
+                const result = await executeQuery('SELECT * FROM cards');
+                log('✅ Query successful!', 'success');
+                log(JSON.stringify(result, null, 2), 'code');
+            } catch (error) {
+                log('❌ Failed: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        async function getStats() {
+            log('📊 Getting database stats...', 'info');
+            try {
+                const stats = await getDatabaseStats();
+                log('✅ Stats retrieved!', 'success');
+                log(JSON.stringify(stats, null, 2), 'code');
+            } catch (error) {
+                log('❌ Failed: ' + error.message, 'error');
+                console.error(error);
+            }
+        }
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            const content = type === 'code' 
+                ? `<pre>${message}</pre>` 
+                : `<p class="${className}">${message}</p>`;
+            output.innerHTML += content;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Attach event listeners
+        document.getElementById('btn-init').addEventListener('click', initDB);
+        document.getElementById('btn-create').addEventListener('click', createTable);
+        document.getElementById('btn-insert').addEventListener('click', insertData);
+        document.getElementById('btn-query').addEventListener('click', queryData);
+        document.getElementById('btn-stats').addEventListener('click', getStats);
+        
+        log('✨ Demo ready! Click "Initialize Database" to start.', 'info');
+    </script>
+</body>
+</html>

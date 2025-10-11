@@ -45,3 +45,12 @@ htmlcov/
 # Environment variables
 .env
 .env.local
+
+# Node/JavaScript
+node_modules/
+apps/static/dist/
+package-lock.json
+
+# Database files
+data/multicardz_dev.db-shm
+data/multicardz_dev.db-wal
