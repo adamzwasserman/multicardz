@@ -21,7 +21,7 @@ uv run python test_drag_drop.py
 ### 1. Start the Server
 ```bash
 # Option A: Using test server
-python test_server.py
+uv run python test_server.py
 
 # Option B: Direct module run
 uv run python -m apps.user.main
