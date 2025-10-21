@@ -1,14 +1,21 @@
 # Turso Browser Integration Implementation Plan v2
 
-**STATUS**: PARTIALLY IMPLEMENTED (~30% complete)
-**IMPLEMENTATION DATE**: Started 2025-10-08, Phase 1 partial
+**STATUS**: PARTIALLY IMPLEMENTED (~60-70% complete)
+**IMPLEMENTATION DATE**: Started 2025-10-08, multiple phases complete
 **VERIFICATION**:
-  - ✅ turso_browser_db.js exists (basic service)
+  - ✅ turso_browser_db.js complete (155 lines - core query infrastructure)
   - ✅ @tursodatabase/database-wasm in package.json
-  - ❌ Mode selection UI not implemented
-  - ❌ Query routing not implemented
-  - ❌ Sync functionality not implemented
-**COMPLETION**: Phase 1 Task 1.2 partial (browser database service created), remaining phases not started
+  - ✅ Mode selection infrastructure implemented (database_mode.py, connection_router.py)
+  - ✅ Query routing implemented (query_router.py - 507 lines)
+  - ✅ Bitmap sync operational (bitmap_sync.py, bitmap_filter.py)
+  - ✅ Card creation integration complete (17K)
+  - ✅ UI mode switching complete (15K)
+  - ⚠️ Task 2.2 (Browser DB Queries): 90% done - just needs UUID wrapper functions
+  - ⚠️ Task 2.3 (Auto-Migration): Already complete via Plan 029 (auto_migration.py)
+  - ❌ Performance benchmarking not done (Task 5.2)
+  - ❌ Privacy verification audit not done (Task 5.3)
+  - ❌ Documentation incomplete (Task 5.4)
+**COMPLETION**: Phases 1-4 substantially complete, Phase 5 (validation/docs) pending
 
 ## Overview
 Implementation of Turso DB with three operational modes to support different use cases from development to privacy-focused deployments. This plan focuses on Privacy Mode implementation, the most complex of the three modes.
