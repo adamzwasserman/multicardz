@@ -16,6 +16,124 @@
 
 ### 3. Technical Design
 
+#### 3.0 Diagram Standards
+
+**REQUIRED**: All diagrams MUST use Mermaid syntax for version control compatibility and maintainability.
+
+**Rationale**:
+- Text-based diagrams enable git diff and proper version control
+- No external tools required - renders in GitHub, GitLab, and modern markdown viewers
+- Easy to update and maintain alongside code
+- Supports all necessary diagram types for architecture documentation
+- Prevents binary image files from bloating repository
+
+**Supported Mermaid Diagram Types**:
+
+1. **Component/Architecture Diagrams** (use `graph` or `flowchart`)
+   ```mermaid
+   graph TB
+       Client[Client Browser]
+       API[API Server]
+       DB[(Database)]
+       Cache[(Redis Cache)]
+
+       Client -->|HTTPS| API
+       API -->|Query| DB
+       API -->|Read/Write| Cache
+   ```
+
+2. **Sequence Diagrams** (for interaction flows)
+   ```mermaid
+   sequenceDiagram
+       participant User
+       participant Browser
+       participant Server
+       participant Database
+
+       User->>Browser: Drag tag to cell
+       Browser->>Server: POST /api/cards/filter
+       Server->>Database: Execute set operation
+       Database-->>Server: Return UUIDs
+       Server-->>Browser: Render cards
+       Browser-->>User: Display filtered cards
+   ```
+
+3. **Entity Relationship Diagrams** (for data models)
+   ```mermaid
+   erDiagram
+       CARD ||--o{ CARD_TAG : has
+       TAG ||--o{ CARD_TAG : references
+       WORKSPACE ||--|| USER : owns
+
+       CARD {
+           uuid card_id PK
+           uuid workspace_id FK
+           uuid user_id FK
+           text content
+           jsonb metadata
+       }
+
+       TAG {
+           uuid tag_id PK
+           uuid workspace_id FK
+           string name
+           string color
+       }
+   ```
+
+4. **State Diagrams** (for workflows)
+   ```mermaid
+   stateDiagram-v2
+       [*] --> Normal
+       Normal --> Privacy: Enable Privacy Mode
+       Privacy --> Normal: Disable Privacy Mode
+       Normal --> Offline: Lose Connection
+       Offline --> Normal: Restore Connection
+       Privacy --> Offline: Lose Connection
+       Offline --> Privacy: Restore in Privacy
+   ```
+
+5. **Class Diagrams** (for Protocol definitions)
+   ```mermaid
+   classDiagram
+       class DataLoader~T~ {
+           <<Protocol>>
+           +load(context: LoadContext) frozenset~T~
+       }
+
+       class SpatialMapper~T,U~ {
+           <<Protocol>>
+           +map(data: frozenset~T~) U
+       }
+
+       class Renderer~T~ {
+           <<Protocol>>
+           +render(spatial_data: T) Any
+       }
+
+       DataLoader~T~ --> SpatialMapper~T,U~
+       SpatialMapper~T,U~ --> Renderer~U~
+   ```
+
+**Diagram Requirements**:
+- All diagrams MUST be embedded directly in markdown using triple-backtick mermaid code blocks
+- Complex diagrams MAY be split into multiple simpler diagrams for clarity
+- Each diagram MUST have a descriptive caption explaining its purpose
+- Component names in diagrams MUST match actual code module/class names
+- Data flow direction MUST be clearly indicated with arrows
+- External dependencies MUST be visually distinguished (e.g., different shape/color)
+
+**Forbidden Practices**:
+- ❌ PNG/JPG/SVG image files committed to repository
+- ❌ Diagrams created in external tools (draw.io, Lucidchart, etc.) without Mermaid source
+- ❌ Screenshots of diagrams
+- ❌ Hand-drawn diagrams (unless for initial brainstorming, not final docs)
+
+**Exception**: Architecture diagrams MAY include external tool exports ONLY IF:
+1. Mermaid equivalent is also provided as source of truth
+2. External diagram is clearly marked as "illustrative only"
+3. Justification is documented for why Mermaid is insufficient
+
 #### 3.1 Component Architecture
 - Component diagram with clear boundaries
 - Responsibilities and interfaces
@@ -402,6 +520,9 @@ def create_renderer(renderer_type: str, **config) -> Renderer[Any]:
 - Supporting research
 
 ## Quality Checklist
+- [ ] All diagrams use Mermaid syntax (no binary image files)
+- [ ] All diagrams have descriptive captions
+- [ ] Component names in diagrams match code
 - [ ] All functions have complete signatures
 - [ ] Set theory operations documented mathematically
 - [ ] No unauthorized classes or JavaScript
