@@ -61,7 +61,7 @@ multicardz integrates subscription flow with authentication using the OAuth stat
    state_json = json.dumps(state_data)
    state_encoded = urllib.parse.quote(state_json)
    auth0_url = f"https://domain.auth0.com/authorize?...&state={state_encoded}"
-   
+
    # Main app callback parses state
    state_decoded = urllib.parse.unquote(state_param)
    state_data = json.loads(state_decoded)
