@@ -29,6 +29,158 @@ The technical teams use this document as a blueprint to build the signup, login,
 
 ---
 
+## Technical Overview
+
+This section provides a technical explanation of the architecture without diving into code details. It bridges the plain language summary above with the detailed requirements below.
+
+### Dual Registration Architecture
+
+**Why Two Paths:**
+MultiCardz supports both freemium (try before you buy) and premium-first business models. The dual-path registration architecture ensures:
+- Low friction for users who want to try the product immediately
+- Secure payment collection before granting premium access
+- Consistent user identity management across both flows
+- Seamless upgrade path from free to paid tiers
+
+**Auth-First Flow (Free Users):**
+The system leverages Auth0's Universal Login for immediate account creation. Upon successful authentication:
+1. Auth0 returns an ID token containing user claims (email, name, sub)
+2. The application extracts these claims and creates a database record
+3. System generates a unique multicardzID for data isolation
+4. Free tier subscription is automatically assigned
+5. User profile is synchronized with Auth0 user metadata
+
+This flow prioritizes speed and reduces friction - users are in the application within seconds.
+
+**Pay-First Flow (Paid Users):**
+The system uses Stripe Checkout as the entry point for premium subscriptions:
+1. User selects a subscription plan, triggering Stripe checkout session creation
+2. Stripe handles PCI-compliant payment collection
+3. Stripe webhook notifies the application of successful payment
+4. System creates database record with multicardzID and StripeID
+5. User is redirected to Auth0 to create login credentials
+6. Auth0ID is linked to the existing database record
+
+This flow ensures payment before access, reducing fraud and failed payment issues.
+
+### Authentication Architecture
+
+**Session Management Strategy:**
+MultiCardz uses a dual-token architecture that separates concerns between user sessions and API access:
+
+**Client-Side (Browser):**
+- HTTP-only secure cookie containing a session token
+- Cookie includes user_id claim for server-side lookups
+- No sensitive tokens exposed to JavaScript (XSS protection)
+- Automatic browser handling of cookie lifecycle
+
+**Server-Side (Token Store):**
+- Thread-safe in-memory store for Auth0 access/refresh tokens
+- Tokens indexed by user_id for fast retrieval
+- Automatic token refresh before expiration
+- Cleanup of expired tokens to prevent memory leaks
+
+**Request Flow:**
+1. Browser sends HTTP-only cookie with every request
+2. Middleware extracts and validates session token
+3. System retrieves user_id from validated token
+4. Auth0 access token fetched from server-side store
+5. Token validated and refreshed if needed
+6. Subscription status checked against Stripe
+7. Request proceeds if all validations pass
+
+This architecture provides security, performance, and automatic token management.
+
+### Zero-Trust Data Isolation
+
+**The UUID-Based Security Model:**
+Every resource in MultiCardz (users, workspaces, cards, tags) has a globally unique identifier. The system enforces data isolation through automatic query filtering:
+
+**data_filter Middleware:**
+The data_filter middleware sits in the request pipeline after authentication but before route handlers. It automatically:
+- Extracts user_id from the authenticated session
+- Intercepts all database queries before execution
+- Injects `WHERE user_id = ?` clause with the authenticated user's ID
+- Ensures queries only return data owned by the requesting user
+- Prevents developer error - filtering happens automatically, not manually
+
+**Multi-Tenant Resource Access:**
+For resources shared across workspaces:
+- workspace_id provides the isolation boundary
+- Users must have explicit access grants to workspaces
+- Queries filter by both user_id (who you are) and workspace_id (what you can access)
+- Invitation system manages workspace membership
+
+**Defense in Depth:**
+Even if a developer forgets to add filtering:
+- Middleware catches it automatically
+- No query executes without user_id filtering
+- Database design prevents cross-user data leaks
+- Audit logs track all data access attempts
+
+This approach makes security the default, not an opt-in.
+
+### Subscription Integration Architecture
+
+**Stripe as Source of Truth:**
+The system treats Stripe as the authoritative source for subscription status:
+
+**Webhook-Driven Updates:**
+- Stripe sends real-time webhooks for all subscription events
+- Webhook handler validates signature to prevent spoofing
+- Events update local database for fast access
+- Background sync reconciles any discrepancies
+
+**Subscription Validation Points:**
+Authentication middleware checks subscription status on:
+- Login (ensure active subscription)
+- API requests (prevent access during grace period)
+- Feature gates (enforce tier-based limits)
+
+**Upgrade/Downgrade Flows:**
+Free users upgrading to paid:
+1. User initiates upgrade from application UI
+2. Stripe checkout session created with user metadata
+3. Payment webhook adds StripeID to existing user record
+4. Subscription tier updated in real-time
+5. New features immediately available
+
+Paid users downgrading or canceling:
+1. Stripe subscription modified or canceled
+2. Webhook updates subscription status
+3. Grace period begins (data retained, access limited)
+4. After grace period, user reverts to free tier
+
+**Idempotency and Reliability:**
+- Webhook handlers are idempotent (safe to replay)
+- Transaction boundaries ensure data consistency
+- Failed webhooks retry automatically
+- Manual reconciliation tools for edge cases
+
+This architecture ensures accurate billing and immediate feature access changes.
+
+### Performance and Scalability Considerations
+
+**Response Time Targets:**
+- Authentication: < 500ms for 95th percentile
+- Token validation: < 100ms
+- Database queries: O(log n) using indexed UUID lookups
+- Session cleanup: Background task, zero impact on requests
+
+**Scalability Strategy:**
+- Stateless application servers (horizontal scaling)
+- Server-side token store with eventual persistence
+- Database read replicas for query distribution
+- Caching layer for subscription status (Redis)
+
+**Failure Handling:**
+- Circuit breakers for Auth0 and Stripe API calls
+- Graceful degradation when external services fail
+- Retry logic with exponential backoff
+- Comprehensive error logging for debugging
+
+---
+
 ## Document Information
 - **Version**: 1.0
 - **Date**: 2025-10-21

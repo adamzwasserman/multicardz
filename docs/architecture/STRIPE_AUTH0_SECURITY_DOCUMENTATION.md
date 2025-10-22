@@ -35,6 +35,280 @@ When you use MultiCardz:
 
 ---
 
+## Implementation Architecture
+
+This section explains how the security system works at a conceptual level before showing the actual code. It helps you understand the architecture decisions and component interactions.
+
+### The Three-Layer Security Model
+
+**Layer 1: Auth0 OAuth2 Flow**
+
+MultiCardz uses Auth0's authorization code flow with PKCE (Proof Key for Code Exchange) for authentication. This provides:
+
+**Authorization Request:**
+- Application redirects user to Auth0 with client_id, redirect_uri, and code_challenge
+- Auth0 presents Universal Login (email/password, Google, Apple, etc.)
+- User authenticates with their chosen method
+- Auth0 redirects back with an authorization code
+
+**Token Exchange:**
+- Application exchanges authorization code + code_verifier for tokens
+- Auth0 validates the PKCE challenge and returns ID token + access token + refresh token
+- ID token contains user claims (sub, email, name) as signed JWT
+- Access token used for API authorization
+- Refresh token enables long-lived sessions
+
+**Token Storage Strategy:**
+- ID token claims extracted and used to create/update user record
+- Session token (minimal) stored in HTTP-only cookie for browser
+- Access/refresh tokens stored server-side in thread-safe token store
+- Never expose Auth0 tokens to JavaScript (XSS prevention)
+
+**Token Lifecycle Management:**
+- Access tokens expire after configurable duration (default: 1 hour)
+- Before expiration, system automatically refreshes using refresh token
+- Refresh tokens rotated on each use (security best practice)
+- Expired tokens cleaned up automatically by background task
+
+**Why This Approach:**
+- Minimizes XSS attack surface (no tokens in localStorage/sessionStorage)
+- Automatic token refresh provides seamless user experience
+- PKCE prevents authorization code interception attacks
+- OAuth2 standard provides battle-tested security
+
+**Layer 2: Stripe Webhook Architecture**
+
+MultiCardz uses Stripe webhooks to synchronize subscription state in real-time. This architecture ensures:
+
+**Webhook Event Processing:**
+1. Stripe sends POST request to configured webhook endpoint
+2. Request includes event type, data, and signature in headers
+3. Application validates signature using Stripe webhook secret
+4. Valid events are processed; invalid signatures rejected (prevents spoofing)
+5. Event handler updates local database based on event type
+6. Response confirms receipt (prevents Stripe retries)
+
+**Critical Event Types:**
+- `checkout.session.completed` - Payment succeeded, create/update subscription
+- `customer.subscription.updated` - Subscription tier changed
+- `customer.subscription.deleted` - Subscription canceled
+- `invoice.payment_failed` - Payment failed, start grace period
+- `invoice.payment_succeeded` - Renewal succeeded, extend access
+
+**Idempotency Handling:**
+- Each webhook event has unique ID
+- System checks if event already processed
+- Database updates wrapped in transactions
+- Safe to replay events without duplicate side effects
+
+**Signature Verification Process:**
+1. Extract signature and timestamp from headers
+2. Reconstruct signed payload: timestamp + "." + request_body
+3. Compute HMAC-SHA256 with webhook secret
+4. Compare computed signature with provided signature
+5. Verify timestamp within tolerance window (prevents replay attacks)
+
+**Why This Approach:**
+- Real-time subscription state updates (no polling needed)
+- Signature verification prevents webhook spoofing
+- Idempotency prevents duplicate processing
+- Stripe's retry logic ensures eventual consistency
+
+**Layer 3: data_filter Middleware (Zero-Trust Isolation)**
+
+The data_filter middleware enforces automatic UUID-based data isolation on every database query:
+
+**Middleware Position in Request Pipeline:**
+```
+Request → Auth Middleware → data_filter Middleware → Route Handler → Database
+```
+
+**How It Works:**
+
+**Context Propagation:**
+1. Auth middleware validates session token and extracts user_id
+2. user_id stored in request context (thread-local or request-scoped)
+3. data_filter middleware retrieves user_id from context
+4. user_id available throughout request lifecycle
+
+**Query Interception:**
+The middleware uses SQLAlchemy event listeners to intercept queries before execution:
+
+1. **Before Query Execution Event:**
+   - Listener fires before any SELECT/UPDATE/DELETE query
+   - Middleware inspects the query AST (Abstract Syntax Tree)
+   - Identifies tables being queried
+
+2. **Automatic Filter Injection:**
+   - For each table with user_id column, adds WHERE clause
+   - Condition: `WHERE table.user_id = :authenticated_user_id`
+   - For workspace-scoped tables, also adds workspace_id filter
+   - Multiple conditions combined with AND logic
+
+3. **Query Execution:**
+   - Modified query executes with injected filters
+   - Only rows matching authenticated user returned
+   - Impossible to retrieve another user's data
+
+**Workspace Multi-Tenancy:**
+For shared resources (cards shared across workspace members):
+1. Workspace membership tracked in junction table
+2. Query filters by workspace_id instead of user_id
+3. Separate access control layer verifies user has workspace access
+4. Combined filtering: `WHERE workspace_id IN (user's workspaces)`
+
+**Fallback Safety Mechanisms:**
+If user_id not found in context:
+- Middleware throws SecurityException (fails closed)
+- Query never executes without user_id
+- Error logged for investigation
+- Request returns 401 Unauthorized
+
+**Why This Approach:**
+- Developer cannot forget to add filtering (automatic)
+- Consistent enforcement across all queries
+- Performance overhead minimal (simple WHERE clause)
+- Defense in depth - even SQL injection can't bypass user_id filter
+- Audit trail of all data access attempts
+
+### Integration Between Layers
+
+**Signup Flow Integration:**
+
+**Free User (Auth-First):**
+1. User authenticates via Auth0 → ID token received
+2. Application extracts claims from ID token
+3. Creates database record with multicardzID from ID token sub claim
+4. Assigns free tier subscription (local database)
+5. Session token created and stored in HTTP-only cookie
+
+**Paid User (Pay-First):**
+1. User completes Stripe Checkout → webhook received
+2. Webhook handler creates database record with StripeID
+3. User redirected to Auth0 → credentials created
+4. Auth0 callback adds Auth0ID to existing record
+5. Session token created linking all three IDs
+
+**Login Flow Integration:**
+1. Auth middleware validates session token from cookie
+2. Retrieves user_id from session token
+3. Fetches Auth0 access token from server-side store
+4. Validates access token (checks expiration, signature)
+5. Refreshes token if needed using refresh token
+6. Queries Stripe API for current subscription status
+7. Verifies active subscription for premium features
+8. Stores user_id in request context for data_filter
+9. Request proceeds to route handler
+
+**API Request Flow Integration:**
+1. Request arrives with HTTP-only cookie
+2. Auth middleware extracts and validates session token → user_id
+3. Subscription middleware checks Stripe status → active/inactive
+4. data_filter middleware intercepts database queries → injects WHERE user_id
+5. Route handler executes business logic
+6. Database returns only user's data
+7. Response sent with updated session cookie
+
+### Performance Optimization Strategies
+
+**Token Caching:**
+- Server-side token store uses in-memory cache (Redis optional)
+- Tokens indexed by user_id for O(1) lookup
+- Automatic eviction of expired tokens
+- LRU eviction if memory threshold exceeded
+
+**Subscription Status Caching:**
+- Subscription status cached after Stripe verification
+- Cache TTL: 5 minutes (balance freshness vs API calls)
+- Webhook updates invalidate cache immediately
+- Cache miss triggers Stripe API call
+
+**Database Query Optimization:**
+- UUID columns indexed for fast filtering
+- Composite indexes on (user_id, created_at) for pagination
+- Query planner uses index for WHERE user_id = ? clauses
+- O(log n) lookup performance regardless of total data size
+
+**Middleware Efficiency:**
+- data_filter uses SQLAlchemy events (low overhead)
+- Filter injection happens once per query (not per row)
+- Connection pooling reduces database connection overhead
+- Prepared statements for token validation queries
+
+### Security Audit Trail
+
+**What Gets Logged:**
+
+**Authentication Events:**
+- Login attempts (success/failure)
+- Token refresh operations
+- Logout actions
+- Failed authentication with reason codes
+
+**Subscription Events:**
+- Payment succeeded/failed
+- Subscription created/updated/canceled
+- Tier changes
+- Webhook processing (event type, result)
+
+**Data Access:**
+- Every database query includes user_id in logs
+- Failed authorization attempts
+- Invalid user_id in context errors
+- Query filter injection (debug mode only)
+
+**Security Violations:**
+- Webhook signature verification failures
+- Token validation failures
+- Missing user_id in secured endpoints
+- Attempted cross-user data access
+
+**Log Format:**
+Each security event includes:
+- Timestamp (ISO 8601)
+- Event type
+- user_id (if available)
+- Request ID (for tracing)
+- IP address
+- User agent
+- Outcome (success/failure)
+- Error details (if failed)
+
+**Log Retention:**
+- Security logs: 90 days minimum
+- Payment logs: 7 years (compliance)
+- Audit logs: 1 year
+- Debug logs: 30 days
+
+### Compliance and Standards
+
+**PCI-DSS Compliance:**
+- Credit card data never touches our servers (Stripe handles it)
+- Webhook endpoints use TLS 1.2+
+- Signature verification prevents card data injection
+- Audit logs meet PCI logging requirements
+
+**GDPR Compliance:**
+- User data export via API
+- Right to be forgotten via data purge
+- Consent tracking for data processing
+- Data residency controls (future)
+
+**OAuth2 Compliance:**
+- PKCE flow (RFC 7636)
+- Token endpoint authentication (client credentials)
+- Refresh token rotation
+- Proper scope enforcement
+
+**Security Standards:**
+- OWASP Top 10 mitigations implemented
+- SQL injection prevention via ORM + parameterized queries
+- XSS prevention via HTTP-only cookies
+- CSRF protection via SameSite cookies
+- Secure headers (HSTS, CSP, X-Frame-Options)
+
+---
+
 This document provides a comprehensive overview of all code related to Stripe payment processing, Auth0 authorization, and middleware that uses user_id for security and data filtering in the DME application.
 
 ## Table of Contents
