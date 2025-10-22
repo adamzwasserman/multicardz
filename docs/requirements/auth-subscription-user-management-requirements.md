@@ -29,6 +29,13 @@ When you use multicardz, you need confidence that:
 **What Happens Behind the Scenes:**
 The technical teams use this document as a blueprint to build the signup, login, payment, and security systems. It ensures everyone builds the same way and nothing important gets forgotten.
 
+**Testing and Quality:**
+To ensure everything works correctly, developers can activate a special "testing mode" that lets them test the application without connecting to real login or payment services. This mode has strict safety measures:
+- It only works on testing computers, never on the live system
+- It still protects data - you can only see test data
+- The system logs warnings constantly so nobody forgets it's enabled
+- It automatically shuts down if someone tries to use it with real customer data
+
 ---
 
 ## Technical Overview
@@ -369,6 +376,18 @@ This document covers requirements for:
 - **FR-SES-004**: System SHALL support concurrent sessions across devices
 - **FR-SES-005**: System SHALL clean up expired sessions automatically
 
+#### 2.3.3 Development/Test Mode
+- **FR-DEV-001**: System SHALL support a development/test mode enabled via environment variable
+- **FR-DEV-002**: Development mode SHALL bypass Auth0 authentication checks
+- **FR-DEV-003**: Development mode SHALL bypass Stripe subscription validation
+- **FR-DEV-004**: Development mode SHALL bypass token validation and refresh logic
+- **FR-DEV-005**: Development mode SHALL still enforce UUID-based data isolation via data_filter middleware
+- **FR-DEV-006**: Development mode SHALL inject a test user_id for data isolation testing
+- **FR-DEV-007**: Development mode SHALL log warnings on every request when enabled
+- **FR-DEV-008**: System SHALL refuse to start if development mode is enabled with production database
+- **FR-DEV-009**: System SHALL require explicit key value in environment variable (not just boolean)
+- **FR-DEV-010**: Development mode SHALL be documented as TESTING ONLY in all configuration files
+
 ### 2.4 User Profile Management
 
 #### 2.4.1 Profile Information
@@ -414,6 +433,20 @@ This document covers requirements for:
 - **SR-ASEC-002**: System SHALL validate token signatures and expiration
 - **SR-ASEC-003**: System SHALL implement rate limiting on authentication endpoints
 - **SR-ASEC-004**: System SHALL log all authentication events for security monitoring
+
+#### 3.1.3 Development/Test Mode Configuration
+- **SR-DEV-001**: System SHALL check for DEV_MODE_KEY environment variable on startup
+- **SR-DEV-002**: Development mode SHALL activate only if DEV_MODE_KEY matches expected secret value
+- **SR-DEV-003**: System SHALL validate database connection string against production patterns
+- **SR-DEV-004**: System SHALL terminate startup if dev mode enabled with production database URL
+- **SR-DEV-005**: Authentication middleware SHALL skip Auth0 checks when dev mode is active
+- **SR-DEV-006**: Subscription middleware SHALL skip Stripe checks when dev mode is active
+- **SR-DEV-007**: System SHALL inject configurable test user_id from DEV_USER_ID environment variable
+- **SR-DEV-008**: System SHALL default to test UUID if DEV_USER_ID not specified in dev mode
+- **SR-DEV-009**: System SHALL log "DEVELOPMENT MODE ACTIVE" warning on every HTTP request
+- **SR-DEV-010**: System SHALL include "X-Dev-Mode: true" header in all responses when dev mode active
+- **SR-DEV-011**: data_filter middleware SHALL continue filtering queries by injected test user_id
+- **SR-DEV-012**: System configuration SHALL document dev mode variables with TESTING ONLY warnings
 
 ### 3.2 Authorization Model (Zero-Trust, UUID Isolation)
 
@@ -652,6 +685,38 @@ This document covers requirements for:
 - Security headers present in all responses
 - Penetration testing passing without critical issues
 
+### 7.5 Development/Test Mode
+
+**Environment Variable Configuration:**
+- DEV_MODE_KEY environment variable enables development mode when set to expected secret value
+- DEV_USER_ID environment variable allows specifying test user UUID for data isolation testing
+- System validates database URL is not production before allowing dev mode activation
+- System terminates with clear error message if dev mode attempted with production database
+
+**Bypass Behavior:**
+- Authentication middleware skips Auth0 token validation when dev mode active
+- Subscription middleware skips Stripe subscription checks when dev mode active
+- Token refresh logic bypassed entirely in dev mode
+- Session validation bypassed in dev mode
+
+**Security Preservation:**
+- data_filter middleware continues to inject WHERE user_id = ? using test user_id
+- UUID-based data isolation still enforced even in dev mode
+- Database queries still filtered to prevent cross-user data access
+- Test user can only access test user's data
+
+**Visibility and Safety:**
+- "DEVELOPMENT MODE ACTIVE" logged on every HTTP request
+- "X-Dev-Mode: true" header included in all responses
+- Configuration files document dev mode as TESTING ONLY with prominent warnings
+- System refuses to start if production database detected with dev mode enabled
+
+**Testing Use Cases:**
+- Automated test suites can run without Auth0 or Stripe dependencies
+- Integration tests can bypass authentication while testing business logic
+- Data isolation tests can verify UUID filtering works correctly
+- Performance tests can measure core functionality without external API latency
+
 ## 8. Workflow Diagrams
 
 ### 8.1 User Registration and Upgrade Flows
@@ -783,6 +848,9 @@ flowchart LR
 - **multicardzID**: Unique identifier assigned to each user account
 - **Auth-First Flow**: Registration flow where free users sign up via Auth0 first, then receive free tier access
 - **Pay-First Flow**: Registration flow where paid users complete Stripe payment before creating Auth0 credentials
+- **Development Mode**: Testing-only mode that bypasses Auth0 and Stripe checks while preserving data isolation
+- **DEV_MODE_KEY**: Environment variable that activates development mode when set to expected secret value
+- **DEV_USER_ID**: Environment variable that specifies test user UUID for data isolation testing in dev mode
 
 ### 9.2 References
 
