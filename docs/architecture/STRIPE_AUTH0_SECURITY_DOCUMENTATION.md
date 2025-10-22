@@ -190,16 +190,128 @@ If user_id not found in context:
 5. Session token created linking all three IDs
 
 **Upgrade Flow (Free to Paid):**
-1. Existing free user clicks "Upgrade" in application
-2. Application creates Stripe checkout session with multicardzID in metadata
-3. User completes payment at Stripe Checkout
-4. Stripe webhook received with multicardzID in metadata
-5. Webhook handler locates existing user record by multicardzID
-6. StripeID added to user record (links Stripe customer to user)
-7. Subscription tier updated from "free" to paid tier
-8. User redirected back to application
-9. Next request picks up new subscription status
-10. Premium features immediately available
+
+The upgrade flow handles the transition from free to paid subscription for existing users. This flow is distinct from both auth-first and pay-first registration flows:
+
+**Step 1: User-Initiated Upgrade**
+- User authenticated and on free tier
+- User navigates to subscription page or clicks "Upgrade" prompt
+- Application displays available paid plans (Pro, Team, Enterprise)
+
+**Step 2: Checkout Session Creation**
+- Application retrieves current user record from database
+- Extracts multicardzID from user record
+- Creates Stripe checkout session API call with:
+  - `price_id`: Selected subscription plan's Stripe price ID
+  - `metadata.multicardz_id`: User's multicardzID (critical linking data)
+  - `metadata.current_tier`: User's current tier (for analytics)
+  - `success_url`: Application URL to return after successful payment
+  - `cancel_url`: Application URL if user cancels
+  - `customer_email`: Pre-fill checkout with user's email
+
+**Step 3: Payment Processing**
+- User redirected to Stripe Checkout (secure, PCI-compliant payment page)
+- User enters credit card information (never touches our servers)
+- Stripe validates payment method and processes charge
+- Stripe creates customer record in their system
+- Stripe creates subscription record linked to customer
+
+**Step 4: Webhook Notification**
+- Stripe sends `checkout.session.completed` webhook to our endpoint
+- Webhook includes:
+  - Event ID (for idempotency tracking)
+  - Session ID
+  - Customer ID (Stripe's customer identifier)
+  - Subscription ID
+  - Metadata including multicardzID
+
+**Step 5: Database Update (Critical)**
+The webhook handler performs atomic update operation:
+
+```
+BEGIN TRANSACTION;
+
+-- Locate existing user by multicardzID from metadata
+SELECT id, auth0_id, multicardz_id, stripe_id, subscription_tier
+FROM users
+WHERE multicardz_id = <metadata.multicardz_id>;
+
+-- Verify user found (error if not)
+-- Verify stripe_id is NULL (first upgrade) or matches (repeat webhook)
+
+-- Update existing record (DO NOT CREATE NEW RECORD)
+UPDATE users
+SET
+  stripe_id = <customer_id>,
+  stripe_subscription_id = <subscription_id>,
+  subscription_tier = 'pro',  -- or selected tier
+  subscription_status = 'active',
+  updated_at = NOW()
+WHERE multicardz_id = <metadata.multicardz_id>;
+
+-- Log upgrade event for audit trail
+INSERT INTO subscription_events (user_id, event_type, stripe_event_id, ...)
+VALUES (...);
+
+COMMIT TRANSACTION;
+```
+
+**Step 6: User Return and Verification**
+- Stripe redirects user to success_url with session_id parameter
+- Application displays success message
+- User's next authenticated API request includes unchanged session cookie
+- Authentication middleware validates session (user_id unchanged)
+- Subscription middleware queries database for current tier
+- Subscription middleware calls Stripe API to verify subscription status
+- Stripe confirms active subscription
+- Request proceeds with premium access granted
+
+**Step 7: Feature Unlock**
+- Feature gates check subscription tier
+- Premium features (previously blocked) now accessible
+- UI updates to show premium badge/status
+- No data migration needed (all existing data intact)
+- No re-authentication needed (session remains valid)
+
+**Critical Implementation Safeguards:**
+
+**Idempotency:**
+- Check if stripe_id already set before updating
+- Use Stripe event ID to track processed webhooks
+- Safe to replay webhook without side effects
+
+**Atomicity:**
+- Database transaction ensures stripe_id and tier update together
+- Prevents partial state (stripe_id without tier upgrade)
+
+**Error Handling:**
+- multicardzID not found → log error, return 400 to Stripe (retry)
+- Duplicate stripe_id → idempotency, return 200 to Stripe (already processed)
+- Database timeout → rollback transaction, return 500 (Stripe retries)
+- Stripe API verification fails → log warning, allow based on webhook (offline mode)
+
+**Security Considerations:**
+- Webhook signature verification prevents fake upgrade events
+- multicardzID in metadata prevents upgrade of wrong user
+- Atomic transaction prevents race conditions
+- Audit log captures all subscription changes
+
+**Why This Architecture:**
+- **Seamless UX**: User never loses session or data
+- **Reliable**: Webhook-driven ensures eventual consistency
+- **Secure**: Signature verification prevents fraud
+- **Maintainable**: Same webhook handler for new signups and upgrades
+- **Recoverable**: Manual reconciliation tools for edge cases
+
+**Upgrade vs. Pay-First Differences:**
+- Upgrade: User record exists → UPDATE record
+- Pay-First: User record doesn't exist → INSERT record
+- Upgrade: Auth0ID already set → skip Auth0 redirect
+- Pay-First: No Auth0ID → redirect to Auth0 after payment
+- Upgrade: Session continues → immediate access
+- Pay-First: No session yet → login after Auth0
+
+This design ensures free users can seamlessly upgrade while maintaining data integrity, security, and a frictionless user experience.
 
 **Login Flow Integration:**
 1. Auth middleware validates session token from cookie

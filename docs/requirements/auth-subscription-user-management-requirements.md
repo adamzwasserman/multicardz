@@ -65,6 +65,57 @@ The system uses Stripe Checkout as the entry point for premium subscriptions:
 
 This flow ensures payment before access, reducing fraud and failed payment issues.
 
+**Upgrade Flow (Free to Paid):**
+The system supports seamless upgrades for existing free users who want premium features:
+1. User clicks "Upgrade" button within the application interface
+2. System retrieves current user record from database (contains multicardzID, Auth0ID, current tier)
+3. Stripe checkout session created with critical metadata:
+   - multicardzID passed in session metadata
+   - Selected subscription plan and pricing
+   - Success/cancel redirect URLs back to application
+4. User redirects to Stripe Checkout (leaves application temporarily)
+5. User completes payment using credit card
+6. Stripe validates payment and processes subscription creation
+7. Stripe sends `checkout.session.completed` webhook to application
+8. Webhook handler executes critical linking operation:
+   - Extracts multicardzID from webhook event metadata
+   - Queries database: `SELECT * FROM users WHERE multicardz_id = ?`
+   - Locates existing user record (doesn't create new record)
+   - Adds StripeID (Stripe customer ID) to existing user record
+   - Updates subscription_tier from "free" to selected paid tier (e.g., "pro", "team")
+   - Transaction committed atomically
+9. Stripe redirects user back to application success URL
+10. User's next API request includes session cookie (user_id unchanged)
+11. Authentication middleware validates session and subscription status
+12. Subscription middleware queries Stripe API for current subscription
+13. Stripe confirms active paid subscription
+14. System grants access to premium features immediately
+
+**Critical Implementation Details:**
+- **multicardzID as Linking Key**: The multicardzID (not email, not Auth0ID) links the payment to the user
+- **Update, Not Create**: Webhook handler MUST update existing record, not create duplicate
+- **Idempotent Processing**: Webhook may fire multiple times; check if StripeID already added
+- **Atomic Transaction**: StripeID addition and tier update MUST occur atomically
+- **No Re-Authentication**: User session remains valid; no logout/login required
+- **Data Preservation**: All existing cards, tags, workspaces remain intact
+- **Immediate Access**: Next authenticated request picks up new subscription status
+
+**Why This Design:**
+- Frictionless upgrade experience (no re-registration)
+- Preserves user's existing work and data
+- Uses same Stripe Checkout flow as pay-first (consistent UX)
+- Leverages existing webhook infrastructure
+- Maintains single source of truth (Stripe for subscription status)
+- No race conditions (webhook updates database, next request reads it)
+
+**Failure Scenarios:**
+- **Payment Fails**: User redirected to cancel URL, remains on free tier, can retry
+- **Webhook Delayed**: User sees free tier briefly, updates when webhook processes
+- **Webhook Lost**: Stripe retries webhook; manual reconciliation available
+- **Duplicate Webhook**: Idempotency check prevents duplicate StripeID writes
+
+This three-flow architecture (auth-first, pay-first, upgrade) provides maximum flexibility for user acquisition while maintaining data integrity and security.
+
 ### Authentication Architecture
 
 **Session Management Strategy:**
