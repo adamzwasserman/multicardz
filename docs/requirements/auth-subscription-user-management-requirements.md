@@ -12,11 +12,13 @@ When you use MultiCardz, you need confidence that:
 - Your data belongs only to you (nobody else can see it)
 - The system works fast and doesn't break
 
-**The Two Ways to Join MultiCardz:**
+**The Three Ways to Get Started:**
 
 1. **Try It Free First** - You create an account instantly with Google, email, or other login methods. You get immediate access to basic features. If you like it, you can upgrade to paid features later.
 
 2. **Start with a Paid Plan** - You choose a subscription plan and pay first. Then you create your login credentials and get full access right away.
+
+3. **Upgrade Anytime** - If you started with a free account, you can upgrade to a paid plan at any time. Click "Upgrade", complete payment, and premium features activate immediately. Your data stays exactly the same, you just get more features.
 
 **How We Keep You Safe:**
 - Every time you access your data, the system automatically checks that you're allowed to see it
@@ -137,14 +139,28 @@ Authentication middleware checks subscription status on:
 - API requests (prevent access during grace period)
 - Feature gates (enforce tier-based limits)
 
-**Upgrade/Downgrade Flows:**
-Free users upgrading to paid:
-1. User initiates upgrade from application UI
-2. Stripe checkout session created with user metadata
-3. Payment webhook adds StripeID to existing user record
-4. Subscription tier updated in real-time
-5. New features immediately available
+**Upgrade Flow (Free to Paid):**
+When a free user decides to upgrade:
+1. User clicks "Upgrade" button in application UI
+2. System creates Stripe checkout session, passing multicardzID in metadata
+3. User redirects to Stripe Checkout (leaves application temporarily)
+4. User completes payment with credit card
+5. Stripe sends `checkout.session.completed` webhook to application
+6. Webhook handler extracts multicardzID from session metadata
+7. System locates existing user record using multicardzID
+8. StripeID added to user record (linking Stripe customer to user)
+9. Subscription tier updated from "free" to selected paid tier
+10. User redirected back to application
+11. Next API request validates new subscription status with Stripe
+12. Premium features become immediately accessible
 
+**Key Difference from Pay-First Flow:**
+- User already exists in database with Auth0ID and multicardzID
+- Upgrade *updates* existing record (doesn't create new one)
+- No Auth0 credential creation needed (user already authenticated)
+- Subscription change takes effect immediately on next request
+
+**Downgrade Flow (Paid to Free):**
 Paid users downgrading or canceling:
 1. Stripe subscription modified or canceled
 2. Webhook updates subscription status
@@ -238,6 +254,15 @@ This document covers requirements for:
 **Common Requirements**
 - **FR-REG-012**: System SHALL support enterprise SSO connections via Auth0
 - **FR-REG-013**: System SHALL validate email addresses during registration
+
+**Upgrade Flow (Free to Paid)**
+- **FR-REG-014**: System SHALL allow free users to upgrade to paid plans from within the application
+- **FR-REG-015**: System SHALL create Stripe checkout session with existing user's multicardzID as metadata
+- **FR-REG-016**: System SHALL redirect user to Stripe Checkout for payment
+- **FR-REG-017**: System SHALL receive payment webhook and locate existing user record via multicardzID
+- **FR-REG-018**: System SHALL add StripeID to existing user account upon successful payment
+- **FR-REG-019**: System SHALL update subscription tier from free to paid immediately
+- **FR-REG-020**: System SHALL make premium features available without requiring re-authentication
 
 #### 2.1.2 Onboarding Experience
 - **FR-ONB-001**: System SHALL redirect new users to profile setup after first authentication
@@ -539,14 +564,22 @@ This document covers requirements for:
 
 ### 7.3 User Management System
 
-**Free User Flow:**
+**Free User Registration Flow:**
 - User accounts created in database from Auth0 ID token claims with multicardzID and Auth0ID
 - Free tier subscription automatically assigned to new users
 - Users able to upgrade to paid plans through Stripe integration
 
-**Paid User Flow:**
+**Paid User Registration Flow:**
 - User accounts created in database from Stripe payment webhook with multicardzID and StripeID
 - Auth0ID added to user account after credential creation
+
+**Upgrade Flow (Free to Paid):**
+- Stripe checkout session created with multicardzID in metadata
+- Payment webhook locates existing user record by multicardzID
+- StripeID added to existing user account
+- Subscription tier updated from free to paid
+- Premium features immediately accessible on next request
+- No re-authentication required
 
 **Common:**
 - User profiles synchronized between database and Auth0
@@ -570,11 +603,12 @@ This document covers requirements for:
 
 ## 8. Workflow Diagrams
 
-### 8.1 User Registration Flows
+### 8.1 User Registration and Upgrade Flows
 
-**Note**: MultiCardz supports two registration flows:
-1. **Free User Flow (Auth-First)**: User → Auth0 → Database (with free tier subscription)
-2. **Paid User Flow (Pay-First)**: User → Stripe → Database → Auth0 (shown below)
+**Note**: MultiCardz supports three distinct flows:
+1. **Free User Registration (Auth-First)**: User → Auth0 → Database (with free tier subscription)
+2. **Paid User Registration (Pay-First)**: User → Stripe → Database → Auth0
+3. **Upgrade Flow (Free to Paid)**: Existing User → Stripe → Update Database Record
 
 #### 8.1.1 Paid User Registration and Subscription Flow (Pay-First)
 
@@ -621,6 +655,33 @@ sequenceDiagram
     Auth0->>MultiCardz: Return ID & access tokens
     MultiCardz->>Postgres: Create user account with multicardzID, Auth0ID, and free tier
     MultiCardz->>User: Redirect to application
+```
+
+#### 8.1.3 Upgrade Flow (Free to Paid)
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant MultiCardz
+    participant Postgres
+    participant Stripe
+
+    Note over User,Postgres: User already has account with multicardzID + Auth0ID
+
+    User->>MultiCardz: Click "Upgrade to Pro"
+    MultiCardz->>Postgres: Fetch user record (multicardzID, current tier)
+    MultiCardz->>Stripe: Create checkout session with multicardzID in metadata
+    Stripe->>MultiCardz: Return checkout session URL
+    MultiCardz->>User: Redirect to Stripe Checkout
+    User->>Stripe: Complete payment
+    Stripe->>MultiCardz: Webhook: checkout.session.completed (includes multicardzID)
+    MultiCardz->>Postgres: Find user by multicardzID
+    MultiCardz->>Postgres: Add StripeID, update tier to "Pro"
+    Stripe->>User: Redirect back to MultiCardz
+    User->>MultiCardz: Next API request
+    MultiCardz->>Stripe: Verify subscription status
+    Stripe->>MultiCardz: Return active Pro subscription
+    MultiCardz->>User: Grant access to Pro features
 ```
 
 ### 8.2 Authentication Flow with Subscription Check

@@ -16,9 +16,9 @@ When you use MultiCardz:
 
 1. **Auth0 for Login Security** - A specialized security service handles your password and login. When you log in, Auth0 gives you a special encrypted "token" that proves you are who you say you are. MultiCardz checks this token on every request.
 
-2. **Stripe for Payment Security** - When you subscribe, your credit card information goes directly to Stripe (a trusted payment processor). MultiCardz never sees or stores your credit card numbers. Stripe sends us a secure notification when payment succeeds.
+2. **Stripe for Payment Security** - When you subscribe or upgrade, your credit card information goes directly to Stripe (a trusted payment processor). MultiCardz never sees or stores your credit card numbers. Stripe sends us a secure notification when payment succeeds, and we update your account to give you access to premium features.
 
-3. **Automatic Data Filtering** - Every single time you request your data, the system automatically adds "WHERE user_id = YOUR_ID" to the database query. This means it's technically impossible to accidentally see someone else's data - the system prevents it automatically.
+3. **Automatic Data Filtering** - Every single time you request your data, the system automatically adds "WHERE user_id = YOUR_ID" to the database query. This means it's technically impossible to accidentally see someone else's data - the system prevents it automatically. When you upgrade from free to paid, your data stays exactly the same - you just get access to more features.
 
 **Who This Document Is For:**
 - Developers building the authentication and payment systems
@@ -188,6 +188,18 @@ If user_id not found in context:
 3. User redirected to Auth0 → credentials created
 4. Auth0 callback adds Auth0ID to existing record
 5. Session token created linking all three IDs
+
+**Upgrade Flow (Free to Paid):**
+1. Existing free user clicks "Upgrade" in application
+2. Application creates Stripe checkout session with multicardzID in metadata
+3. User completes payment at Stripe Checkout
+4. Stripe webhook received with multicardzID in metadata
+5. Webhook handler locates existing user record by multicardzID
+6. StripeID added to user record (links Stripe customer to user)
+7. Subscription tier updated from "free" to paid tier
+8. User redirected back to application
+9. Next request picks up new subscription status
+10. Premium features immediately available
 
 **Login Flow Integration:**
 1. Auth middleware validates session token from cookie
