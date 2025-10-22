@@ -1,5 +1,5 @@
 """
-pytest configuration for MultiCardz™ shared package tests.
+pytest configuration for multicardz™ shared package tests.
 """
 
 import pytest

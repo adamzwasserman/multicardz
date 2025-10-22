@@ -1,6 +1,6 @@
 # multicardz Data Transformation Guidelines
 
-**Document ID**: 012-2025-09-18-MultiCardz-Data-Transformation-Guidelines-v1
+**Document ID**: 012-2025-09-18-multicardz-Data-Transformation-Guidelines-v1
 **Created**: September 18, 2025
 **Author**: System Architect
 **Status**: Active Architecture Specification
@@ -78,11 +78,11 @@ Based on dual-value analysis (internal operations + market opportunity):
 **Mathematical Model**:
 ```
 Traditional Approach: Event → Single Record → Database Normalization
-MultiCardz Approach: Event → Card Instances → Spatial Proliferation → Pattern Discovery
+multicardz Approach: Event → Card Instances → Spatial Proliferation → Pattern Discovery
 
 For user with N failed logins:
 Traditional: 1 user record + N login_attempt records
-MultiCardz: N Card instances each tagged #user-alice for spatial aggregation
+multicardz: N Card instances each tagged #user-alice for spatial aggregation
 ```
 
 **Implementation Pattern**:
@@ -369,7 +369,7 @@ def extract_spatial_tags(
 
 **Engineering Operations Intelligence**:
 
-The power of MultiCardz emerges when Cards from different systems are spatially correlated to reveal operational patterns.
+The power of multicardz emerges when Cards from different systems are spatially correlated to reveal operational patterns.
 
 **Correlation Pattern 1: Deployment Impact Analysis**
 ```
@@ -873,7 +873,7 @@ def create_fallback_card(
 
 ### Spatial Manipulation Alignment
 
-The data transformation guidelines maintain complete compliance with MultiCardz patent specifications:
+The data transformation guidelines maintain complete compliance with multicardz patent specifications:
 
 **Claim 1 Compliance**: "System for organizing multi-dimensional data through spatial manipulation"
 - ✅ Operational data becomes multi-dimensional through tag extraction
@@ -930,7 +930,7 @@ The transformation guidelines extend patent coverage by enabling spatial manipul
 
 ## Conclusion
 
-These data transformation guidelines establish MultiCardz as the definitive platform for operational intelligence through spatial manipulation. By transforming heterogeneous operational data into semantic Card instances, organizations can discover patterns and correlations invisible in traditional tool-hopping approaches.
+These data transformation guidelines establish multicardz as the definitive platform for operational intelligence through spatial manipulation. By transforming heterogeneous operational data into semantic Card instances, organizations can discover patterns and correlations invisible in traditional tool-hopping approaches.
 
 **The "Drag. Drop. Discover." paradigm becomes reality through**:
 1. **Semantic Cards** that humans immediately understand
@@ -938,10 +938,10 @@ These data transformation guidelines establish MultiCardz as the definitive plat
 3. **Cross-System Correlation** through shared semantic attributes
 4. **Real-Time Intelligence** through immediate operational Card availability
 
-The guidelines ensure MultiCardz solves the heterogeneous data correlation problem that no other tool addresses, establishing a new category of operational intelligence platforms.
+The guidelines ensure multicardz solves the heterogeneous data correlation problem that no other tool addresses, establishing a new category of operational intelligence platforms.
 
-**Success in implementing these guidelines will enable the compelling story**: "We use MultiCardz to run MultiCardz" - demonstrating operational intelligence capabilities that resonate with technical organizations worldwide.
+**Success in implementing these guidelines will enable the compelling story**: "We use multicardz to run multicardz" - demonstrating operational intelligence capabilities that resonate with technical organizations worldwide.
 
 ---
 
-**This document provides the foundation for transforming MultiCardz from a spatial manipulation tool into a comprehensive operational intelligence platform, enabling discovery of patterns and correlations across any operational data sources.**
+**This document provides the foundation for transforming multicardz from a spatial manipulation tool into a comprehensive operational intelligence platform, enabling discovery of patterns and correlations across any operational data sources.**

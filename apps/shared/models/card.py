@@ -1,5 +1,5 @@
 """
-Card models for MultiCardz™.
+Card models for multicardz™.
 Two-tier architecture for optimal performance.
 """
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Spatial Rendering Test for MultiCardz™
+Spatial Rendering Test for multicardz™
 Tests the polymorphic spatial rendering system with real browser interactions.
 
 Test Sequence:
@@ -128,7 +128,7 @@ class SpatialRenderingTest:
 
 async def run_spatial_test():
     """Run the complete spatial rendering test."""
-    print("🚀 MultiCardz™ Spatial Rendering Test")
+    print("🚀 multicardz™ Spatial Rendering Test")
     print("=" * 60)
 
     tester = SpatialRenderingTest(headless=False, slow_mo=300)

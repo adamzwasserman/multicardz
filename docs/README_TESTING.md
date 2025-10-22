@@ -1,4 +1,4 @@
-# MultiCardz™ Testing Guide
+# multicardz™ Testing Guide
 
 ## 🎯 **Unified Test Runner**
 

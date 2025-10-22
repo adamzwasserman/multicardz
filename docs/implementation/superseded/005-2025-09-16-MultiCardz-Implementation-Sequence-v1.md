@@ -1,4 +1,4 @@
-# MultiCardz™ Implementation Sequence v1
+# multicardz™ Implementation Sequence v1
 
 **Document Version**: 1.0
 **Date**: 2025-09-16

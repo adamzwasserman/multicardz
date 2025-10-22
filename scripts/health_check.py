@@ -1,5 +1,5 @@
 """
-Health Check and Performance Monitoring for MultiCardz™ on Render.
+Health Check and Performance Monitoring for multicardz™ on Render.
 
 Provides real-time performance metrics and system health information
 for monitoring set operations performance in production.

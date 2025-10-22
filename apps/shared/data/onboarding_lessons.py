@@ -1,5 +1,5 @@
 """
-MultiCardz™ Progressive Onboarding Lesson Data
+multicardz™ Progressive Onboarding Lesson Data
 Contains all lesson cards, tags, and progression logic for teaching users.
 
 Based on Piagetian Learning principles with Muji aesthetic.

@@ -975,4 +975,4 @@ Based on user value and risk, recommended implementation order:
 
 - Implementation Plan: `030-2025-10-08-Turso-Browser-Integration-Plan-v2.md`
 - Documentation Audit: `DOCUMENTATION_AUDIT_2025-10-20.md`
-- Architecture: `027-2025-10-15-MultiCardz-Outlook-Email-Integration-Architecture-v1.md` (reference for zero-trust patterns)
+- Architecture: `027-2025-10-15-multicardz-Outlook-Email-Integration-Architecture-v1.md` (reference for zero-trust patterns)

@@ -1,4 +1,4 @@
-# MultiCardz Project - Local Configuration
+# multicardz Project - Local Configuration
 
 ## Python Execution Standard
 

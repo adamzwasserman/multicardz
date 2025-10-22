@@ -1,5 +1,5 @@
 """
-MultiCardz" User Application Routes
+multicardz" User Application Routes
 """
 
 from .cards_api import router as cards_router

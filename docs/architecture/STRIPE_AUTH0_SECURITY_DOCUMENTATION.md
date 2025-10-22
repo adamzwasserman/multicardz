@@ -3,10 +3,10 @@
 ## Plain Language Introduction
 
 **What This Document Explains:**
-This document shows developers exactly how MultiCardz keeps your login secure and your payment information safe. It's a technical guide that contains actual code examples.
+This document shows developers exactly how multicardz keeps your login secure and your payment information safe. It's a technical guide that contains actual code examples.
 
 **Why Security Matters:**
-When you use MultiCardz:
+When you use multicardz:
 - Your login credentials need to be protected from hackers
 - Your credit card information must never be exposed
 - Your cards and tags should only be visible to you
@@ -14,9 +14,9 @@ When you use MultiCardz:
 
 **The Three Security Layers:**
 
-1. **Auth0 for Login Security** - A specialized security service handles your password and login. When you log in, Auth0 gives you a special encrypted "token" that proves you are who you say you are. MultiCardz checks this token on every request.
+1. **Auth0 for Login Security** - A specialized security service handles your password and login. When you log in, Auth0 gives you a special encrypted "token" that proves you are who you say you are. multicardz checks this token on every request.
 
-2. **Stripe for Payment Security** - When you subscribe or upgrade, your credit card information goes directly to Stripe (a trusted payment processor). MultiCardz never sees or stores your credit card numbers. Stripe sends us a secure notification when payment succeeds, and we update your account to give you access to premium features.
+2. **Stripe for Payment Security** - When you subscribe or upgrade, your credit card information goes directly to Stripe (a trusted payment processor). multicardz never sees or stores your credit card numbers. Stripe sends us a secure notification when payment succeeds, and we update your account to give you access to premium features.
 
 3. **Automatic Data Filtering** - Every single time you request your data, the system automatically adds "WHERE user_id = YOUR_ID" to the database query. This means it's technically impossible to accidentally see someone else's data - the system prevents it automatically. When you upgrade from free to paid, your data stays exactly the same - you just get access to more features.
 
@@ -43,7 +43,7 @@ This section explains how the security system works at a conceptual level before
 
 **Layer 1: Auth0 OAuth2 Flow**
 
-MultiCardz uses Auth0's authorization code flow with PKCE (Proof Key for Code Exchange) for authentication. This provides:
+multicardz uses Auth0's authorization code flow with PKCE (Proof Key for Code Exchange) for authentication. This provides:
 
 **Authorization Request:**
 - Application redirects user to Auth0 with client_id, redirect_uri, and code_challenge
@@ -78,7 +78,7 @@ MultiCardz uses Auth0's authorization code flow with PKCE (Proof Key for Code Ex
 
 **Layer 2: Stripe Webhook Architecture**
 
-MultiCardz uses Stripe webhooks to synchronize subscription state in real-time. This architecture ensures:
+multicardz uses Stripe webhooks to synchronize subscription state in real-time. This architecture ensures:
 
 **Webhook Event Processing:**
 1. Stripe sends POST request to configured webhook endpoint

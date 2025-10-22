@@ -1,5 +1,5 @@
 /**
- * MultiCardz™ Application Logic
+ * multicardz™ Application Logic
  * UI controls, card/tag creation, and event handlers
  * Follows web performance best practices
  */

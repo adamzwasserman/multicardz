@@ -22,7 +22,7 @@ def run_command(cmd, description):
 
 def main():
     """Install all testing dependencies."""
-    print("🚀 Setting up MultiCardz™ Test Environment")
+    print("🚀 Setting up multicardz™ Test Environment")
     print("=" * 50)
 
     # Install parallel testing

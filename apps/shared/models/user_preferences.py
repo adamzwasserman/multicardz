@@ -1,5 +1,5 @@
 """
-User Preferences model for MultiCardz™.
+User Preferences model for multicardz™.
 Handles all user UI/UX customization settings.
 """
 

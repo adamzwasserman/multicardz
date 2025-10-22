@@ -44,7 +44,7 @@ Comprehensive README documenting:
 ### 4. Added Status Headers to Key Documents
 
 #### Outlook Email Integration Architecture
-**File**: `/docs/architecture/027-2025-10-15-MultiCardz-Outlook-Email-Integration-Architecture-v1.md`
+**File**: `/docs/architecture/027-2025-10-15-multicardz-Outlook-Email-Integration-Architecture-v1.md`
 
 Added header:
 ```markdown
@@ -55,14 +55,14 @@ Added header:
 ```
 
 #### Outlook Email Integration Implementation Plan
-**File**: `/docs/implementation/028-2025-10-15-MultiCardz-Outlook-Email-Integration-Implementation-v1.md`
+**File**: `/docs/implementation/028-2025-10-15-multicardz-Outlook-Email-Integration-Implementation-v1.md`
 
 Added header:
 ```markdown
 **STATUS**: PLANNED - NOT YET IMPLEMENTED
 **IMPLEMENTATION DATE**: Not Started
 **VERIFICATION**: No Outlook integration code exists in codebase
-**ARCHITECTURE**: docs/architecture/027-2025-10-15-MultiCardz-Outlook-Email-Integration-Architecture-v1.md
+**ARCHITECTURE**: docs/architecture/027-2025-10-15-multicardz-Outlook-Email-Integration-Architecture-v1.md
 **LAST UPDATED**: 2025-10-15
 ```
 
@@ -126,7 +126,7 @@ The audit identified several additional actions that should be taken:
 1. ✅ Add STATUS headers to all architecture and implementation documents (PARTIALLY DONE - key docs updated)
 2. ✅ Move superseded documents (DONE)
 3. ⏳ Delete duplicate files (NOT DONE)
-   - `016-2025-09-20-MultiCardz-Unified-Implementation-Plan-v1 - duplicate.md`
+   - `016-2025-09-20-multicardz-Unified-Implementation-Plan-v1 - duplicate.md`
 4. ⏳ Update IMPLEMENTATION_STATUS_UPDATE.md (NOT DONE)
    - Add Turso integration status
    - Add auto-migration completion
@@ -157,8 +157,8 @@ The audit identified several additional actions that should be taken:
 4. `/docs/architecture/superseded/` (directory)
 
 ### Modified
-1. `/docs/architecture/027-2025-10-15-MultiCardz-Outlook-Email-Integration-Architecture-v1.md` (added status header)
-2. `/docs/implementation/028-2025-10-15-MultiCardz-Outlook-Email-Integration-Implementation-v1.md` (added status header)
+1. `/docs/architecture/027-2025-10-15-multicardz-Outlook-Email-Integration-Architecture-v1.md` (added status header)
+2. `/docs/implementation/028-2025-10-15-multicardz-Outlook-Email-Integration-Implementation-v1.md` (added status header)
 3. `/docs/implementation/030-2025-10-08-Turso-Browser-Integration-Plan-v2.md` (added status header)
 4. `/docs/implementation/superceeded/outlook-email-integration-plan.md` (added superseded header)
 5. `/docs/implementation/superceeded/030-2025-10-08-Turso-Browser-Integration-Plan-v1.md` (added superseded header)

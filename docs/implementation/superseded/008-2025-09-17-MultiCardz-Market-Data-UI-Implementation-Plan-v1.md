@@ -1,9 +1,9 @@
-# MultiCardz Market Data and UI Implementation Plan
+# multicardz Market Data and UI Implementation Plan
 
 **Document Version**: 1.0
 **Date**: 2025-09-17
 **Status**: IMPLEMENTATION PLAN
-**Architecture Reference**: 007-2025-09-17-MultiCardz-Market-Data-UI-Architecture-v1.md
+**Architecture Reference**: 007-2025-09-17-multicardz-Market-Data-UI-Architecture-v1.md
 
 ## Overview
 
@@ -75,7 +75,7 @@ This implementation plan executes the comprehensive architecture for market segm
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
+   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -306,7 +306,7 @@ This implementation plan executes the comprehensive architecture for market segm
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
+   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
    # Duration: 3 hours 15 minutes
    ```
 
@@ -333,7 +333,7 @@ This implementation plan executes the comprehensive architecture for market segm
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
+   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -348,7 +348,7 @@ This implementation plan executes the comprehensive architecture for market segm
        Given a social media production manager segment
        When I create a customer scenario
        Then it should include content management pain points
-       And it should show MultiCardz solutions for asset organization
+       And it should show multicardz solutions for asset organization
 
      Scenario: Create scenario-based cards
        Given a customer scenario definition
@@ -467,7 +467,7 @@ This implementation plan executes the comprehensive architecture for market segm
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
+   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
    # Duration: 2 hours 45 minutes
    ```
 
@@ -481,7 +481,7 @@ This implementation plan executes the comprehensive architecture for market segm
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
+   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -603,7 +603,7 @@ This implementation plan executes the comprehensive architecture for market segm
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 2.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
+   echo "Task 2.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -845,7 +845,7 @@ This implementation plan executes the comprehensive architecture for market segm
 
 8. **Capture End Time**
    ```bash
-   echo "Task 2.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
+   echo "Task 2.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
    # Duration: 4 hours 30 minutes
    ```
 

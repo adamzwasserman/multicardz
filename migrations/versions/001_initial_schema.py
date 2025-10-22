@@ -1,4 +1,4 @@
-"""Initial MultiCardz database schema
+"""Initial multicardz database schema
 
 Revision ID: 001
 Revises:

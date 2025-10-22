@@ -1,6 +1,6 @@
-# MultiCardz Accessibility Gap Analysis and Remediation Strategy
+# multicardz Accessibility Gap Analysis and Remediation Strategy
 
-**Document ID**: 014-2025-09-18-MultiCardz-Accessibility-Gap-Analysis-v1
+**Document ID**: 014-2025-09-18-multicardz-Accessibility-Gap-Analysis-v1
 **Created**: September 18, 2025
 **Author**: System Architect
 **Status**: Critical Architecture Analysis - Implementation Required
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This comprehensive accessibility gap analysis identifies critical barriers preventing equitable access to MultiCardz's revolutionary spatial manipulation interface. The analysis reveals significant gaps across web accessibility standards, tablet interaction patterns, and assistive technology compatibility that must be addressed to achieve WCAG 2.1 AA compliance and ensure universal usability.
+This comprehensive accessibility gap analysis identifies critical barriers preventing equitable access to multicardz's revolutionary spatial manipulation interface. The analysis reveals significant gaps across web accessibility standards, tablet interaction patterns, and assistive technology compatibility that must be addressed to achieve WCAG 2.1 AA compliance and ensure universal usability.
 
 **Critical Findings**:
 - **Spatial drag-and-drop operations lack accessible alternatives**, creating complete barriers for keyboard-only and screen reader users
@@ -24,7 +24,7 @@ This comprehensive accessibility gap analysis identifies critical barriers preve
 
 ### 1.1 Architecture Review for Accessibility
 
-Based on analysis of the current architecture documents, MultiCardz implements a sophisticated spatial manipulation system with the following accessibility-relevant components:
+Based on analysis of the current architecture documents, multicardz implements a sophisticated spatial manipulation system with the following accessibility-relevant components:
 
 **HTMX + Web Components Architecture**:
 - Server-side HTML generation maintains semantic structure foundation
@@ -97,7 +97,7 @@ Based on analysis of the current architecture documents, MultiCardz implements a
 
 #### 2.1.2 Time-based Media (1.2)
 **STATUS: Not Applicable**
-MultiCardz does not currently use time-based media.
+multicardz does not currently use time-based media.
 
 #### 2.1.3 Adaptable (1.3)
 **MAJOR GAP: Spatial Relationships Not Programmatically Determinable**
@@ -315,7 +315,7 @@ class AccessibleAnimations {
 </div>
 
 <!-- Proper landmark structure -->
-<main id="main-content" role="main" aria-label="MultiCardz spatial data interface">
+<main id="main-content" role="main" aria-label="multicardz spatial data interface">
   <section id="spatial-zones" role="application" aria-label="Spatial manipulation zones">
     <!-- Spatial zones with proper ARIA -->
   </section>
@@ -681,7 +681,7 @@ Card multiplicity indicators and spatial feedback may be invisible on tablet scr
 }
 ```
 
-## 4. MultiCardz-Specific Accessibility Considerations
+## 4. multicardz-Specific Accessibility Considerations
 
 ### 4.1 Card Multiplicity Accessibility
 
@@ -1326,8 +1326,8 @@ class AccessibilityMonitoring {
 - Enterprise accessibility requirements met
 - Legal risk mitigation documented and verified
 
-The implementation of this accessibility remediation strategy will transform MultiCardz from an accessibility-exclusionary system to a universally accessible platform that exemplifies the principles of inclusive design while maintaining the revolutionary spatial manipulation capabilities protected by our patent portfolio.
+The implementation of this accessibility remediation strategy will transform multicardz from an accessibility-exclusionary system to a universally accessible platform that exemplifies the principles of inclusive design while maintaining the revolutionary spatial manipulation capabilities protected by our patent portfolio.
 
 ---
 
-**This accessibility gap analysis provides the foundation for creating an inclusive MultiCardz experience that serves all users while preserving the innovative spatial manipulation paradigm that defines our competitive advantage.**
+**This accessibility gap analysis provides the foundation for creating an inclusive multicardz experience that serves all users while preserving the innovative spatial manipulation paradigm that defines our competitive advantage.**

@@ -1,8 +1,8 @@
-# 022 MultiCardz Multi-Tier Database Architecture v1
+# 022 multicardz Multi-Tier Database Architecture v1
 
 ## Executive Summary
 
-MultiCardz requires a sophisticated multi-tier database architecture that separates authentication/billing concerns from high-performance project data while maintaining sub-millisecond set theory operations and patent compliance. This architecture implements a three-tier system: Central PostgreSQL for authentication/billing, individual Turso instances for project data, and master customer instances for cross-project user preferences.
+multicardz requires a sophisticated multi-tier database architecture that separates authentication/billing concerns from high-performance project data while maintaining sub-millisecond set theory operations and patent compliance. This architecture implements a three-tier system: Central PostgreSQL for authentication/billing, individual Turso instances for project data, and master customer instances for cross-project user preferences.
 
 **Key Architectural Decisions:**
 - **Central Tier**: PostgreSQL cloud instance for authentication, billing, and subscription management
@@ -22,7 +22,7 @@ MultiCardz requires a sophisticated multi-tier database architecture that separa
 
 ### Current State Architecture
 
-The existing MultiCardz system uses a single SQLite database with an advanced two-tier storage pattern:
+The existing multicardz system uses a single SQLite database with an advanced two-tier storage pattern:
 - **CardSummary** objects for fast list operations (~50 bytes per card)
 - **CardDetail** objects for on-demand content loading
 - **Normalized tag schema** with card-tag relationship tables

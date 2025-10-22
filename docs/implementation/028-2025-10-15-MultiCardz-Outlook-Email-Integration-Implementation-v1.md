@@ -1,15 +1,15 @@
-# MultiCardz Outlook Email Integration Implementation Plan
+# multicardz Outlook Email Integration Implementation Plan
 
 **STATUS**: PLANNED - NOT YET IMPLEMENTED
 **IMPLEMENTATION DATE**: Not Started
 **VERIFICATION**: No Outlook integration code exists in codebase
-**ARCHITECTURE**: docs/architecture/027-2025-10-15-MultiCardz-Outlook-Email-Integration-Architecture-v1.md
+**ARCHITECTURE**: docs/architecture/027-2025-10-15-multicardz-Outlook-Email-Integration-Architecture-v1.md
 **LAST UPDATED**: 2025-10-15
 
 ## Implementation Overview
 
 ### Scope and Objectives
-Implement complete Outlook email integration for MultiCardz following the architecture specification, enabling users to transform emails into semantic cards for spatial manipulation while maintaining 100% privacy through browser-only storage.
+Implement complete Outlook email integration for multicardz following the architecture specification, enabling users to transform emails into semantic cards for spatial manipulation while maintaining 100% privacy through browser-only storage.
 
 ### Success Criteria
 - ✅ Functional OAuth authentication with MSAL.js and PKCE
@@ -76,7 +76,7 @@ Implement complete Outlook email integration for MultiCardz following the archit
 **Azure Portal Configuration**:
 1. Navigate to Azure Active Directory → App registrations
 2. Create new registration:
-   - Name: "MultiCardz Email Integration"
+   - Name: "multicardz Email Integration"
    - Supported account types: "Multitenant and personal accounts"
    - Redirect URI: `http://localhost:3000/auth/callback` (SPA type)
 3. Configure authentication:
@@ -1625,7 +1625,7 @@ export function cancelSync();
 
 2. **Create App Registration**
    - Azure Active Directory → App registrations → New registration
-   - Name: "MultiCardz Email Integration"
+   - Name: "multicardz Email Integration"
    - Account types: Multitenant + personal
    - Redirect URI: http://localhost:3000/auth/callback (SPA)
 

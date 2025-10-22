@@ -1,5 +1,5 @@
 """
-BDD tests for MultiCardz™ models.
+BDD tests for multicardz™ models.
 """
 
 import pytest

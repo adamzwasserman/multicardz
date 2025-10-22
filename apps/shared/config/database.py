@@ -1,5 +1,5 @@
 """
-Database configuration for MultiCardz.
+Database configuration for multicardz.
 
 The database path is DYNAMIC and can be specified per-request via
 tagsInPlay.controls.databasePath for multi-user environments.

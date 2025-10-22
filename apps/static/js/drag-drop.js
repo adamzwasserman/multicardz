@@ -1,5 +1,5 @@
 /**
- * MultiCardz™ Spatial Drag-Drop System
+ * multicardz™ Spatial Drag-Drop System
  * Handles dynamic zone discovery, multi-tag operations, and immutable DOM manipulation
  *
  * Architecture: Polymorphic state table-driven drag-drop with handler registry

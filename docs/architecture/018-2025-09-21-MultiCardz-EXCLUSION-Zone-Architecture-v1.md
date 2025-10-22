@@ -1,6 +1,6 @@
-# MultiCardz™ EXCLUSION Zone Architecture v1
+# multicardz™ EXCLUSION Zone Architecture v1
 
-**Document ID**: 018-2025-09-21-MultiCardz-EXCLUSION-Zone-Architecture-v1
+**Document ID**: 018-2025-09-21-multicardz-EXCLUSION-Zone-Architecture-v1
 **Created**: September 21, 2025
 **Status**: URGENT IMPLEMENTATION REQUIRED
 **Purpose**: Define EXCLUSION zone functionality to complete set theory operations
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-The EXCLUSION zone represents a critical missing piece in the MultiCardz spatial manipulation paradigm. While UNION and INTERSECTION zones are implemented, the absence of EXCLUSION prevents users from performing complete set theory operations. This document specifies the architecture for implementing EXCLUSION zones across the entire stack.
+The EXCLUSION zone represents a critical missing piece in the multicardz spatial manipulation paradigm. While UNION and INTERSECTION zones are implemented, the absence of EXCLUSION prevents users from performing complete set theory operations. This document specifies the architecture for implementing EXCLUSION zones across the entire stack.
 
 **Mathematical Definition**:
 ```
@@ -464,4 +464,4 @@ The EXCLUSION zone completes the set theory trinity required for comprehensive s
 
 ---
 
-*This architecture document defines the complete specification for EXCLUSION zone implementation in the MultiCardz system.*
+*This architecture document defines the complete specification for EXCLUSION zone implementation in the multicardz system.*

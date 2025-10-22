@@ -1,8 +1,8 @@
-# MultiCardz™ Set Operations Performance Remediation Implementation Plan v1
+# multicardz™ Set Operations Performance Remediation Implementation Plan v1
 
-**Document ID**: 018-2025-09-20-MultiCardz-Set-Operations-Performance-Remediation-Plan-v1
+**Document ID**: 018-2025-09-20-multicardz-Set-Operations-Performance-Remediation-Plan-v1
 **Created**: September 20, 2025
-**Architecture Reference**: docs/architecture/017-2025-09-20-MultiCardz-Set-Operations-Performance-Remediation-Architecture-v1.md
+**Architecture Reference**: docs/architecture/017-2025-09-20-multicardz-Set-Operations-Performance-Remediation-Architecture-v1.md
 **Status**: CRITICAL PERFORMANCE REMEDIATION
 **Priority**: P0 - System Performance Foundation
 
@@ -65,7 +65,7 @@ This implementation plan remediates critical architectural violations in the set
 
 ##### Step 1: Capture Start Time
 ```bash
-echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/018-2025-09-20-MultiCardz-Set-Operations-Performance-Remediation-Plan-v1.md
+echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/018-2025-09-20-multicardz-Set-Operations-Performance-Remediation-Plan-v1.md
 ```
 
 ##### Step 2: Create BDD Feature File
@@ -215,7 +215,7 @@ python -m pytest tests/test_singleton_registry.py -v --tb=short
 ```python
 # apps/shared/services/set_operations_registry.py
 """
-Elite Singleton Registry for MultiCardz Set Operations.
+Elite Singleton Registry for multicardz Set Operations.
 
 Thread-safe singleton pattern (approved class usage) for stable in-memory data structures.
 Pre-computes all tag mappings and bitmaps for optimal performance.

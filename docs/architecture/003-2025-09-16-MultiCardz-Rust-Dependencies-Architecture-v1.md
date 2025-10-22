@@ -1,4 +1,4 @@
-# MultiCardz™ Rust-Powered Dependencies Architecture v1
+# multicardz™ Rust-Powered Dependencies Architecture v1
 
 **Document Version**: 1.0
 **Date**: 2025-09-16
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-MultiCardz™ leverages a carefully curated selection of Rust-powered dependencies to achieve elite performance while maintaining Python's development velocity. This hybrid approach delivers enterprise-grade performance characteristics (sub-millisecond operations, hardware-accelerated encryption, O(1) set operations) without sacrificing code maintainability or deployment simplicity.
+multicardz™ leverages a carefully curated selection of Rust-powered dependencies to achieve elite performance while maintaining Python's development velocity. This hybrid approach delivers enterprise-grade performance characteristics (sub-millisecond operations, hardware-accelerated encryption, O(1) set operations) without sacrificing code maintainability or deployment simplicity.
 
 The dependency architecture supports our tiered service model, where Elite tier customers benefit from maximum performance optimizations while Standard and Cloud tiers maintain compatibility with traditional Python tooling. All dependencies are production-hardened, actively maintained, and provide measurable performance improvements over pure Python alternatives.
 

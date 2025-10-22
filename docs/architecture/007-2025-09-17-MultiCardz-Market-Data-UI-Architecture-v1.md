@@ -1,13 +1,13 @@
-# MultiCardz Market Data and UI Architecture Specification
+# multicardz Market Data and UI Architecture Specification
 
 **Document Version**: 1.0
 **Date**: 2025-09-17
 **Status**: ARCHITECTURE SPECIFICATION
-**Next Document**: 008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
+**Next Document**: 008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
 
 ## Executive Summary
 
-This architecture specification defines the comprehensive implementation of market segment data models and complete UI specification for the MultiCardz spatial manipulation system. Based on analysis of the sales document and patent specifications, this architecture establishes the foundational data structures for market scenarios and the complete UI framework supporting spatial manipulation paradigms.
+This architecture specification defines the comprehensive implementation of market segment data models and complete UI specification for the multicardz spatial manipulation system. Based on analysis of the sales document and patent specifications, this architecture establishes the foundational data structures for market scenarios and the complete UI framework supporting spatial manipulation paradigms.
 
 The solution implements patent-compliant spatial manipulation zones with set theory operations, comprehensive market data models supporting all identified segments, and a complete UI framework using HTMX for interactivity while maintaining pure functional architecture principles. Performance targets include sub-millisecond spatial operations and seamless scaling to 500,000+ cards without degradation.
 

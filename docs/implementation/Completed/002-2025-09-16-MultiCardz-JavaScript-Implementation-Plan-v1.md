@@ -1,4 +1,4 @@
-# MultiCardz JavaScript Implementation Plan
+# multicardz JavaScript Implementation Plan
 
 **Document Version**: 1.0
 **Date**: 2025-09-16
@@ -9,9 +9,9 @@
 
 ## Overview
 
-This implementation plan transforms the CardZ spatial tag manipulation system into MultiCardz using pure JavaScript instead of C/WASM, while maintaining strict patent compliance and architectural principles. The implementation follows the mandatory 8-step process for every task, ensuring test-driven development, behavior-driven development, and accurate time tracking.
+This implementation plan transforms the CardZ spatial tag manipulation system into multicardz using pure JavaScript instead of C/WASM, while maintaining strict patent compliance and architectural principles. The implementation follows the mandatory 8-step process for every task, ensuring test-driven development, behavior-driven development, and accurate time tracking.
 
-**Reference Architecture**: `docs/architecture/001-2025-09-16-MultiCardz-JavaScript-Architecture-v1.md`
+**Reference Architecture**: `docs/architecture/001-2025-09-16-multicardz-JavaScript-Architecture-v1.md`
 
 **Business Value**:
 - Simplified development workflow (no WASM compilation)
@@ -95,7 +95,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -179,7 +179,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 7. **Commit and Push**
    ```bash
    git add -A
-   git commit -m "feat: Create project structure for MultiCardz
+   git commit -m "feat: Create project structure for multicardz
 
    - Added complete directory structure following architecture
    - Created packages for user-site and shared components
@@ -192,7 +192,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 **Validation Criteria**:
@@ -215,7 +215,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -223,18 +223,18 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    # tests/features/documentation_migration.feature
    Feature: Documentation Migration
      As a developer
-     I want all CardZ documentation migrated to MultiCardz
+     I want all CardZ documentation migrated to multicardz
      So that I have complete context for development
 
      Scenario: Patent documentation migration
        Given CardZ patent documents exist
-       When I copy them to MultiCardz docs/patents/
+       When I copy them to multicardz docs/patents/
        Then all patent files should be preserved exactly
        And file integrity should be verified
 
      Scenario: Standards documentation migration
        Given CardZ standards exist
-       When I copy them to MultiCardz docs/standards/
+       When I copy them to multicardz docs/standards/
        Then all standard files should be accessible
        And guidelines should be properly referenced
    ```
@@ -301,7 +301,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 **Validation Criteria**:
@@ -319,7 +319,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -328,7 +328,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    Feature: Development Environment Setup
      As a developer
      I want a properly configured development environment
-     So that I can develop MultiCardz efficiently
+     So that I can develop multicardz efficiently
 
      Scenario: Python dependencies installation
        Given I have a requirements.txt file
@@ -406,7 +406,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 1.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 **Validation Criteria**:
@@ -438,7 +438,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 2.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 2.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -447,7 +447,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    Feature: FastAPI Application Setup
      As a developer
      I want a properly configured FastAPI application
-     So that I can serve the MultiCardz interface
+     So that I can serve the multicardz interface
 
      Scenario: Basic application startup
        Given I have a FastAPI application
@@ -493,7 +493,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    from fastapi.templating import Jinja2Templates
    from pathlib import Path
 
-   app = FastAPI(title="MultiCardz", version="1.0.0")
+   app = FastAPI(title="multicardz", version="1.0.0")
 
    # Static files configuration
    static_path = Path(__file__).parent.parent / "static"
@@ -538,7 +538,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 2.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 2.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ### Task 2.2: Set Theory Service Implementation ✅
@@ -550,7 +550,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 2.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 2.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -718,7 +718,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 2.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 2.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ### Task 2.3: HTML Template System ✅
@@ -730,7 +730,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 2.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 2.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -793,7 +793,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    <head>
        <meta charset="UTF-8">
        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-       <title>MultiCardz</title>
+       <title>multicardz</title>
        <link rel="stylesheet" href="/static/css/wasm-interface.css">
        <script src="https://unpkg.com/htmx.org@1.9.8"></script>
    </head>
@@ -899,7 +899,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 2.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 2.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ---
@@ -925,7 +925,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 3.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 3.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -992,10 +992,10 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    ```javascript
    // packages/user-site/static/js/dispatch.js
    /**
-    * MultiCardz Polymorphic Dispatch System
+    * multicardz Polymorphic Dispatch System
     * Replaces WASM functionality with pure JavaScript
     */
-   const MultiCardzDispatch = (function() {
+   const multicardzDispatch = (function() {
        'use strict';
 
        // Dispatch table for drag-drop operations
@@ -1119,7 +1119,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
                operation = 'tag-to-cloud';
            }
 
-           MultiCardzDispatch.dispatch(operation, context);
+           multicardzDispatch.dispatch(operation, context);
 
        } catch (error) {
            console.error('Drop handling error:', error);
@@ -1133,7 +1133,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
    // Initialize dispatch system
    document.addEventListener('DOMContentLoaded', function() {
-       console.log('MultiCardz Dispatch System initialized');
+       console.log('multicardz Dispatch System initialized');
    });
    ```
 
@@ -1161,7 +1161,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 3.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 3.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ### Task 3.2: CSS Integration from CardZ ✅
@@ -1173,7 +1173,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 3.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 3.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -1186,13 +1186,13 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
      Scenario: CSS file integration
        Given CardZ has wasm-interface.css
-       When I copy it to MultiCardz static/css/
+       When I copy it to multicardz static/css/
        Then the styling should be identical
        And all CSS classes should be available
 
      Scenario: Visual interface rendering
        Given I have the integrated CSS
-       When I load the MultiCardz interface
+       When I load the multicardz interface
        Then it should visually match the CardZ interface
        And drag-drop zones should have proper styling
    ```
@@ -1249,7 +1249,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 3.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 3.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ---
@@ -1275,7 +1275,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 4.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 4.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -1432,7 +1432,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 4.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 4.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ### Task 4.2: Core.py Integration ✅
@@ -1444,20 +1444,20 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 4.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 4.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
    ```gherkin
    # tests/features/core_integration.feature
    Feature: Core.py Integration
-     As a MultiCardz system
+     As a multicardz system
      I want to preserve CardZ core functionality
      So that the /api/render/card logic is maintained
 
      Scenario: Core functionality preservation
        Given CardZ has core.py with render logic
-       When I integrate it into MultiCardz
+       When I integrate it into multicardz
        Then the same filtering logic should be available
        And API compatibility should be maintained
    ```
@@ -1507,7 +1507,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 4.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 4.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ---
@@ -1520,7 +1520,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 ### Objectives
 - [ ] Create enhanced Claude agents for JavaScript development
-- [ ] Adapt existing agents for MultiCardz context
+- [ ] Adapt existing agents for multicardz context
 - [ ] Configuration and testing of agent system
 
 ### Task 5.1: Enhanced Agent Creation ✅
@@ -1532,7 +1532,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 5.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 5.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -1541,11 +1541,11 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    Feature: Enhanced Agent System
      As a development team
      I want improved Claude agents for JavaScript development
-     So that development workflow is optimized for MultiCardz
+     So that development workflow is optimized for multicardz
 
      Scenario: Agent configuration
        Given I have CardZ agents as a baseline
-       When I create enhanced agents for MultiCardz
+       When I create enhanced agents for multicardz
        Then each agent should have JavaScript-specific capabilities
        And agents should follow the improved patterns
    ```
@@ -1575,12 +1575,12 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    # .claude/agents/code-architect-js.md
    ---
    name: code-architect-js
-   description: JavaScript architecture enforcement for MultiCardz spatial tag manipulation system. Use when planning JavaScript implementations, enforcing set theory compliance, or ensuring patent compliance in JavaScript-based solutions.
+   description: JavaScript architecture enforcement for multicardz spatial tag manipulation system. Use when planning JavaScript implementations, enforcing set theory compliance, or ensuring patent compliance in JavaScript-based solutions.
    model: opus
    color: blue
    ---
 
-   You are an elite JavaScript architecture specialist for the MultiCardz spatial tag manipulation system. Your expertise combines patent-compliant design with JavaScript performance optimization and set theory implementation.
+   You are an elite JavaScript architecture specialist for the multicardz spatial tag manipulation system. Your expertise combines patent-compliant design with JavaScript performance optimization and set theory implementation.
 
    **CORE RESPONSIBILITIES**:
 
@@ -1610,12 +1610,12 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    # .claude/agents/test-automation-specialist.md
    ---
    name: test-automation-specialist
-   description: Comprehensive testing specialist for JavaScript/Python MultiCardz stack. Use for creating BDD tests, performance validation, and ensuring 100% test coverage.
+   description: Comprehensive testing specialist for JavaScript/Python multicardz stack. Use for creating BDD tests, performance validation, and ensuring 100% test coverage.
    model: haiku
    color: green
    ---
 
-   You are a test automation specialist focused on the MultiCardz JavaScript/Python implementation. You ensure comprehensive test coverage, performance validation, and behavior-driven development compliance.
+   You are a test automation specialist focused on the multicardz JavaScript/Python implementation. You ensure comprehensive test coverage, performance validation, and behavior-driven development compliance.
 
    **TESTING RESPONSIBILITIES**:
 
@@ -1655,7 +1655,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    - Added code-architect-js for JavaScript architecture enforcement
    - Created test-automation-specialist for comprehensive testing
    - Enhanced existing agents with JavaScript-specific capabilities
-   - Configured agents for MultiCardz development workflow
+   - Configured agents for multicardz development workflow
    - Integrated performance monitoring and patent compliance
 
    "
@@ -1664,7 +1664,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 5.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 5.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ---
@@ -1690,7 +1690,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 6.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 6.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -1699,7 +1699,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
    Feature: Comprehensive Testing Suite
      As a development team
      I want complete test coverage across all components
-     So that MultiCardz is production-ready
+     So that multicardz is production-ready
 
      Scenario: Full system integration test
        Given I have all components implemented
@@ -1768,7 +1768,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 6.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 6.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ### Task 6.2: CLAUDE.md Creation ✅
@@ -1780,7 +1780,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 6.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 6.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -1792,12 +1792,12 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
      So that I can work effectively in this repository
 
      Scenario: Development commands documentation
-       Given MultiCardz has specific development patterns
+       Given multicardz has specific development patterns
        When Claude Code reads CLAUDE.md
        Then it should know how to run tests, start servers, and lint code
 
      Scenario: Architecture guidance
-       Given MultiCardz has JavaScript-based architecture
+       Given multicardz has JavaScript-based architecture
        When Claude Code needs to understand the system
        Then it should have clear architectural guidance
    ```
@@ -1830,7 +1830,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
    ## Project Overview
 
-   MultiCardz is a spatial tag manipulation system using JavaScript instead of WASM, maintaining patent compliance and set theory operations. The system implements drag-drop tag filtering with backend HTML generation and HTMX interactions.
+   multicardz is a spatial tag manipulation system using JavaScript instead of WASM, maintaining patent compliance and set theory operations. The system implements drag-drop tag filtering with backend HTML generation and HTMX interactions.
 
    ## Development Commands
 
@@ -1944,7 +1944,7 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 8. **Capture End Time**
    ```bash
-   echo "Task 6.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md
+   echo "Task 6.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md
    ```
 
 ---
@@ -2061,4 +2061,4 @@ This implementation plan transforms the CardZ spatial tag manipulation system in
 
 ---
 
-**Implementation Completion**: All phases successfully completed with 100% success criteria met. MultiCardz JavaScript implementation ready for production deployment with maintained patent compliance and enhanced developer experience.
+**Implementation Completion**: All phases successfully completed with 100% success criteria met. multicardz JavaScript implementation ready for production deployment with maintained patent compliance and enhanced developer experience.

@@ -1,11 +1,11 @@
-# MultiCardz Documentation Audit Report
+# multicardz Documentation Audit Report
 **Date**: 2025-10-20
 **Auditor**: Documentation Synchronization System
 **Scope**: Complete codebase documentation verification
 
 ## Executive Summary
 
-This audit examined all documentation in the MultiCardz codebase to verify accuracy against actual implementation, identify superseded documents, and assess documentation quality. The audit found significant documentation drift with multiple planning documents describing unimplemented features.
+This audit examined all documentation in the multicardz codebase to verify accuracy against actual implementation, identify superseded documents, and assess documentation quality. The audit found significant documentation drift with multiple planning documents describing unimplemented features.
 
 ### Key Findings
 - **Total Documents Audited**: 56
@@ -29,40 +29,40 @@ This audit examined all documentation in the MultiCardz codebase to verify accur
 
 #### ✅ ACCURATE - Currently Implemented
 
-**001-2025-09-16-MultiCardz-JavaScript-Architecture-v1.md**
+**001-2025-09-16-multicardz-JavaScript-Architecture-v1.md**
 - Status: ACCURATE - Core architecture matches implementation
 - Evidence: JavaScript drag-drop.js exists, HTMX integration verified
 - Verification: Backend Python/FastAPI structure confirmed
 - Note: Performance targets documented may need update based on actual benchmarks
 
-**003-2025-09-16-MultiCardz-Rust-Dependencies-Architecture-v1.md**
+**003-2025-09-16-multicardz-Rust-Dependencies-Architecture-v1.md**
 - Status: ACCURATE - Describes RoaringBitmap and set operations
 - Evidence: Python implementation exists in apps/shared
 - Note: Rust/WASM not used, pure Python implementation instead
 
-**004-2025-09-16-MultiCardz-HTMX-WebComponents-Architecture-v1.md**
+**004-2025-09-16-multicardz-HTMX-WebComponents-Architecture-v1.md**
 - Status: ACCURATE - HTMX patterns verified in templates
 - Evidence: Templates use HTMX attributes, Web Components approach confirmed
 
-**013-2025-09-18-MultiCardz-System-Tags-Architecture-v1.md**
+**013-2025-09-18-multicardz-System-Tags-Architecture-v1.md**
 - Status: ACCURATE - System tags implemented
 - Evidence: Tags table with tag_type field in schema
 
-**016-2025-09-28-MultiCardz-Zero-Trust-UUID-Architecture-v1.md**
+**016-2025-09-28-multicardz-Zero-Trust-UUID-Architecture-v1.md**
 - Status: PARTIALLY IMPLEMENTED
 - Evidence: Migration 001_zero_trust_schema.sql exists and implements core tables
 - Gap: Full three-tier database separation not complete
 - Tables Implemented: cards, tags, card_contents with user_id/workspace_id isolation
 - Missing: Separate user preferences database, full privacy mode architecture
 
-**018-2025-09-21-MultiCardz-EXCLUSION-Zone-Architecture-v1.md**
+**018-2025-09-21-multicardz-EXCLUSION-Zone-Architecture-v1.md**
 - Status: IMPLEMENTED (per IMPLEMENTATION_STATUS_UPDATE.md)
 - Evidence: Implementation completed 2025-09-22 with comprehensive tests
 - Files: set_operations_unified.py, user_home.html, user.css, cards_api.py
 
 #### ⚠️ PLANNED - Architecture Defined But Not Yet Implemented
 
-**027-2025-10-15-MultiCardz-Outlook-Email-Integration-Architecture-v1.md**
+**027-2025-10-15-multicardz-Outlook-Email-Integration-Architecture-v1.md**
 - Status: PLANNED - NO IMPLEMENTATION FOUND
 - Evidence Searched:
   - No MSAL.js integration in package.json
@@ -73,57 +73,57 @@ This audit examined all documentation in the MultiCardz codebase to verify accur
 - Size: 530 lines of detailed architecture
 - Note: Document modified 2025-10-20 per git status
 
-**020-2025-09-22-MultiCardz-WASM-Browser-Rendering-Feasibility-Study-v1.md**
+**020-2025-09-22-multicardz-WASM-Browser-Rendering-Feasibility-Study-v1.md**
 - Status: FEASIBILITY STUDY - Not an implementation plan
 - Accurate: Describes exploration, not commitment
 
-**021-2025-09-22-MultiCardz-Privacy-Preserving-Obfuscation-Architecture-v1.md**
+**021-2025-09-22-multicardz-Privacy-Preserving-Obfuscation-Architecture-v1.md**
 - Status: PLANNED
 - Note: Part of broader privacy architecture, not yet implemented
 
-**022-2025-09-22-MultiCardz-Multi-Tier-Database-Architecture-v1.md**
+**022-2025-09-22-multicardz-Multi-Tier-Database-Architecture-v1.md**
 - Status: PARTIALLY IMPLEMENTED
 - Evidence: Single SQLite database exists, not three-tier separation
 - Gap: Browser/Server/Cloud tier separation not implemented
 
-**024-2025-09-22-MultiCardz-Database-Schema-Specifications-v1.md**
+**024-2025-09-22-multicardz-Database-Schema-Specifications-v1.md**
 - Status: SUPERSEDED by actual migration files
 - Recommendation: Reference 001_zero_trust_schema.sql as source of truth
 
-**026-2025-09-22-MultiCardz-Progressive-Onboarding-System-Architecture-v1.md**
+**026-2025-09-22-multicardz-Progressive-Onboarding-System-Architecture-v1.md**
 - Status: PLANNED
 - No onboarding system implementation found
 
 #### 📊 ANALYSIS/REFERENCE DOCUMENTS
 
-**005-2025-09-17-MultiCardz-Admin-Site-Architecture-v1.md**
+**005-2025-09-17-multicardz-Admin-Site-Architecture-v1.md**
 - Status: ACCURATE - Admin app exists in apps/admin/
 - Evidence: Admin directory structure confirmed
 
-**007-2025-09-17-MultiCardz-Market-Data-UI-Architecture-v1.md**
+**007-2025-09-17-multicardz-Market-Data-UI-Architecture-v1.md**
 - Status: UNCLEAR - Needs verification against actual UI implementation
 
-**009-2025-09-18-MultiCardz-Polymorphic-Rendering-Architecture-v1.md**
+**009-2025-09-18-multicardz-Polymorphic-Rendering-Architecture-v1.md**
 - Status: ACCURATE - Polymorphic card content implemented
 - Evidence: card_contents table with type field
 
-**012-2025-09-18-MultiCardz-Data-Transformation-Guidelines-v1.md**
+**012-2025-09-18-multicardz-Data-Transformation-Guidelines-v1.md**
 - Status: ACCURATE - Guidelines document, not implementation
 
-**014-2025-09-18-MultiCardz-Accessibility-Gap-Analysis-v1.md**
+**014-2025-09-18-multicardz-Accessibility-Gap-Analysis-v1.md**
 - Status: ANALYSIS - Gap analysis, not implementation plan
 
-**015-2025-09-18-MultiCardz-Accessibility-Implementation-Plan-v1.md**
+**015-2025-09-18-multicardz-Accessibility-Implementation-Plan-v1.md**
 - Status: PLANNED
 
-**017-2025-09-20-MultiCardz-Set-Operations-Performance-Remediation-Architecture-v1.md**
+**017-2025-09-20-multicardz-Set-Operations-Performance-Remediation-Architecture-v1.md**
 - Status: IMPLEMENTED
 - Evidence: set_operations_unified.py with performance optimizations
 
-**019-2025-09-21-MultiCardz-Connector-System-Architecture-v1.md**
+**019-2025-09-21-multicardz-Connector-System-Architecture-v1.md**
 - Status: UNCLEAR - Needs verification
 
-**025-2025-09-22-MultiCardz-Set-Theory-RoaringBitmap-Operations-v1.md**
+**025-2025-09-22-multicardz-Set-Theory-RoaringBitmap-Operations-v1.md**
 - Status: ACCURATE - Mathematical specification
 - Evidence: Bitmap operations in schema and code
 
@@ -144,7 +144,7 @@ This audit examined all documentation in the MultiCardz codebase to verify accur
 
 #### ✅ COMPLETED IMPLEMENTATIONS (docs/implementation/completed/)
 
-**002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md**
+**002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md**
 - Status: COMPLETED
 - Location: Correctly in completed/ folder
 
@@ -164,12 +164,12 @@ This audit examined all documentation in the MultiCardz codebase to verify accur
 
 #### ⚠️ PLANNED IMPLEMENTATIONS
 
-**023-2025-09-22-MultiCardz-Multi-Tier-Implementation-Plan-v1.md**
+**023-2025-09-22-multicardz-Multi-Tier-Implementation-Plan-v1.md**
 - Status: PLANNED - NOT IMPLEMENTED
 - Aligns with: Architecture 022 (Multi-Tier Database)
 - Evidence: Single-tier implementation exists, not multi-tier
 
-**027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md**
+**027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md**
 - Status: PLANNED
 - Aligns with: Architecture 026
 
@@ -179,7 +179,7 @@ This audit examined all documentation in the MultiCardz codebase to verify accur
 - Actual: Zero-trust schema migration completed
 - Missing: Full three-database separation, privacy modes
 
-**028-2025-10-15-MultiCardz-Outlook-Email-Integration-Implementation-v1.md**
+**028-2025-10-15-multicardz-Outlook-Email-Integration-Implementation-v1.md**
 - Status: PLANNED - NO IMPLEMENTATION
 - Size: 54KB detailed implementation plan
 - Evidence: No Outlook/MSAL code found
@@ -219,33 +219,33 @@ This audit examined all documentation in the MultiCardz codebase to verify accur
 
 **Note**: Directory misspelled as "superceeded" instead of "superseded"
 
-**005-2025-09-16-MultiCardz-Implementation-Sequence-v1.md**
+**005-2025-09-16-multicardz-Implementation-Sequence-v1.md**
 - Status: CORRECTLY SUPERSEDED
 - Reason: Initial sequence replaced by actual implementation
 
-**006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md**
+**006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md**
 - Status: CORRECTLY SUPERSEDED
 - Reason: Admin implementation completed
 
-**008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md**
+**008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md**
 - Status: CORRECTLY SUPERSEDED
 
-**010-2025-09-18-MultiCardz-Polymorphic-Rendering-Implementation-Plan-v1.md**
+**010-2025-09-18-multicardz-Polymorphic-Rendering-Implementation-Plan-v1.md**
 - Status: CORRECTLY SUPERSEDED
 
-**016-2025-09-20-MultiCardz-Unified-Implementation-Plan-v1.md**
+**016-2025-09-20-multicardz-Unified-Implementation-Plan-v1.md**
 - Status: CORRECTLY SUPERSEDED
 
-**016-2025-09-20-MultiCardz-Unified-Implementation-Plan-v1 - duplicate.md**
+**016-2025-09-20-multicardz-Unified-Implementation-Plan-v1 - duplicate.md**
 - Status: DUPLICATE - Should be deleted
 
-**017-2025-09-21-MultiCardz-Consolidated-Implementation-Status-v1.md**
+**017-2025-09-21-multicardz-Consolidated-Implementation-Status-v1.md**
 - Status: CORRECTLY SUPERSEDED
 
 **017-2025-09-28-multicardz-Zero-Trust-Implementation-Plan-v1.md**
 - Status: CORRECTLY SUPERSEDED by v2
 
-**018-2025-09-20-MultiCardz-Set-Operations-Performance-Remediation-Plan-v1.md**
+**018-2025-09-20-multicardz-Set-Operations-Performance-Remediation-Plan-v1.md**
 - Status: CORRECTLY SUPERSEDED
 - Reason: Implementation completed
 
@@ -337,7 +337,7 @@ This audit examined all documentation in the MultiCardz codebase to verify accur
      - Current phase status
 
 4. **Delete Duplicates**
-   - Remove: `016-2025-09-20-MultiCardz-Unified-Implementation-Plan-v1 - duplicate.md`
+   - Remove: `016-2025-09-20-multicardz-Unified-Implementation-Plan-v1 - duplicate.md`
    - Remove: Duplicate PLAYWRIGHT_TESTS_ANALYSIS.md
 
 5. **Fix Directory Naming**
@@ -463,7 +463,7 @@ This audit examined all documentation in the MultiCardz codebase to verify accur
 
 ## Conclusion
 
-The MultiCardz documentation shows moderate to significant drift from actual implementation. While core architecture documents are accurate, several large planning documents (especially Outlook integration and full Turso browser implementation) describe features not yet built.
+The multicardz documentation shows moderate to significant drift from actual implementation. While core architecture documents are accurate, several large planning documents (especially Outlook integration and full Turso browser implementation) describe features not yet built.
 
 **Key Insight**: Documentation is being created in a "design-first" approach with detailed plans written before implementation. This is valuable for planning but creates confusion about current system state.
 

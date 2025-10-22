@@ -21,7 +21,7 @@ from apps.shared.services.card_service import (
 
 def test_card_service():
     """Test the card service with real database."""
-    print("Testing MultiCardz card service with real database...")
+    print("Testing multicardz card service with real database...")
 
     # Database configuration
     db_path = Path("/var/data/multicardz_dev.db")

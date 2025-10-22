@@ -1,6 +1,6 @@
-# MultiCardz™ WASM Browser Rendering Feasibility Study v1
+# multicardz™ WASM Browser Rendering Feasibility Study v1
 
-**Document ID**: 020-2025-09-22-MultiCardz-WASM-Browser-Rendering-Feasibility-Study-v1
+**Document ID**: 020-2025-09-22-multicardz-WASM-Browser-Rendering-Feasibility-Study-v1
 **Created**: September 22, 2025
 **Status**: FEASIBILITY ANALYSIS
 **Patent Compliance**: docs/patents/cardz-complete-patent.md
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This study evaluates the feasibility of porting the MultiCardz card rendering system to WebAssembly (WASM) for browser execution. After comprehensive analysis of memory constraints, performance projections, and browser limitations, **we recommend AGAINST a full WASM implementation** for the following critical reasons:
+This study evaluates the feasibility of porting the multicardz card rendering system to WebAssembly (WASM) for browser execution. After comprehensive analysis of memory constraints, performance projections, and browser limitations, **we recommend AGAINST a full WASM implementation** for the following critical reasons:
 
 1. **Memory Catastrophe at Scale**: Browser tab will crash at ~250,000 cards due to memory limits
 2. **Performance Degradation**: WASM implementation would be 2-10x SLOWER than current backend
@@ -449,7 +449,7 @@ WASM would be viable if:
 
 ## 9. Conclusion
 
-After extensive analysis, **WebAssembly is definitively the wrong technology** for the MultiCardz card rendering system. The combination of browser memory limits, performance degradation, bundle size explosion, and development complexity makes WASM implementation a technical and business mistake.
+After extensive analysis, **WebAssembly is definitively the wrong technology** for the multicardz card rendering system. The combination of browser memory limits, performance degradation, bundle size explosion, and development complexity makes WASM implementation a technical and business mistake.
 
 ### The Brutal Truth
 
@@ -467,7 +467,7 @@ At realistic card counts (100K-250K), WASM implementation would:
 
 **Action**: Continue with current backend architecture. Implement lightweight JavaScript pre-filtering for marginal gains. Revisit in 2030 when browser technology has evolved.
 
-The current MultiCardz architecture with backend set operations and HTML generation is not just adequate—it's optimal for the problem space. The system already achieves 1.54ms operations for 1,000 cards, meeting and exceeding all performance targets.
+The current multicardz architecture with backend set operations and HTML generation is not just adequate—it's optimal for the problem space. The system already achieves 1.54ms operations for 1,000 cards, meeting and exceeding all performance targets.
 
 ---
 

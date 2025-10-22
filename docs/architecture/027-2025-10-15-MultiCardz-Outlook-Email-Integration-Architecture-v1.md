@@ -1,4 +1,4 @@
-# MultiCardz Outlook Email Integration Architecture
+# multicardz Outlook Email Integration Architecture
 
 **STATUS**: PLANNED - NOT YET IMPLEMENTED
 **IMPLEMENTATION DATE**: Not Started
@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-This architecture defines the integration of Microsoft Outlook email into the MultiCardz spatial manipulation paradigm, enabling users to transform emails into semantic cards for n-dimensional organization. The system implements 100% client-side OAuth authentication using MSAL.js with PKCE flow, direct browser-to-Microsoft Graph API communication, and local-only email storage in Turso WASM database.
+This architecture defines the integration of Microsoft Outlook email into the multicardz spatial manipulation paradigm, enabling users to transform emails into semantic cards for n-dimensional organization. The system implements 100% client-side OAuth authentication using MSAL.js with PKCE flow, direct browser-to-Microsoft Graph API communication, and local-only email storage in Turso WASM database.
 
 Key architectural decisions include:
 - Zero server-side email persistence for maximum privacy

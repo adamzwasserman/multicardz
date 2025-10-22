@@ -1,4 +1,4 @@
-# MultiCardz™ HTMX + Web Components Architecture v1
+# multicardz™ HTMX + Web Components Architecture v1
 
 **Document Version**: 1.0
 **Date**: 2025-09-16
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-MultiCardz™ implements a cutting-edge hybrid approach combining HTMX's HTML-first philosophy with modern Web Standards (Web Components, ViewTransitions API, Speculation Rules API). This architecture maintains our proven 0.38ms backend performance while adding progressive enhancement through native browser APIs rather than framework dependencies.
+multicardz™ implements a cutting-edge hybrid approach combining HTMX's HTML-first philosophy with modern Web Standards (Web Components, ViewTransitions API, Speculation Rules API). This architecture maintains our proven 0.38ms backend performance while adding progressive enhancement through native browser APIs rather than framework dependencies.
 
 The approach preserves all existing HTMX backend patterns while adding encapsulated custom elements for complex UI behaviors. Web Components provide isolation and reusability without JavaScript framework overhead, while ViewTransitions API delivers smooth state changes comparable to SPAs but with server-rendered reliability.
 
@@ -156,7 +156,7 @@ Functional Component Factories
 
 // Classes ONLY for Web Components API compliance
 HTMLElement (Required by Browser API)
-├── MultiCardzElement (Minimal class wrapper)
+├── multicardzElement (Minimal class wrapper)
 └── Component-specific elements (Minimal class wrapper)
 ```
 
@@ -164,7 +164,7 @@ HTMLElement (Required by Browser API)
 
 ```javascript
 // ANTI-PATTERN MITIGATION: Minimal class wrapper, maximum functional logic
-class MultiCardzElement extends HTMLElement {
+class multicardzElement extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -231,7 +231,7 @@ const EventDelegator = {
 
 ```javascript
 // ANTI-PATTERN MITIGATION: Minimal class wrapper only
-class MultiCardzFilterZone extends MultiCardzElement {
+class multicardzFilterZone extends multicardzElement {
     connectedCallback() {
         // FUNCTIONAL DELEGATION: No class logic
         const filterZone = FilterZoneFactory.create(this);
@@ -318,7 +318,7 @@ const TagOperations = {
 ### 3.4 Tag Cloud Component
 
 ```javascript
-class TagCloud extends MultiCardzElement {
+class TagCloud extends multicardzElement {
     static get observedAttributes() {
         return ['selected', 'available', 'workspace-id'];
     }
@@ -361,7 +361,7 @@ class TagCloud extends MultiCardzElement {
 ### 3.5 Card Grid Component
 
 ```javascript
-class CardGrid extends MultiCardzElement {
+class CardGrid extends multicardzElement {
     static get observedAttributes() {
         return ['view-mode', 'sort-by'];
     }
@@ -408,7 +408,7 @@ class CardGrid extends MultiCardzElement {
 
 ```javascript
 // WRONG - Class-based state and methods
-class TagCloud extends MultiCardzElement {
+class TagCloud extends multicardzElement {
     constructor() {
         super();
         this.selectedTags = new Set(); // STATE CORRUPTION RISK
@@ -420,7 +420,7 @@ class TagCloud extends MultiCardzElement {
 }
 
 // CORRECT - Functional implementation
-class TagCloud extends MultiCardzElement {
+class TagCloud extends multicardzElement {
     connectedCallback() {
         // FUNCTIONAL DELEGATION ONLY
         const cloud = TagCloudFactory.create(this);
@@ -793,7 +793,7 @@ npx web-component-tester # Optional testing
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MultiCardz - Multi-Tag Drag Demo</title>
+  <title>multicardz - Multi-Tag Drag Demo</title>
   <!-- ViewTransitions Polyfill for non-Chrome browsers (optional, ~2KB) -->
   <script src="https://cdn.skypack.dev/view-transition-polyfill"></script>
 </head>
@@ -1216,7 +1216,7 @@ async def get_cards_interface():
 
 ### 9.1 Lightning-Fast Card Entry Vision
 
-MultiCardz™ implements a hybrid input system supporting both visual drag-and-drop operations and power-user keyboard workflows. Users can create cards through natural language parsing with inline commands:
+multicardz™ implements a hybrid input system supporting both visual drag-and-drop operations and power-user keyboard workflows. Users can create cards through natural language parsing with inline commands:
 
 ```javascript
 // User types "C" or Cmd+N to create a card, then types naturally:
@@ -1236,7 +1236,7 @@ MultiCardz™ implements a hybrid input system supporting both visual drag-and-d
 
 ```javascript
 // Keyboard shortcut activation
-class QuickCreateElement extends MultiCardzElement {
+class QuickCreateElement extends multicardzElement {
   connectedCallback() {
     super.connectedCallback();
     this.setupGlobalShortcuts();
@@ -1264,7 +1264,7 @@ class QuickCreateElement extends MultiCardzElement {
 }
 
 // Smart input parser component
-class SmartCardInput extends MultiCardzElement {
+class SmartCardInput extends multicardzElement {
   static get observedAttributes() {
     return ['input-value'];
   }
@@ -1556,7 +1556,7 @@ function fuzzyMatchTags(input, existingTags) {
 
 ### 9.6 Performance Integration
 
-The keyboard-driven interface maintains MultiCardz's elite performance characteristics:
+The keyboard-driven interface maintains multicardz's elite performance characteristics:
 
 - **Parsing Speed**: <1ms for typical card input
 - **Backend Integration**: Maintains 0.38ms tag operations

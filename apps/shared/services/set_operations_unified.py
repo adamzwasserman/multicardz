@@ -1,5 +1,5 @@
 """
-Pure Functional Set Operations Library for MultiCardz™.
+Pure Functional Set Operations Library for multicardz™.
 
 Flattened functional library with no classes, no mutable state, no OOP overhead.
 Pure functions with explicit state passing for universe-scale operations.

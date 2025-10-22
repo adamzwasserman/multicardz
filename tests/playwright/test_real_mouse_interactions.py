@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Replayable Playwright test for MultiCardz™ drag-drop system.
+Replayable Playwright test for multicardz™ drag-drop system.
 Uses REAL mouse interactions, not JavaScript simulation.
 Can record and replay user interactions.
 """
@@ -73,7 +73,7 @@ class DragDropTester:
         })
 
     async def navigate_to_app(self, url="http://localhost:8011"):
-        """Navigate to the MultiCardz app."""
+        """Navigate to the multicardz app."""
         print(f"🌐 Navigating to {url}...")
 
         self.record_action("navigate", url=url)
@@ -395,7 +395,7 @@ class DragDropTester:
 
 async def run_comprehensive_test():
     """Run comprehensive test with real mouse interactions."""
-    print("🚀 MultiCardz™ Comprehensive Real Mouse Test")
+    print("🚀 multicardz™ Comprehensive Real Mouse Test")
     print("=" * 50)
 
     # Test with visible browser (set headless=True to hide)

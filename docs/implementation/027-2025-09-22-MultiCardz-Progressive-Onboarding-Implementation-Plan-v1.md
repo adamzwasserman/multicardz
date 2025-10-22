@@ -1,4 +1,4 @@
-# MultiCardz Progressive Onboarding Implementation Plan v1
+# multicardz Progressive Onboarding Implementation Plan v1
 
 **Document Version**: 1.0
 **Date**: 2025-09-22
@@ -13,7 +13,7 @@ This implementation plan executes the Progressive Onboarding System Architecture
 
 ## Current State Analysis
 
-MultiCardz currently lacks structured onboarding, requiring users to understand set theory and spatial manipulation concepts through trial and error. The existing drag-drop system, card service, and template engine provide the foundation for seamless lesson integration without architectural modifications.
+multicardz currently lacks structured onboarding, requiring users to understand set theory and spatial manipulation concepts through trial and error. The existing drag-drop system, card service, and template engine provide the foundation for seamless lesson integration without architectural modifications.
 
 **Existing Assets**:
 - Sophisticated SpatialDragDrop system with zone discovery
@@ -62,7 +62,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -70,7 +70,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
    # tests/features/lesson_card_management.feature
    Feature: Lesson Card Data Structure
      As a lesson system
-     I want to store lesson content as standard MultiCardz cards
+     I want to store lesson content as standard multicardz cards
      So that I can leverage existing infrastructure
 
      Scenario: Create lesson card with metadata
@@ -114,7 +114,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
    def sample_lesson_card_summary():
        return CardSummaryTuple(
            id="lesson-1-step-1",
-           title="Welcome to MultiCardz! Let's learn spatial tag manipulation.",
+           title="Welcome to multicardz! Let's learn spatial tag manipulation.",
            tags=frozenset(["#lesson-1", "#step-1", "#instruction"]),
            created_at=datetime.now(UTC),
            modified_at=datetime.now(UTC),
@@ -249,7 +249,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    # Duration: 3 hours
    ```
 
@@ -269,14 +269,14 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
    ```gherkin
    # tests/features/lesson_state_management.feature
    Feature: Lesson State Management
-     As a user learning MultiCardz
+     As a user learning multicardz
      I want my lesson progress to be saved
      So that I can continue where I left off
 
@@ -497,7 +497,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    # Duration: 2 hours 30 minutes
    ```
 
@@ -510,7 +510,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -544,7 +544,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
        return [
            {
                "step": 1,
-               "title": "Welcome to MultiCardz!",
+               "title": "Welcome to multicardz!",
                "content": "<div class='lesson-instruction'>Drag the blue 'project-alpha' tag to the Intersection Zone below.</div>",
                "metadata": {
                    "instruction_type": "action",
@@ -618,7 +618,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
            1: [  # Lesson 1: Basic Tag Dragging
                {
                    "step": 1,
-                   "title": "Welcome to MultiCardz! Let's learn spatial tag manipulation.",
+                   "title": "Welcome to multicardz! Let's learn spatial tag manipulation.",
                    "content": """
                    <div class="lesson-instruction">
                        <h3>Step 1: Basic Tag Dragging</h3>
@@ -647,7 +647,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
                    "content": """
                    <div class="lesson-success">
                        <h3>Cards Appear When Tags Are Placed!</h3>
-                       <p>Notice how cards appeared when you moved the tag? This is the core of MultiCardz:
+                       <p>Notice how cards appeared when you moved the tag? This is the core of multicardz:
                           <strong>tags control which cards you see</strong>.</p>
                        <div class="lesson-next">
                            Ready to learn about selecting multiple tags?
@@ -764,7 +764,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 1.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    # Duration: 2 hours
    ```
 
@@ -790,7 +790,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 2.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 2.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -818,7 +818,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
      Scenario: Exit lesson mode
        Given I am in lesson mode
        When I click "Exit Lessons"
-       Then I should return to normal MultiCardz interface
+       Then I should return to normal multicardz interface
        And my lesson progress should be saved
    ```
 
@@ -983,7 +983,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 8. **Capture End Time**
    ```bash
-   echo "Task 2.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 2.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    # Duration: 2 hours
    ```
 
@@ -996,14 +996,14 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 2.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 2.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
    ```gherkin
    # tests/features/lesson_progression.feature
    Feature: Automatic Lesson Progression
-     As a user learning MultiCardz
+     As a user learning multicardz
      I want lessons to advance automatically when I complete steps
      So that I have a seamless learning experience
 
@@ -1290,7 +1290,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 8. **Capture End Time**
    ```bash
-   echo "Task 2.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+   echo "Task 2.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
    # Duration: 3 hours
    ```
 
@@ -1359,7 +1359,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 
 **Total Estimated Duration**: 6.5 days
 **Critical Path**: Sequential phases with minimal parallelization opportunities
-**Resource Requirements**: 1 senior developer with MultiCardz architecture knowledge
+**Resource Requirements**: 1 senior developer with multicardz architecture knowledge
 
 **Phase Breakdown**:
 - Phase 1 (Foundation): 2 days - 7.5 hours total
@@ -1385,7 +1385,7 @@ MultiCardz currently lacks structured onboarding, requiring users to understand 
 - [ ] Lesson instructions clear and actionable
 - [ ] Automatic progression works reliably
 - [ ] Graceful error handling and recovery
-- [ ] Seamless transition to normal MultiCardz usage
+- [ ] Seamless transition to normal multicardz usage
 
 **Business Impact Validation**:
 - [ ] 95% reduction in onboarding time demonstrated

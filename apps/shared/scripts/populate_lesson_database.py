@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MultiCardz™ Lesson Database Population Script
+multicardz™ Lesson Database Population Script
 Populates the default database with lesson cards and tags for progressive onboarding.
 """
 

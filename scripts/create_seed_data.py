@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create seed data for MultiCardz™ development and testing.
+Create seed data for multicardz™ development and testing.
 
 This script creates realistic test data including:
 - Sample users with proper authentication
@@ -236,8 +236,8 @@ def create_sample_preferences() -> list[UserPreferences]:
 
 
 def main():
-    """Create seed data for MultiCardz development."""
-    print("Creating MultiCardz seed data...")
+    """Create seed data for multicardz development."""
+    print("Creating multicardz seed data...")
 
     # Database configuration for development
     db_path = Path("/var/data/multicardz_dev.db")

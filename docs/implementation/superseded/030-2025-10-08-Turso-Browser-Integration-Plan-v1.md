@@ -14,7 +14,7 @@
 
 ## Executive Summary
 
-Integrate **Turso DB in Browser** with **Turso Sync** to enable true offline-first, privacy-preserving database capabilities in MultiCardz. This implementation creates three operational modes:
+Integrate **Turso DB in Browser** with **Turso Sync** to enable true offline-first, privacy-preserving database capabilities in multicardz. This implementation creates three operational modes:
 
 1. **Privacy Mode** (Local-Only): 100% client-side WASM database, zero server communication
 2. **Hybrid Mode** (Sync): Local WASM database with selective cloud sync

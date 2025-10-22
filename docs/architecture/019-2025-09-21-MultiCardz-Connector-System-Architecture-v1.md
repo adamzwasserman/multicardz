@@ -1,6 +1,6 @@
-# MultiCardz Connector System Architecture
+# multicardz Connector System Architecture
 
-**Document ID**: 019-2025-09-21-MultiCardz-Connector-System-Architecture-v1
+**Document ID**: 019-2025-09-21-multicardz-Connector-System-Architecture-v1
 **Created**: September 21, 2025
 **Author**: System Architect
 **Status**: Active Architecture Specification
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This document specifies the MultiCardz Connector System architecture for integrating external data sources while maintaining patent-compliant spatial manipulation paradigms. The system employs an LLM-powered semantic extraction engine to transform heterogeneous data from sources like Outlook, JIRA, Stripe, Notion, and Obsidian into Card representations as information quanta. Using Turso/libSQL for privacy-first local storage with optional sync, the architecture ensures data sovereignty while enabling sophisticated semantic operations. The connector plugin system provides extensibility through Protocol-based interfaces, allowing runtime selection of data source implementations without modifying core architecture.
+This document specifies the multicardz Connector System architecture for integrating external data sources while maintaining patent-compliant spatial manipulation paradigms. The system employs an LLM-powered semantic extraction engine to transform heterogeneous data from sources like Outlook, JIRA, Stripe, Notion, and Obsidian into Card representations as information quanta. Using Turso/libSQL for privacy-first local storage with optional sync, the architecture ensures data sovereignty while enabling sophisticated semantic operations. The connector plugin system provides extensibility through Protocol-based interfaces, allowing runtime selection of data source implementations without modifying core architecture.
 
 **Core Innovation**: Semantic Card Extraction transforms operational data from any source into spatially manipulatable Cards through LLM-powered information extraction. Each Card represents a quantum of information transmission, not a unified entity, preserving the original information context while enabling set operations across diverse information streams.
 
@@ -24,7 +24,7 @@ This document specifies the MultiCardz Connector System architecture for integra
 
 ### Philosophical Foundation: Cards as Information Quanta
 
-**CRITICAL ARCHITECTURAL PRINCIPLE**: Cards are NOT unified entities. Each Card represents a quantum of information transmission, not a canonical representation of a concept. This is fundamental to the MultiCardz philosophy:
+**CRITICAL ARCHITECTURAL PRINCIPLE**: Cards are NOT unified entities. Each Card represents a quantum of information transmission, not a canonical representation of a concept. This is fundamental to the multicardz philosophy:
 
 1. **No Entity Unification**: An email about a JIRA ticket and the JIRA ticket itself are TWO separate Cards, not one unified entity
 2. **Information Multiplicity**: Multiple Cards about the same topic are intentional and desired
@@ -49,20 +49,20 @@ Projects (JIRA) → Different UI → Loss of Relationships
 Payments (Stripe) → Isolated Data → No Cross-Reference
 Notes (Notion/Obsidian) → Siloed Knowledge → Duplicate Effort
 
-MultiCardz Connector System (Information Quanta):
+multicardz Connector System (Information Quanta):
 All Sources → Semantic Extraction → Card Transmissions → Spatial Manipulation
 Single Interface → Multiple Representations → Cross-Source Intelligence
 ```
 
 ### Privacy-First Architecture Philosophy
 
-Traditional integration platforms require cloud synchronization, exposing sensitive data to third-party infrastructure. The MultiCardz Connector System implements local-first architecture:
+Traditional integration platforms require cloud synchronization, exposing sensitive data to third-party infrastructure. The multicardz Connector System implements local-first architecture:
 
 ```
 Traditional: Source → Cloud Service → Processing → Storage → Client
 Privacy Risk: Data exposed at every step
 
-MultiCardz: Source → Local Extraction → Local Storage → Optional Sync
+multicardz: Source → Local Extraction → Local Storage → Optional Sync
 Privacy Protected: Data never leaves device unless explicitly authorized
 ```
 
@@ -1729,7 +1729,7 @@ async function handleOfflineConnector(request) {
 
 ### A. Turso/libSQL Features
 
-**Key Advantages for MultiCardz**:
+**Key Advantages for multicardz**:
 - **Edge Replication**: Built-in geo-distributed replication
 - **WASM Support**: Runs in browser via WASM
 - **Encryption**: Native encryption at rest

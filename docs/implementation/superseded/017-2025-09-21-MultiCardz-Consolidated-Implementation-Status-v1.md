@@ -1,6 +1,6 @@
-# MultiCardz™ Consolidated Implementation Status v1
+# multicardz™ Consolidated Implementation Status v1
 
-**Document ID**: 017-2025-09-21-MultiCardz-Consolidated-Implementation-Status-v1
+**Document ID**: 017-2025-09-21-multicardz-Consolidated-Implementation-Status-v1
 **Created**: September 21, 2025
 **Status**: ACTIVE IMPLEMENTATION REALITY CHECK
 **Purpose**: Accurate assessment of actual vs planned implementation after reversion
@@ -325,7 +325,7 @@ After thorough examination of the codebase following a major reversion, this doc
 
 ## Conclusion
 
-The MultiCardz system has a **solid technical foundation** with excellent drag-drop UI and clean architecture patterns. However, it's **far from production-ready**. The core challenge is connecting the working frontend to a real backend with data persistence.
+The multicardz system has a **solid technical foundation** with excellent drag-drop UI and clean architecture patterns. However, it's **far from production-ready**. The core challenge is connecting the working frontend to a real backend with data persistence.
 
 **Honest Assessment**:
 - 45% complete for MVP (updated with new components)

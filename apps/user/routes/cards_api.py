@@ -1,5 +1,5 @@
 """
-MultiCardz™ Cards API Router
+multicardz™ Cards API Router
 Handles dynamic card rendering with validated input using the complete backend stack.
 """
 

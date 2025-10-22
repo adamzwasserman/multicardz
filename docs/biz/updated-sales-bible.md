@@ -1,6 +1,6 @@
 #### Patent-Protected Technology Innovations
 
-- Inverted index system with O# The MultiCardz™ Sales Collateral Bible - Updated Edition
+- Inverted index system with O# The multicardz™ Sales Collateral Bible - Updated Edition
 
 ## Table of Contents
 
@@ -55,7 +55,7 @@
 
 #### The Prison Break One-Liner
 
-"Your data is in spreadsheet prison. MultiCardz™ is the jailbreak - 3 seconds to any insight."
+"Your data is in spreadsheet prison. multicardz™ is the jailbreak - 3 seconds to any insight."
 
 #### Alternative One-Liners
 
@@ -67,9 +67,9 @@
 
 #### The Value Amplifier Strategy
 
-**Key Strategic Insight:** MultiCardz™ is priced as a **negligible addition** to existing software budgets, not a replacement decision. This creates a fundamentally different sales dynamic.
+**Key Strategic Insight:** multicardz™ is priced as a **negligible addition** to existing software budgets, not a replacement decision. This creates a fundamentally different sales dynamic.
 
-| Customer Type   | Existing Tools        | Current Cost | + MultiCardz™ | Total  | Increase |
+| Customer Type   | Existing Tools        | Current Cost | + multicardz™ | Total  | Increase |
 | --------------- | --------------------- | ------------ | ------------- | ------ | -------- |
 | Marketing Team  | Monday.com + Slack    | $120/month   | $10           | $130   | 8%       |
 | Product Manager | Jira + Confluence     | $200/month   | $10           | $210   | 5%       |
@@ -114,7 +114,7 @@
 **"How can you afford to keep prices so low?"**
 
 *Response (without revealing secrets):*
-"We built MultiCardz™ from the ground up with modern architecture. While competitors are stuck with 10-year-old infrastructure that requires massive server farms, we use cutting-edge optimization techniques. Think of it like Tesla vs. traditional automakers - when you start fresh, you can be 10x more efficient."
+"We built multicardz™ from the ground up with modern architecture. While competitors are stuck with 10-year-old infrastructure that requires massive server farms, we use cutting-edge optimization techniques. Think of it like Tesla vs. traditional automakers - when you start fresh, you can be 10x more efficient."
 
 **"How do I know you won't raise prices once I'm hooked?"**
 
@@ -154,15 +154,15 @@ Plus, our business model is built on volume, not price increases. We'd rather ha
 
 #### 10-Second Pitch
 
-"MultiCardz™: Drag. Drop. Discover. Unbelievable insights in 3 seconds compared to 30 minutes in Excel."
+"multicardz™: Drag. Drop. Discover. Unbelievable insights in 3 seconds compared to 30 minutes in Excel."
 
 #### 30-Second Pitch
 
-"Your team wastes 2.5 hours daily searching across 17 tools. MultiCardz™ unifies everything with dimensional tagging. Drag #urgent + #this-week = instant priorities. No migration, no training - just answers in 3 seconds. We're 26x faster than competitors and 50% cheaper than Trello."
+"Your team wastes 2.5 hours daily searching across 17 tools. multicardz™ unifies everything with dimensional tagging. Drag #urgent + #this-week = instant priorities. No migration, no training - just answers in 3 seconds. We're 26x faster than competitors and 50% cheaper than Trello."
 
 ### Performance-Based Competitive Positioning Matrix
 
-| Feature | MultiCardz™ | Notion | Airtable | Monday.com | Trello |
+| Feature | multicardz™ | Notion | Airtable | Monday.com | Trello |
 |---------|------------|---------|----------|-------------|---------|
 | **Query Speed** | **0.07-0.38ms** | 2-7 seconds* | 3-10 seconds** | 5-30 seconds*** | 1-8 seconds**** |
 | **Max Records (Optimal)** | **500,000+** | ~5,000 | ~10,000 | ~3,000 | ~500 |
@@ -253,7 +253,7 @@ Plus, our business model is built on volume, not price increases. We'd rather ha
 - "Meanwhile, 847 high-performing pieces sit unused and forgotten"
 
 **The Magic - Content Discovery (45 seconds)**
-"Now watch MultiCardz™ transform her workflow:"
+"Now watch multicardz™ transform her workflow:"
 - Drags #unused to X-axis, #engagement-rate to Y-axis
 - "Every unused asset, sorted by past performance"
 - Adds #evergreen filter
@@ -303,7 +303,7 @@ Plus, our business model is built on volume, not price increases. We'd rather ha
 - **Process millions of data points without slowing down**
 
 **Performance Comparison**:
-- MultiCardz™: 0.38ms query on 500k records
+- multicardz™: 0.38ms query on 500k records
 - Typical marketing dashboard: 30+ seconds to load
 - Excel pivot tables: 5+ minutes on large datasets
 - Power BI: 10-60 seconds per refresh
@@ -384,7 +384,7 @@ Plus, our business model is built on volume, not price increases. We'd rather ha
 
 **Performance Comparison Table**:
 
-| Metric | Trello | MultiCardz™ | Improvement |
+| Metric | Trello | multicardz™ | Improvement |
 |--------|---------|-------------|-------------|
 | Optimal card count | 500 | 500,000+ | 1000x |
 | Load time (1000 cards) | 7-8 seconds | 0.1 seconds | 70-80x faster |
@@ -395,7 +395,7 @@ Plus, our business model is built on volume, not price increases. We'd rather ha
 **Killer Demo for Trello Users**:
 
 1. **Opening**: "Show me your most complex Trello board"
-2. **Import**: Bring it into MultiCardz™ (30 seconds)
+2. **Import**: Bring it into multicardz™ (30 seconds)
 3. **Shock**: "Now let me import 100 more boards just like it" (2 minutes)
 4. **Magic Moment**: 
    - "You now have 100,000 cards. Watch this..." *drags #priority + #overdue*
@@ -423,7 +423,7 @@ Quick question: How long does your Jira advanced search take when you're looking
 
 If you're like most PMs at growing startups, you're watching that loading spinner for 30+ seconds, then waiting for the results to render, then realizing you need to refine your search...
 
-[Company] just imported their entire 47,000 ticket backlog into MultiCardz™. Their PMs now:
+[Company] just imported their entire 47,000 ticket backlog into multicardz™. Their PMs now:
 - See blockers across all sprints in 0.38ms (not a typo)
 - Switch from dev view to marketing view instantly
 - Never see a loading spinner again
@@ -448,7 +448,7 @@ Now the painful question: How many high-performing pieces are sitting unused in 
 
 I've been talking to social media managers, and they all have the same problem - amazing content gets posted once, performs brilliantly, then disappears into the digital abyss.
 
-[Similar Company] just imported 10,000 content pieces into MultiCardz™. In 3 seconds, they discovered:
+[Similar Company] just imported 10,000 content pieces into multicardz™. In 3 seconds, they discovered:
 - 847 high-performing pieces never reused
 - $50,000+ of video content shot but never edited  
 - 200+ pieces perfect for repurposing to new platforms
@@ -459,7 +459,7 @@ Want to see what gold is hiding in your content vault? Demo here: [Link]
 
 [Signature]
 
-P.S. One client discovered their intern had been saving content in the wrong folder for 6 months. 300 pieces, never used. MultiCardz™ found them instantly.
+P.S. One client discovered their intern had been saving content in the wrong folder for 6 months. 300 pieces, never used. multicardz™ found them instantly.
 
 #### Marketing Manager Outreach
 
@@ -471,11 +471,11 @@ I noticed [Company] is running campaigns across LinkedIn, Google, and Instagram.
 
 Let me guess: When you open your "real-time" dashboard, you see a loading bar, wait 30 seconds, then get data from yesterday?
 
-Marketing teams using MultiCardz™ drag #campaign + #channel + #revenue and get truly instant answers - 0.38ms instant.
+Marketing teams using multicardz™ drag #campaign + #channel + #revenue and get truly instant answers - 0.38ms instant.
 
 One CMO discovered their dashboard was hiding $2M in misattributed revenue because it couldn't handle cross-channel data at scale.
 
-Unlike Monday.com dashboards that take 20-30 seconds to load, MultiCardz™ maintains sub-millisecond performance with millions of data points.
+Unlike Monday.com dashboards that take 20-30 seconds to load, multicardz™ maintains sub-millisecond performance with millions of data points.
 
 See your campaigns at the speed of decision-making: [Demo Link]
 
@@ -491,7 +491,7 @@ I saw your team uses Trello for project management. Let me guess - you've learne
 
 Trello recommends keeping boards under 1,000 cards (500 with attachments). But real projects don't follow Trello's limitations.
 
-[Competitor] switched from Trello to MultiCardz™. They now:
+[Competitor] switched from Trello to multicardz™. They now:
 - Manage 50,000 cards with 0.1 second load times
 - See overdue items across ALL projects in 0.38ms  
 - Pay 50% less while getting 1000x the capacity
@@ -572,7 +572,7 @@ P.S. One user called Trello "painfully slow" with just 200 cards. We call that a
 - Team productivity plummeting
 
 **Solution**:
-- Imported all 150,000 tickets to MultiCardz™
+- Imported all 150,000 tickets to multicardz™
 - Inverted index architecture with O(M) complexity
 - Sub-millisecond queries on any combination
 
@@ -587,7 +587,7 @@ P.S. One user called Trello "painfully slow" with just 200 cards. We call that a
 
 ### Performance White Paper Topics
 
-1. **"The O(M) Revolution: Why MultiCardz™ Scales When Others Fail"**
+1. **"The O(M) Revolution: Why multicardz™ Scales When Others Fail"**
    - Technical deep-dive on inverted index architecture
    - Performance benchmarks at various scales
    - Mathematical proof of constant-time operations
@@ -633,7 +633,7 @@ Daily Performance Waste =
 Example (10-person team):
 - 50 operations/day × 15 seconds wait × 10 people = 125 minutes/day wasted
 - 125 minutes × $50/hour × 250 days = $26,041/year in waiting
-- MultiCardz™ eliminates 99.9% of this waste = $26,015 saved
+- multicardz™ eliminates 99.9% of this waste = $26,015 saved
 ```
 
 ### Migration Performance Guarantees
@@ -661,7 +661,7 @@ Example (10-person team):
 ### Competitive Migration Messaging
 
 **The Performance Promise**: 
-"If MultiCardz™ isn't at least 10x faster than your current tool, we'll refund your first year. (No one has ever asked for a refund.)"
+"If multicardz™ isn't at least 10x faster than your current tool, we'll refund your first year. (No one has ever asked for a refund.)"
 
 **The Scale Promise**:
 "Import your entire dataset - no limits, no throttling, no performance degradation. What breaks other tools is just a Tuesday for us."
@@ -700,6 +700,6 @@ Example (10-person team):
 
 ------
 
-Remember: MultiCardz™ doesn't just compete on features - we compete on physics. When they're still loading, we're already done.
+Remember: multicardz™ doesn't just compete on features - we compete on physics. When they're still loading, we're already done.
 
 **Speed kills the competition. We are speed.**

@@ -1,5 +1,5 @@
 """
-3-Layer Adaptive Performance Tracking System for MultiCardz.
+3-Layer Adaptive Performance Tracking System for multicardz.
 
 Layer 1: Conservative global baselines (always available)
 Layer 2: Per-session adaptive learning (personalizes to user)

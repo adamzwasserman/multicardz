@@ -1,4 +1,4 @@
-"""Database mode selection and management for MultiCardz.
+"""Database mode selection and management for multicardz.
 
 This module implements the three operational modes:
 - DEV: Local development with local Turso instance
@@ -17,7 +17,7 @@ import os
 
 
 class DatabaseMode(str, Enum):
-    """Database operational modes for MultiCardz.
+    """Database operational modes for multicardz.
 
     Attributes:
         DEV: Local development mode with local Turso instance

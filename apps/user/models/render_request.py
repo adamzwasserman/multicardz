@@ -1,5 +1,5 @@
 """
-Pydantic models for MultiCardz™ card rendering requests.
+Pydantic models for multicardz™ card rendering requests.
 Provides validation and type safety for the dynamic drag-drop system.
 """
 

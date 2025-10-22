@@ -1,6 +1,6 @@
 # Gap Report: 023 - Multi-Tier Database Implementation
 
-**Plan**: docs/implementation/023-2025-09-22-MultiCardz-Multi-Tier-Implementation-Plan-v1.md
+**Plan**: docs/implementation/023-2025-09-22-multicardz-Multi-Tier-Implementation-Plan-v1.md
 **Status**: NOT STARTED (0%)
 **Review Date**: 2025-10-21
 **Reviewer**: Manual Analysis
@@ -228,7 +228,7 @@ tests/features/database_connection_abstraction.feature
 
 This plan represents a comprehensive architectural transformation that has **NOT been started**. The only implemented component (RoaringBitmap) was completed independently and now works within the existing single-database architecture.
 
-**Current Reality**: MultiCardz uses a single SQLite database with RoaringBitmap optimization, achieving performance targets without multi-tier complexity.
+**Current Reality**: multicardz uses a single SQLite database with RoaringBitmap optimization, achieving performance targets without multi-tier complexity.
 
 **Plan Vision**: Transform to PostgreSQL (central) + Turso (project/customer) multi-tier architecture with OAuth2 authentication and subscription management.
 

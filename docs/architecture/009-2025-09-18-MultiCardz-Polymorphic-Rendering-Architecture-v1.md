@@ -1,6 +1,6 @@
 # multicardz Polymorphic Rendering Architecture
 
-**Document ID**: 009-2025-09-18-MultiCardz-Polymorphic-Rendering-Architecture-v1
+**Document ID**: 009-2025-09-18-multicardz-Polymorphic-Rendering-Architecture-v1
 **Created**: September 18, 2025
 **Author**: System Architect
 **Status**: Active Architecture Specification
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This document specifies a revolutionary 4-layer polymorphic rendering architecture for MultiCardz that implements complete separation of concerns while enabling maximum functionality with minimal code. The architecture transforms the current monolithic `/api/render/cards` function into a composable system that supports cards, charts, n-dimensional views, and future visualizations through the same architectural pattern.
+This document specifies a revolutionary 4-layer polymorphic rendering architecture for multicardz that implements complete separation of concerns while enabling maximum functionality with minimal code. The architecture transforms the current monolithic `/api/render/cards` function into a composable system that supports cards, charts, n-dimensional views, and future visualizations through the same architectural pattern.
 
 **Core Innovation**: Protocol-based polymorphism where the same spatial manipulation logic drives card grids, pie charts, sankey diagrams, 3D spatial arrangements, and any future visualization type. This approach eliminates code duplication while preserving the mathematical rigor of our patent-compliant set theory operations.
 
@@ -1334,8 +1334,8 @@ async def render_cards_polymorphic(request: Request):
 
 **Story-Driven Visualization for Enterprise Sales**:
 ```python
-# "We use MultiCardz to run MultiCardz" demonstration
-class MultiCardzOperationsRenderer(HTMLCardRenderer):
+# "We use multicardz to run multicardz" demonstration
+class multicardzOperationsRenderer(HTMLCardRenderer):
     async def render_operations_story(self, operational_cards: frozenset[Card]) -> str:
         """Render compelling operational intelligence story."""
         template = self.templates.get_template('operations/multicardz_story.html')
@@ -1346,7 +1346,7 @@ class MultiCardzOperationsRenderer(HTMLCardRenderer):
         correlation_discoveries = extract_correlation_patterns(operational_cards)
 
         return template.render(
-            story_title="How MultiCardz Operations Team Uses Spatial Correlation",
+            story_title="How multicardz Operations Team Uses Spatial Correlation",
             deployment_rate=deployment_success_rate,
             mttr_improvement="75% reduction in mean time to resolution",
             key_discoveries=correlation_discoveries,

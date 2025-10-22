@@ -1,5 +1,5 @@
 """
-MultiCardz™ Public API.
+multicardz™ Public API.
 External facing API and documentation.
 """
 
@@ -13,7 +13,7 @@ def create_app():
 def main():
     """Run public API application."""
     # Will be implemented in Phase 9: Deployment
-    print("MultiCardz Public API - Phase 0 foundation complete")
+    print("multicardz Public API - Phase 0 foundation complete")
 
 
 if __name__ == "__main__":

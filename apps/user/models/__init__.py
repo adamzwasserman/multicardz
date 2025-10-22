@@ -1,5 +1,5 @@
 """
-MultiCardz" User Application Models
+multicardz" User Application Models
 """
 
 from .render_request import (

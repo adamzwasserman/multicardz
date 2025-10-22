@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Unified MultiCardz™ Test Runner with Parallel Execution & Smart Selection.
+Unified multicardz™ Test Runner with Parallel Execution & Smart Selection.
 Optimized for speed with git-aware test selection and parallel processing.
 
 Usage:
@@ -348,7 +348,7 @@ def main():
         show_help()
         return True
 
-    print("🚀 MultiCardz™ Unified Test Runner")
+    print("🚀 multicardz™ Unified Test Runner")
     print("=" * 50)
 
     # Get changed files for smart mode

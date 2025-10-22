@@ -1,6 +1,6 @@
 # Gap Report: 027 - Progressive Onboarding Implementation
 
-**Plan**: docs/implementation/027-2025-09-22-MultiCardz-Progressive-Onboarding-Implementation-Plan-v1.md
+**Plan**: docs/implementation/027-2025-09-22-multicardz-Progressive-Onboarding-Implementation-Plan-v1.md
 **Status**: PARTIAL (30%)
 **Review Date**: 2025-10-21
 **Reviewer**: Manual Analysis

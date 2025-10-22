@@ -1,5 +1,5 @@
 """
-MultiCardz™ User Application.
+multicardz™ User Application.
 Frontend application for spatial tag manipulation interface.
 """
 
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 def create_app():
     """Create FastAPI application instance."""
     app = FastAPI(
-        title="MultiCardz™ User Application",
+        title="multicardz™ User Application",
         description="Frontend application for spatial tag manipulation interface",
         version="1.0.0"
     )
@@ -126,7 +126,7 @@ def create_app():
 
         return response
 
-    logger.info("MultiCardz™ User Application initialized")
+    logger.info("multicardz™ User Application initialized")
     return app
 
 
@@ -135,7 +135,7 @@ def main():
     import uvicorn
     app = create_app()
 
-    logger.info("Starting MultiCardz™ User Application")
+    logger.info("Starting multicardz™ User Application")
     uvicorn.run(app, host="0.0.0.0", port=8011, reload=True)
 
 

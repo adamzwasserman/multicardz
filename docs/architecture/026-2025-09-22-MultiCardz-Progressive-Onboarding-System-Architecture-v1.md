@@ -1,4 +1,4 @@
-# MultiCardz Progressive Onboarding System Architecture v1
+# multicardz Progressive Onboarding System Architecture v1
 
 **Document Version**: 1.0
 **Date**: 2025-09-22
@@ -9,11 +9,11 @@
 
 ## 1. Executive Summary
 
-The MultiCardz Progressive Onboarding System provides an interactive, tutorial-driven introduction to spatial tag manipulation through seven carefully designed lessons. This system transforms complex set theory concepts into an intuitive learning experience, enabling new users to master MultiCardz's unique spatial interface within minutes rather than hours.
+The multicardz Progressive Onboarding System provides an interactive, tutorial-driven introduction to spatial tag manipulation through seven carefully designed lessons. This system transforms complex set theory concepts into an intuitive learning experience, enabling new users to master multicardz's unique spatial interface within minutes rather than hours.
 
 The architecture integrates seamlessly with existing components while maintaining patent compliance and functional programming principles. The system utilizes pre-populated lesson cards, progressive revelation mechanics, and real-time feedback to guide users through increasingly sophisticated operations. Key innovations include dynamic lesson state management, contextual instruction delivery, and automated progression triggers that respond to user actions.
 
-Core architectural decisions: (1) Lesson cards stored as standard MultiCardz cards with special metadata, (2) Lesson state managed through pure functional operations in the database, (3) Progressive revelation implemented through existing set operations, (4) Integration with existing drag-drop system without modification, and (5) Universal controls extended to include lesson selection and progression.
+Core architectural decisions: (1) Lesson cards stored as standard multicardz cards with special metadata, (2) Lesson state managed through pure functional operations in the database, (3) Progressive revelation implemented through existing set operations, (4) Integration with existing drag-drop system without modification, and (5) Universal controls extended to include lesson selection and progression.
 
 Expected outcomes: 95% reduction in onboarding time, 80% increase in feature adoption, improved user engagement through interactive learning, and strengthened competitive positioning through superior user experience.
 
@@ -23,7 +23,7 @@ Expected outcomes: 95% reduction in onboarding time, 80% increase in feature ado
 
 ### 2.1 Current State Architecture
 
-The existing MultiCardz system implements sophisticated spatial tag manipulation through a mature JavaScript drag-drop interface with backend HTML generation. Users interact with cards through zones that apply mathematical set operations (intersection, union, exclusion) to filter and organize data. The current system assumes user familiarity with set theory concepts and spatial manipulation paradigms.
+The existing multicardz system implements sophisticated spatial tag manipulation through a mature JavaScript drag-drop interface with backend HTML generation. Users interact with cards through zones that apply mathematical set operations (intersection, union, exclusion) to filter and organize data. The current system assumes user familiarity with set theory concepts and spatial manipulation paradigms.
 
 **Integration Points**:
 - **Drag-Drop System**: Existing SpatialDragDrop class handles all spatial interactions
@@ -105,7 +105,7 @@ The onboarding system follows the same unidirectional data flow as the main syst
 - Maintains lesson state persistence across sessions
 
 **Lesson Card System**:
-- Stores instructional content as standard MultiCardz cards
+- Stores instructional content as standard multicardz cards
 - Implements progressive revelation through set operations
 - Provides contextual guidance and next-step instructions
 - Manages lesson-specific tags and metadata
@@ -118,7 +118,7 @@ The onboarding system follows the same unidirectional data flow as the main syst
 
 #### 3.1.3 Communication Patterns
 
-All lesson interactions follow existing MultiCardz patterns:
+All lesson interactions follow existing multicardz patterns:
 - **Frontend**: Drag-drop actions trigger lesson progression checks
 - **Backend**: Lesson logic executed through pure functional operations
 - **Database**: Lesson state stored using existing card and user preference systems
@@ -129,7 +129,7 @@ All lesson interactions follow existing MultiCardz patterns:
 #### 3.2.1 Lesson Card Data Structure
 
 ```python
-# Lesson cards stored as standard MultiCardz cards with special metadata
+# Lesson cards stored as standard multicardz cards with special metadata
 LessonCardMetadata = {
     "lesson_id": str,           # "lesson-1", "lesson-2", etc.
     "step_number": int,         # Sequential step within lesson
@@ -143,7 +143,7 @@ LessonCardMetadata = {
 # Example lesson card content
 lesson_1_step_1 = CardSummaryTuple(
     id="lesson-1-step-1",
-    title="Welcome to MultiCardz! Let's learn spatial tag manipulation.",
+    title="Welcome to multicardz! Let's learn spatial tag manipulation.",
     tags=frozenset(["#lesson-1", "#step-1", "#instruction"]),
     created_at=datetime.now(UTC),
     modified_at=datetime.now(UTC),
@@ -500,7 +500,7 @@ def render_lesson_interface(
     lesson_mode: bool = True
 ) -> str:
     """
-    Render MultiCardz interface with lesson overlay.
+    Render multicardz interface with lesson overlay.
 
     Args:
         conn: Database connection
@@ -544,7 +544,7 @@ def exit_lesson_mode(
     save_progress: bool = True
 ) -> dict[str, Any]:
     """
-    Exit lesson mode and return to normal MultiCardz interface.
+    Exit lesson mode and return to normal multicardz interface.
 
     Args:
         conn: Database connection
@@ -853,7 +853,7 @@ def handle_lesson_state_error(
 **BDD Scenarios for Each Lesson**:
 ```gherkin
 Feature: Lesson 1 Basic Tag Dragging
-  As a new MultiCardz user
+  As a new multicardz user
   I want to learn basic tag dragging
   So that I can begin using spatial manipulation
 
@@ -965,7 +965,7 @@ ADVANCED_LESSONS_ENABLED = True   # Lessons 6-7 availability
 
 ### 11.1 Lesson Storage as Standard Cards
 
-**Decision**: Store lesson content as standard MultiCardz cards with special metadata
+**Decision**: Store lesson content as standard multicardz cards with special metadata
 **Rationale**:
 - Leverages existing card storage and retrieval infrastructure
 - Enables use of existing set operations for lesson filtering
@@ -995,7 +995,7 @@ ADVANCED_LESSONS_ENABLED = True   # Lessons 6-7 availability
 
 **Decision**: Implement progressive revelation using existing set theory operations
 **Rationale**:
-- Consistent with MultiCardz mathematical foundation
+- Consistent with multicardz mathematical foundation
 - Leverages existing high-performance filtering infrastructure
 - Provides precise control over lesson card visibility
 - Maintains patent compliance and architectural principles

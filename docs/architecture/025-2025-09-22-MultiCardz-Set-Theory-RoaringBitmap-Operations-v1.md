@@ -1,8 +1,8 @@
-# 025 MultiCardz Set Theory Operations with RoaringBitmap Optimization v1
+# 025 multicardz Set Theory Operations with RoaringBitmap Optimization v1
 
 ## Executive Summary
 
-This document specifies the mathematical foundation and implementation details for MultiCardz's enhanced set theory operations using RoaringBitmap compression. The design maintains the system's patent-compliant spatial tag manipulation while achieving universe-scale performance through compressed bitmap indexing and O(1) set operations.
+This document specifies the mathematical foundation and implementation details for multicardz's enhanced set theory operations using RoaringBitmap compression. The design maintains the system's patent-compliant spatial tag manipulation while achieving universe-scale performance through compressed bitmap indexing and O(1) set operations.
 
 **Key Mathematical Enhancements:**
 - **RoaringBitmap Integration**: Compressed bitmap representation enabling O(1) tag membership testing
@@ -1292,4 +1292,4 @@ async def test_mathematical_equivalence():
         )
 ```
 
-This comprehensive RoaringBitmap integration provides MultiCardz with universe-scale performance while maintaining complete mathematical correctness and patent compliance. The enhanced set operations achieve the target performance of <50ms for 1M+ card operations while reducing memory usage by 90%+ through advanced bitmap compression techniques.
+This comprehensive RoaringBitmap integration provides multicardz with universe-scale performance while maintaining complete mathematical correctness and patent compliance. The enhanced set operations achieve the target performance of <50ms for 1M+ card operations while reducing memory usage by 90%+ through advanced bitmap compression techniques.

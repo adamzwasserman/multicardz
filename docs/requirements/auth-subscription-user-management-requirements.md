@@ -1,12 +1,12 @@
-# MultiCardz Authentication, Subscription & User Management Requirements
+# multicardz Authentication, Subscription & User Management Requirements
 
 ## Plain Language Summary
 
 **What This Document Is:**
-This document describes how people sign up for MultiCardz, how they log in, how they pay for subscriptions, and how their data stays private and secure.
+This document describes how people sign up for multicardz, how they log in, how they pay for subscriptions, and how their data stays private and secure.
 
 **Why It Matters:**
-When you use MultiCardz, you need confidence that:
+When you use multicardz, you need confidence that:
 - Your login is secure and works reliably
 - Your payment information is protected
 - Your data belongs only to you (nobody else can see it)
@@ -38,7 +38,7 @@ This section provides a technical explanation of the architecture without diving
 ### Dual Registration Architecture
 
 **Why Two Paths:**
-MultiCardz supports both freemium (try before you buy) and premium-first business models. The dual-path registration architecture ensures:
+multicardz supports both freemium (try before you buy) and premium-first business models. The dual-path registration architecture ensures:
 - Low friction for users who want to try the product immediately
 - Secure payment collection before granting premium access
 - Consistent user identity management across both flows
@@ -119,7 +119,7 @@ This three-flow architecture (auth-first, pay-first, upgrade) provides maximum f
 ### Authentication Architecture
 
 **Session Management Strategy:**
-MultiCardz uses a dual-token architecture that separates concerns between user sessions and API access:
+multicardz uses a dual-token architecture that separates concerns between user sessions and API access:
 
 **Client-Side (Browser):**
 - HTTP-only secure cookie containing a session token
@@ -147,7 +147,7 @@ This architecture provides security, performance, and automatic token management
 ### Zero-Trust Data Isolation
 
 **The UUID-Based Security Model:**
-Every resource in MultiCardz (users, workspaces, cards, tags) has a globally unique identifier. The system enforces data isolation through automatic query filtering:
+Every resource in multicardz (users, workspaces, cards, tags) has a globally unique identifier. The system enforces data isolation through automatic query filtering:
 
 **data_filter Middleware:**
 The data_filter middleware sits in the request pipeline after authentication but before route handlers. It automatically:
@@ -258,7 +258,7 @@ This architecture ensures accurate billing and immediate feature access changes.
 ## 1. Overview
 
 ### 1.1 System Purpose
-MultiCardz requires a comprehensive authentication, subscription, and user management system to:
+multicardz requires a comprehensive authentication, subscription, and user management system to:
 - Securely authenticate and authorize users
 - Manage subscription-based access to premium features
 - Enforce zero-trust security principles with UUID-based data isolation
@@ -273,10 +273,10 @@ This document covers requirements for:
 - Subscription management and validation via Stripe
 - User profile and workspace management
 - Zero-trust security with UUID-based data isolation via data_filter middleware
-- Integration points between Auth0, Stripe, and the MultiCardz application
+- Integration points between Auth0, Stripe, and the multicardz application
 
 ### 1.3 Key Stakeholders
-- End Users: Individuals and teams using MultiCardz for semantic tag management
+- End Users: Individuals and teams using multicardz for semantic tag management
 - System Administrators: Managing user access and subscriptions
 - Development Team: Implementing and maintaining the systems
 - Security Team: Ensuring compliance and data protection
@@ -656,7 +656,7 @@ This document covers requirements for:
 
 ### 8.1 User Registration and Upgrade Flows
 
-**Note**: MultiCardz supports three distinct flows:
+**Note**: multicardz supports three distinct flows:
 1. **Free User Registration (Auth-First)**: User → Auth0 → Database (with free tier subscription)
 2. **Paid User Registration (Pay-First)**: User → Stripe → Database → Auth0
 3. **Upgrade Flow (Free to Paid)**: Existing User → Stripe → Update Database Record
@@ -676,7 +676,7 @@ sequenceDiagram
     UserSite->>User: Show subscription plans
     User->>UserSite: Select paid plan
     UserSite->>Stripe: Redirect to Stripe
-    MultiCardz->>Stripe: Create checkout session
+    multicardz->>Stripe: Create checkout session
     Stripe->>User: Show payment form
     User->>Stripe: Submit payment
     Stripe->>AdminSite: Webhook: payment success
@@ -684,8 +684,8 @@ sequenceDiagram
     AdminSite->>User: Redirect to Auth0
     Auth0->>User: Show signup screen
     User->>Auth0: Create credentials
-    Auth0->>MultiCardz: Return ID & access tokens
-    MultiCardz->>Postgres: Add Auth0ID to user account
+    Auth0->>multicardz: Return ID & access tokens
+    multicardz->>Postgres: Add Auth0ID to user account
 ```
 
 #### 8.1.2 Free User Registration Flow (Auth-First)
@@ -703,9 +703,9 @@ sequenceDiagram
     UserSite->>Auth0: Redirect to Auth0
     Auth0->>User: Show signup screen
     User->>Auth0: Create credentials
-    Auth0->>MultiCardz: Return ID & access tokens
-    MultiCardz->>Postgres: Create user account with multicardzID, Auth0ID, and free tier
-    MultiCardz->>User: Redirect to application
+    Auth0->>multicardz: Return ID & access tokens
+    multicardz->>Postgres: Create user account with multicardzID, Auth0ID, and free tier
+    multicardz->>User: Redirect to application
 ```
 
 #### 8.1.3 Upgrade Flow (Free to Paid)
@@ -713,26 +713,26 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant User
-    participant MultiCardz
+    participant multicardz
     participant Postgres
     participant Stripe
 
     Note over User,Postgres: User already has account with multicardzID + Auth0ID
 
-    User->>MultiCardz: Click "Upgrade to Pro"
-    MultiCardz->>Postgres: Fetch user record (multicardzID, current tier)
-    MultiCardz->>Stripe: Create checkout session with multicardzID in metadata
-    Stripe->>MultiCardz: Return checkout session URL
-    MultiCardz->>User: Redirect to Stripe Checkout
+    User->>multicardz: Click "Upgrade to Pro"
+    multicardz->>Postgres: Fetch user record (multicardzID, current tier)
+    multicardz->>Stripe: Create checkout session with multicardzID in metadata
+    Stripe->>multicardz: Return checkout session URL
+    multicardz->>User: Redirect to Stripe Checkout
     User->>Stripe: Complete payment
-    Stripe->>MultiCardz: Webhook: checkout.session.completed (includes multicardzID)
-    MultiCardz->>Postgres: Find user by multicardzID
-    MultiCardz->>Postgres: Add StripeID, update tier to "Pro"
-    Stripe->>User: Redirect back to MultiCardz
-    User->>MultiCardz: Next API request
-    MultiCardz->>Stripe: Verify subscription status
-    Stripe->>MultiCardz: Return active Pro subscription
-    MultiCardz->>User: Grant access to Pro features
+    Stripe->>multicardz: Webhook: checkout.session.completed (includes multicardzID)
+    multicardz->>Postgres: Find user by multicardzID
+    multicardz->>Postgres: Add StripeID, update tier to "Pro"
+    Stripe->>User: Redirect back to multicardz
+    User->>multicardz: Next API request
+    multicardz->>Stripe: Verify subscription status
+    Stripe->>multicardz: Return active Pro subscription
+    multicardz->>User: Grant access to Pro features
 ```
 
 ### 8.2 Authentication Flow with Subscription Check
@@ -790,7 +790,7 @@ flowchart LR
 - Stripe API Reference: https://stripe.com/docs/api
 - OWASP Security Guidelines: https://owasp.org/www-project-top-ten/
 - OAuth2 Specification: https://oauth.net/2/
-- MultiCardz Architecture Documents: `/docs/architecture/`
+- multicardz Architecture Documents: `/docs/architecture/`
 
 ### 9.3 Related Documents
 
@@ -804,7 +804,7 @@ flowchart LR
 ## Plain Language Conclusion
 
 **What We're Building:**
-A secure, user-friendly system that lets people sign up for MultiCardz in two ways:
+A secure, user-friendly system that lets people sign up for multicardz in two ways:
 1. Try it free → upgrade later if they like it
 2. Choose a paid plan → create account → start using immediately
 

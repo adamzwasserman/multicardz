@@ -25,7 +25,7 @@ from apps.shared.services.database_storage import (
 
 def test_authentication():
     """Test the authentication system."""
-    print("Testing MultiCardz authentication system...")
+    print("Testing multicardz authentication system...")
 
     # Database configuration
     db_path = Path("/var/data/multicardz_dev.db")

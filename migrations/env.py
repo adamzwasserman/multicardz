@@ -1,5 +1,5 @@
 """
-Alembic migration environment for MultiCardz™.
+Alembic migration environment for multicardz™.
 
 This module configures Alembic for database migrations with SQLite support.
 """

@@ -1,5 +1,5 @@
 """
-Elite storage strategy pattern for MultiCardz.
+Elite storage strategy pattern for multicardz.
 Implements local-first architecture with optional cloud sync.
 """
 

@@ -1,10 +1,10 @@
 # multicardz Polymorphic Rendering Implementation Plan
 
-**Document ID**: 010-2025-09-18-MultiCardz-Polymorphic-Rendering-Implementation-Plan-v1
+**Document ID**: 010-2025-09-18-multicardz-Polymorphic-Rendering-Implementation-Plan-v1
 **Created**: September 18, 2025
 **Author**: System Architect
 **Status**: Active Implementation Specification
-**Related Architecture**: 009-2025-09-18-MultiCardz-Polymorphic-Rendering-Architecture-v1
+**Related Architecture**: 009-2025-09-18-multicardz-Polymorphic-Rendering-Architecture-v1
 
 ---
 
@@ -2857,7 +2857,7 @@ async def get_performance_statistics():
 - [ ] Interactive features work with HTMX for real-time operational updates
 - [ ] Performance targets met for complex charts with live operational data
 - [ ] Charts maintain patent compliance for spatial operations across heterogeneous data
-- [ ] "We use MultiCardz to run MultiCardz" story elements functional
+- [ ] "We use multicardz to run multicardz" story elements functional
 
 #### Step 4.2: N-Dimensional Visualization
 **Duration**: 3 days
@@ -2946,7 +2946,7 @@ async def get_performance_statistics():
 
 ## Conclusion
 
-This implementation plan provides a comprehensive roadmap for transforming MultiCardz from a monolithic rendering system to a revolutionary polymorphic architecture. By following the 8-step process outlined above, we will achieve:
+This implementation plan provides a comprehensive roadmap for transforming multicardz from a monolithic rendering system to a revolutionary polymorphic architecture. By following the 8-step process outlined above, we will achieve:
 
 1. **Maximum Functionality with Minimal Code**: Single codebase supporting unlimited visualization types
 2. **Patent-Compliant Innovation**: Spatial manipulation extended to charts and N-dimensional data
@@ -2954,6 +2954,6 @@ This implementation plan provides a comprehensive roadmap for transforming Multi
 4. **Zero-Downtime Migration**: Gradual rollout preserving system stability
 5. **Unlimited Extensibility**: Foundation for future visualization innovations
 
-The polymorphic architecture represents a fundamental advancement in data visualization systems, enabling spatial manipulation of any data representation while maintaining the mathematical rigor and user experience excellence that defines MultiCardz.
+The polymorphic architecture represents a fundamental advancement in data visualization systems, enabling spatial manipulation of any data representation while maintaining the mathematical rigor and user experience excellence that defines multicardz.
 
-**Success in this implementation will establish MultiCardz as the definitive platform for spatial data manipulation, providing capabilities no competitor can match while maintaining the performance and reliability demanded by enterprise users.**
+**Success in this implementation will establish multicardz as the definitive platform for spatial data manipulation, providing capabilities no competitor can match while maintaining the performance and reliability demanded by enterprise users.**

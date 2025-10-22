@@ -1,8 +1,8 @@
-# MultiCardz™ Render Deployment Guide
+# multicardz™ Render Deployment Guide
 
 ## 🚀 Optimized for High-Performance Set Operations
 
-This guide provides deployment configuration for achieving optimal performance of MultiCardz set operations on Render's infrastructure.
+This guide provides deployment configuration for achieving optimal performance of multicardz set operations on Render's infrastructure.
 
 ## 📊 Performance by Render Plan
 

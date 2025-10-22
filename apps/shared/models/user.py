@@ -1,5 +1,5 @@
 """
-User model for MultiCardz™ authentication and authorization.
+User model for multicardz™ authentication and authorization.
 Pure data model with no business logic.
 """
 

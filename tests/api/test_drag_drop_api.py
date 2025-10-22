@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive test suite for the MultiCardz™ drag-drop system.
+Comprehensive test suite for the multicardz™ drag-drop system.
 """
 
 import sys
@@ -24,7 +24,7 @@ def test_basic_routes():
     # Test main route
     response = client.get("/")
     assert response.status_code == 200
-    assert "MultiCardz™" in response.text
+    assert "multicardz™" in response.text
     print("✅ Main route working")
 
     # Test health check
@@ -263,7 +263,7 @@ def test_css_exists():
 
 def run_all_tests():
     """Run the complete test suite."""
-    print("🚀 Starting MultiCardz™ Drag-Drop Test Suite\n")
+    print("🚀 Starting multicardz™ Drag-Drop Test Suite\n")
 
     test_functions = [
         test_basic_routes,

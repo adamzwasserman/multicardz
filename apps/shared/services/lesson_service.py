@@ -1,5 +1,5 @@
 """
-MultiCardz™ Lesson Service
+multicardz™ Lesson Service
 Pure functional service for managing progressive onboarding lessons.
 Follows function-based architecture with explicit state passing.
 """
@@ -325,7 +325,7 @@ def get_lesson_selector_options(lesson_state: dict) -> list[dict[str, Any]]:
         options.append({
             "value": "production",
             "label": "🚀 Production Mode",
-            "description": "Use MultiCardz with your own data",
+            "description": "Use multicardz with your own data",
             "selected": current_lesson == "production",
             "unlocked": True
         })

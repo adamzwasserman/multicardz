@@ -1,4 +1,4 @@
-# MultiCardz JavaScript Architecture v1
+# multicardz JavaScript Architecture v1
 
 **Document Version**: 1.0
 **Date**: 2025-09-16
@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary
 
-MultiCardz represents a clean reimplementation of the CardZ spatial tag manipulation system, replacing C/WASM with pure JavaScript while maintaining strict patent compliance and architectural principles. The system provides a visual query builder based on mathematical set theory, enabling users to organize and filter large datasets through drag-and-drop interactions within a polymorphic spatial interface.
+multicardz represents a clean reimplementation of the CardZ spatial tag manipulation system, replacing C/WASM with pure JavaScript while maintaining strict patent compliance and architectural principles. The system provides a visual query builder based on mathematical set theory, enabling users to organize and filter large datasets through drag-and-drop interactions within a polymorphic spatial interface.
 
 The architecture eliminates complexity introduced by WASM compilation while preserving the core patent-compliant spatial manipulation paradigms. JavaScript's native Set operations provide comparable performance for typical dataset sizes (1K-10K cards) while offering superior debugging capabilities and simplified deployment. The backend maintains full HTML generation responsibility, ensuring horizontal scalability and patent compliance through server-side set theory operations.
 
@@ -25,7 +25,7 @@ The existing CardZ system implements spatial tag manipulation through C/WASM mod
 
 ### 2.2 Elite Storage Strategy Architecture
 
-MultiCardz implements a tiered storage architecture designed for enterprise deployment flexibility:
+multicardz implements a tiered storage architecture designed for enterprise deployment flexibility:
 
 **Local-First Strategy (Elite Tier)**:
 - Encrypted SQLite with Fernet 256-bit AES encryption
@@ -310,8 +310,8 @@ Database migrations follow forward-only pattern with rollback scripts for emerge
  * Progressive enhancement over HTMX backend responses.
  */
 
-// Base class for all MultiCardz custom elements
-class MultiCardzElement extends HTMLElement {
+// Base class for all multicardz custom elements
+class multicardzElement extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
@@ -325,7 +325,7 @@ class MultiCardzElement extends HTMLElement {
 }
 
 // Filter Zone Component
-class MultiCardzFilterZone extends MultiCardzElement {
+class multicardzFilterZone extends multicardzElement {
     static get observedAttributes() {
         return ['filter-tags', 'mode'];
     }
@@ -338,7 +338,7 @@ class MultiCardzFilterZone extends MultiCardzElement {
 }
 
 // Tag Cloud Component with built-in behavior
-class TagCloud extends MultiCardzElement {
+class TagCloud extends multicardzElement {
     static get observedAttributes() {
         return ['selected', 'available'];
     }
@@ -354,7 +354,7 @@ class TagCloud extends MultiCardzElement {
 }
 
 // Card Grid with ViewTransitions
-class CardGrid extends MultiCardzElement {
+class CardGrid extends multicardzElement {
     updateCards(newCards) {
         // Use ViewTransitions API for smooth updates
         if (document.startViewTransition) {
@@ -368,7 +368,7 @@ class CardGrid extends MultiCardzElement {
 }
 
 // Register custom elements
-customElements.define('multicardz-filter-zone', MultiCardzFilterZone);
+customElements.define('multicardz-filter-zone', multicardzFilterZone);
 customElements.define('tag-cloud', TagCloud);
 customElements.define('card-grid', CardGrid);
 
@@ -636,7 +636,7 @@ Where: P = partition matrix, r = row_tag, c = column_tag
 ### 4.2 Function-Based Architecture - Classes Considered Harmful
 
 **Classes as Anti-Pattern**:
-Classes are designated as an anti-pattern in MultiCardz due to fundamental performance and quality issues:
+Classes are designated as an anti-pattern in multicardz due to fundamental performance and quality issues:
 
 **Performance Nobody Talks About**:
 - Every `new MyClass()` creates cache misses across the heap
@@ -767,7 +767,7 @@ The system automatically selects optimal processing based on dataset size:
 **Approved JavaScript Patterns**:
 ```javascript
 // 1. Polymorphic dispatch table operation
-const result = MultiCardzDispatch.dispatch('tag-to-zone', context);
+const result = multicardzDispatch.dispatch('tag-to-zone', context);
 
 // 2. DOM property assignment for spatial elements
 element.dataset.tagValue = tagName;
@@ -1032,7 +1032,7 @@ Feature: Tag-to-Zone Operation
 
 ### 8.4 Migration Test Procedures
 
-**CardZ to MultiCardz Migration Testing**:
+**CardZ to multicardz Migration Testing**:
 ```python
 def test_migration_data_integrity():
     """
@@ -1367,7 +1367,7 @@ Difference: A - B = {x : x ∈ A ∧ x ∉ B}
 Complement: A^c = {x ∈ U : x ∉ A}
 ```
 
-**MultiCardz Specific Operations**:
+**multicardz Specific Operations**:
 ```
 Phase 1 (Intersection): U' = {c ∈ U : I ⊆ c.tags}
 Phase 2 (Union): R = {c ∈ U' : O ∩ c.tags ≠ ∅}

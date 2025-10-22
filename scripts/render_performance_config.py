@@ -1,5 +1,5 @@
 """
-Render Deployment Performance Configuration for MultiCardz™.
+Render Deployment Performance Configuration for multicardz™.
 
 Optimizes set operations performance based on Render's infrastructure
 characteristics and automatically detects available resources.

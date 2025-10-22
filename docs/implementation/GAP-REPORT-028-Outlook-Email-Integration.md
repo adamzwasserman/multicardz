@@ -1,6 +1,6 @@
 # Gap Report: 028 - Outlook Email Integration Implementation
 
-**Plan**: docs/implementation/028-2025-10-15-MultiCardz-Outlook-Email-Integration-Implementation-v1.md
+**Plan**: docs/implementation/028-2025-10-15-multicardz-Outlook-Email-Integration-Implementation-v1.md
 **Status**: NOT STARTED (0%)
 **Review Date**: 2025-10-21
 **Reviewer**: Manual Analysis

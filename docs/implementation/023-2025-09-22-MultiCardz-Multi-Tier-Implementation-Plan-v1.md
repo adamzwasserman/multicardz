@@ -1,8 +1,8 @@
-# 023 MultiCardz Multi-Tier Implementation Plan v1am
+# 023 multicardz Multi-Tier Implementation Plan v1am
 
 ## Overview
 
-This implementation plan provides a comprehensive roadmap for migrating MultiCardz from its current single-SQLite architecture to a sophisticated multi-tier database system. The plan implements the architecture defined in document 022, delivering authentication/billing separation, project data isolation, and enhanced performance through RoaringBitmap optimization.
+This implementation plan provides a comprehensive roadmap for migrating multicardz from its current single-SQLite architecture to a sophisticated multi-tier database system. The plan implements the architecture defined in document 022, delivering authentication/billing separation, project data isolation, and enhanced performance through RoaringBitmap optimization.
 
 **Goals and Scope:**
 - Migrate existing SQLite database to multi-tier architecture
@@ -102,7 +102,7 @@ This implementation plan provides a comprehensive roadmap for migrating MultiCar
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-MultiCardz-Multi-Tier-Implementation-Plan-v1.md
+   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-multicardz-Multi-Tier-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -431,7 +431,7 @@ This implementation plan provides a comprehensive roadmap for migrating MultiCar
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-MultiCardz-Multi-Tier-Implementation-Plan-v1.md
+   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-multicardz-Multi-Tier-Implementation-Plan-v1.md
    # Duration calculation will be added here
    ```
 
@@ -457,7 +457,7 @@ This implementation plan provides a comprehensive roadmap for migrating MultiCar
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-MultiCardz-Multi-Tier-Implementation-Plan-v1.md
+   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-multicardz-Multi-Tier-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -894,7 +894,7 @@ This implementation plan provides a comprehensive roadmap for migrating MultiCar
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-MultiCardz-Multi-Tier-Implementation-Plan-v1.md
+   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-multicardz-Multi-Tier-Implementation-Plan-v1.md
    # Duration calculation will be added here
    ```
 
@@ -921,7 +921,7 @@ This implementation plan provides a comprehensive roadmap for migrating MultiCar
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-MultiCardz-Multi-Tier-Implementation-Plan-v1.md
+   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-multicardz-Multi-Tier-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -1323,7 +1323,7 @@ This implementation plan provides a comprehensive roadmap for migrating MultiCar
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-MultiCardz-Multi-Tier-Implementation-Plan-v1.md
+   echo "Task 1.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/023-2025-09-22-multicardz-Multi-Tier-Implementation-Plan-v1.md
    # Duration calculation will be added here
    ```
 
@@ -1682,4 +1682,4 @@ This implementation plan provides a comprehensive roadmap for migrating MultiCar
 - Performance degradation >20% requires rollback consideration
 - Security vulnerabilities force immediate system lockdown
 
-This implementation plan provides a comprehensive roadmap for migrating MultiCardz to a sophisticated multi-tier database architecture while maintaining the system's exceptional performance characteristics and patent-compliant functionality. The detailed 8-step process for each task ensures consistent quality, comprehensive testing, and proper documentation throughout the implementation.
+This implementation plan provides a comprehensive roadmap for migrating multicardz to a sophisticated multi-tier database architecture while maintaining the system's exceptional performance characteristics and patent-compliant functionality. The detailed 8-step process for each task ensures consistent quality, comprehensive testing, and proper documentation throughout the implementation.

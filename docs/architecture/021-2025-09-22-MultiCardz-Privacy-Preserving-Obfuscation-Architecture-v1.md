@@ -1,4 +1,4 @@
-# MultiCardz Privacy-Preserving Obfuscation Architecture
+# multicardz Privacy-Preserving Obfuscation Architecture
 **Version**: 1.0
 **Date**: 2025-09-22
 **Status**: APPROVED FOR IMPLEMENTATION
@@ -12,7 +12,7 @@ The core insight driving this architecture is that backend set operations requir
 ## System Context
 
 ### Current State
-The existing MultiCardz system transmits card content and tags in plaintext to the backend for set operations and spatial manipulation. While HTTPS provides transport security, the backend has full visibility into user data, creating potential privacy concerns for sensitive information.
+The existing multicardz system transmits card content and tags in plaintext to the backend for set operations and spatial manipulation. While HTTPS provides transport security, the backend has full visibility into user data, creating potential privacy concerns for sensitive information.
 
 ### Privacy Requirements
 - **Zero Knowledge Backend**: Server performs operations without knowing actual content
@@ -675,7 +675,7 @@ describe('Privacy Mode Integration', () => {
 ### Progressive Enhancement
 ```javascript
 // Privacy mode as opt-in feature
-class MultiCardzApp {
+class multicardzApp {
     initializePrivacy() {
         // Check browser support
         if (!window.crypto?.subtle) {

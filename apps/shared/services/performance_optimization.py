@@ -1,5 +1,5 @@
 """
-Performance optimization functions for MultiCardz.
+Performance optimization functions for multicardz.
 
 Pure functions for caching, parallel processing, and connection pooling.
 Architecture compliance: function-based, immutable data structures.

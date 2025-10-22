@@ -1,8 +1,8 @@
-# 024 MultiCardz Database Schema Specifications v1
+# 024 multicardz Database Schema Specifications v1
 
 ## Executive Summary
 
-This document provides comprehensive database schema specifications for MultiCardz's three-tier architecture: Central PostgreSQL tier for authentication/billing, Project Turso instances for high-performance card operations, and Master Customer instances for cross-project preferences. Each schema is optimized for its specific role while maintaining mathematical correctness for set theory operations and patent compliance.
+This document provides comprehensive database schema specifications for multicardz's three-tier architecture: Central PostgreSQL tier for authentication/billing, Project Turso instances for high-performance card operations, and Master Customer instances for cross-project preferences. Each schema is optimized for its specific role while maintaining mathematical correctness for set theory operations and patent compliance.
 
 **Key Schema Design Principles:**
 - **Separation of Concerns**: Each tier handles distinct data domains without overlap
@@ -1792,4 +1792,4 @@ search_history.workspace_id → workspace_settings.workspace_id (Project)
 - Project Tier: Hourly snapshots with instant restore capability
 - Master Customer Tier: Daily backups with point-in-time recovery
 
-This comprehensive database schema specification provides the foundation for MultiCardz's multi-tier architecture, ensuring optimal performance, complete data isolation, and seamless cross-tier operations while maintaining patent compliance and set theory mathematical correctness.
+This comprehensive database schema specification provides the foundation for multicardz's multi-tier architecture, ensuring optimal performance, complete data isolation, and seamless cross-tier operations while maintaining patent compliance and set theory mathematical correctness.

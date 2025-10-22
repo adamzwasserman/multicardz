@@ -1,4 +1,4 @@
-# MultiCardz™ Polymorphic Drag-Drop System Specification
+# multicardz™ Polymorphic Drag-Drop System Specification
 
 **Document ID**: drag-drop-polymorphic-specification-v1
 **Created**: October 3, 2025
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This document specifies the complete polymorphic drag-drop system for MultiCardz, defining all valid drag/drop combinations, their behaviors, and implementation requirements. The system uses a state table-driven approach to enable extensible, maintainable drag-drop interactions while maintaining strict compliance with DOM manipulation rules and set theory operations.
+This document specifies the complete polymorphic drag-drop system for multicardz, defining all valid drag/drop combinations, their behaviors, and implementation requirements. The system uses a state table-driven approach to enable extensible, maintainable drag-drop interactions while maintaining strict compliance with DOM manipulation rules and set theory operations.
 
 **Core Principle**: Every drag/drop combination has exactly one well-defined behavior specified in the state table. No ambiguity, no if/else chains, pure polymorphic dispatch.
 

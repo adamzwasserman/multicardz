@@ -2,7 +2,7 @@
 ## Collecting Emails to Turso In-Browser Database
 
 **STATUS**: SUPERSEDED
-**SUPERSEDED BY**: docs/implementation/028-2025-10-15-MultiCardz-Outlook-Email-Integration-Implementation-v1.md
+**SUPERSEDED BY**: docs/implementation/028-2025-10-15-multicardz-Outlook-Email-Integration-Implementation-v1.md
 **SUPERSEDED DATE**: 2025-10-15
 **REASON**: Planning document replaced by formal versioned implementation plan with architecture reference
 
@@ -14,7 +14,7 @@
 
 ## Executive Summary
 
-This plan outlines the implementation of Outlook email collection and storage in a browser-based Turso database for the MultiCardz application. The architecture follows Superhuman's approach: OAuth-based authentication, client-side storage, and no server-side email copies.
+This plan outlines the implementation of Outlook email collection and storage in a browser-based Turso database for the multicardz application. The architecture follows Superhuman's approach: OAuth-based authentication, client-side storage, and no server-side email copies.
 
 ---
 
@@ -208,7 +208,7 @@ const accessToken = tokenResponse.accessToken;
 ### 2.1 High-Level Flow
 
 ```
-User → MultiCardz App → MSAL Auth → Microsoft Graph API
+User → multicardz App → MSAL Auth → Microsoft Graph API
                   ↓
               Turso DB (Browser)
                   ↓
@@ -238,7 +238,7 @@ User → MultiCardz App → MSAL Auth → Microsoft Graph API
 - Full-text search implementation
 
 **4. Email UI Components** (`email-viewer.js`, `email-list.js`)
-- Display emails in MultiCardz interface
+- Display emails in multicardz interface
 - Integrate with card/tag system
 - Email preview and full view
 
@@ -264,7 +264,7 @@ User → MultiCardz App → MSAL Auth → Microsoft Graph API
 ```sql
 CREATE TABLE emails (
   email_id TEXT PRIMARY KEY,           -- Microsoft Graph message ID
-  user_id TEXT NOT NULL,               -- MultiCardz user ID
+  user_id TEXT NOT NULL,               -- multicardz user ID
   account_email TEXT NOT NULL,         -- Outlook account email
 
   -- Email metadata
@@ -295,8 +295,8 @@ CREATE TABLE emails (
   folder_id TEXT,
   folder_name TEXT,
 
-  -- MultiCardz integration
-  card_id TEXT,                        -- Link to MultiCardz card
+  -- multicardz integration
+  card_id TEXT,                        -- Link to multicardz card
   tags TEXT,                           -- JSON array of tag IDs
 
   -- Search optimization
@@ -459,7 +459,7 @@ async function decryptToken(encryptedData, iv, userKey) {
 
 **Tasks**:
 1. **Microsoft Entra (Azure AD) App Registration**
-   - Register MultiCardz as SPA
+   - Register multicardz as SPA
    - Configure redirect URIs
    - Request API permissions (Mail.Read, User.Read)
    - Document client ID
@@ -635,7 +635,7 @@ async function decryptToken(encryptedData, iv, userKey) {
 
 ### Phase 5: Email Display & Search (Week 5)
 
-**Goals**: Display emails in MultiCardz interface
+**Goals**: Display emails in multicardz interface
 
 **Tasks**:
 1. **Email List Component**
@@ -698,7 +698,7 @@ async function decryptToken(encryptedData, iv, userKey) {
    - Auto-tag emails based on rules
    - Manual tagging
    - Tag-based filtering
-   - Integration with MultiCardz tag system
+   - Integration with multicardz tag system
 
 4. **Offline Support**
    - Work with synced emails offline

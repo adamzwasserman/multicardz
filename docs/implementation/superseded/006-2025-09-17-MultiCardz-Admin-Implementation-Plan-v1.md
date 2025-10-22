@@ -1,17 +1,17 @@
-# MultiCardz™ Admin Site Implementation Plan v1
+# multicardz™ Admin Site Implementation Plan v1
 
 **Document Version**: 1.0
 **Date**: 2025-09-17
 **Author**: System Architect
 **Status**: READY FOR IMPLEMENTATION
-**Architecture Reference**: docs/architecture/006-2025-09-17-MultiCardz-Admin-Core-Architecture-v1.md
+**Architecture Reference**: docs/architecture/006-2025-09-17-multicardz-Admin-Core-Architecture-v1.md
 
 ---
 
 ## Implementation Overview
 
 ### Purpose
-Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fully functional administrative system that applies spatial manipulation paradigms to enterprise monitoring and management operations. This implementation will create the world's first administrative interface where complex queries like "Show critical alerts from Q3 affecting enterprise users in healthcare workspaces" are constructed through spatial gestures rather than SQL or complex filter dialogs.
+Transform the revolutionary multicardz™ Admin Site Core Architecture into a fully functional administrative system that applies spatial manipulation paradigms to enterprise monitoring and management operations. This implementation will create the world's first administrative interface where complex queries like "Show critical alerts from Q3 affecting enterprise users in healthcare workspaces" are constructed through spatial gestures rather than SQL or complex filter dialogs.
 
 ### Success Metrics
 - **Performance Targets**: Administrative filtering <10ms for 10,000 entities, spatial partitioning <50ms for complex dimensional organization
@@ -22,7 +22,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 ### Current State Analysis
 **Existing Foundation**:
-- ✅ Core MultiCardz™ spatial manipulation engine established
+- ✅ Core multicardz™ spatial manipulation engine established
 - ✅ Shared services package with set theory operations
 - ✅ Database foundation with SQLAlchemy models
 - ✅ HTMX frontend architecture with web components
@@ -52,7 +52,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 - Create administrative authentication and authorization framework
 - Set up administrative test infrastructure with BDD feature files
 
-**Dependencies**: Core MultiCardz™ system must be operational, shared services package available
+**Dependencies**: Core multicardz™ system must be operational, shared services package available
 **Risk Level**: Low (building on established patterns)
 
 ### Task 1.1: Administrative Entity Models ✅
@@ -64,7 +64,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 1.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -168,7 +168,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
    class AdminEntity(BaseModel, frozen=True):
        """
-       Core administrative entity model following MultiCardz™ patterns.
+       Core administrative entity model following multicardz™ patterns.
 
        Implements patent-compliant entity structure for spatial manipulation:
        - Immutable entity with frozenset tags for set theory operations
@@ -271,7 +271,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 1.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    # Target Duration: 3 hours
    ```
 
@@ -284,7 +284,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 **Rollback Procedure**:
 1. Revert feature branch commits in reverse order
-2. Verify core MultiCardz™ system remains operational
+2. Verify core multicardz™ system remains operational
 3. Notify team of rollback and investigation timeline
 
 ### Task 1.2: Administrative Spatial Zone Definitions ✅
@@ -296,7 +296,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 1.2 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -670,7 +670,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 1.2 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    # Target Duration: 4 hours
    ```
 
@@ -695,7 +695,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 1.3 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -1027,7 +1027,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 1.3 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    # Target Duration: 2 hours
    ```
 
@@ -1052,7 +1052,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 1.4 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 1.4 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -1442,7 +1442,7 @@ Transform the revolutionary MultiCardz™ Admin Site Core Architecture into a fu
 
 8. **Capture End Time**
    ```bash
-   echo "Task 1.4 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 1.4 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    # Target Duration: 2 hours
    ```
 
@@ -1509,7 +1509,7 @@ Performance Verified: O(n) filtering, O(n×r×c) partitioning within targets
 
 1. **Capture Start Time**
    ```bash
-   echo "Task 2.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 2.1 Start: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    ```
 
 2. **Create BDD Feature File**
@@ -2041,7 +2041,7 @@ Performance Verified: O(n) filtering, O(n×r×c) partitioning within targets
 
 8. **Capture End Time**
    ```bash
-   echo "Task 2.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-MultiCardz-Admin-Implementation-Plan-v1.md
+   echo "Task 2.1 End: $(date '+%Y-%m-%d %H:%M:%S')" >> docs/implementation/006-2025-09-17-multicardz-Admin-Implementation-Plan-v1.md
    # Target Duration: 5 hours
    ```
 
@@ -2072,4 +2072,4 @@ Would you like me to continue with the remaining tasks (User Management, Workspa
 
 <function_calls>
 <invoke name="TodoWrite">
-<parameter name="todos">[{"content": "Analyze patent specifications for admin site compliance requirements", "status": "completed", "activeForm": "Analyzing patent specifications for admin site compliance requirements"}, {"content": "Design overall architecture pattern for admin site integration", "status": "completed", "activeForm": "Designing overall architecture pattern for admin site integration"}, {"content": "Define directory structure following MultiCardz\u2122 patterns", "status": "completed", "activeForm": "Defining directory structure following MultiCardz\u2122 patterns"}, {"content": "Design core administrative components with set theory operations", "status": "completed", "activeForm": "Designing core administrative components with set theory operations"}, {"content": "Create data flow architecture for monitoring systems", "status": "completed", "activeForm": "Creating data flow architecture for monitoring systems"}, {"content": "Design integration points with existing MultiCardz\u2122 services", "status": "completed", "activeForm": "Designing integration points with existing MultiCardz\u2122 services"}, {"content": "Create architecture document following established guidelines", "status": "completed", "activeForm": "Creating architecture document following established guidelines"}, {"content": "Create implementation plan following 8-step process guidelines", "status": "completed", "activeForm": "Creating implementation plan following 8-step process guidelines"}]
+<parameter name="todos">[{"content": "Analyze patent specifications for admin site compliance requirements", "status": "completed", "activeForm": "Analyzing patent specifications for admin site compliance requirements"}, {"content": "Design overall architecture pattern for admin site integration", "status": "completed", "activeForm": "Designing overall architecture pattern for admin site integration"}, {"content": "Define directory structure following multicardz\u2122 patterns", "status": "completed", "activeForm": "Defining directory structure following multicardz\u2122 patterns"}, {"content": "Design core administrative components with set theory operations", "status": "completed", "activeForm": "Designing core administrative components with set theory operations"}, {"content": "Create data flow architecture for monitoring systems", "status": "completed", "activeForm": "Creating data flow architecture for monitoring systems"}, {"content": "Design integration points with existing multicardz\u2122 services", "status": "completed", "activeForm": "Designing integration points with existing multicardz\u2122 services"}, {"content": "Create architecture document following established guidelines", "status": "completed", "activeForm": "Creating architecture document following established guidelines"}, {"content": "Create implementation plan following 8-step process guidelines", "status": "completed", "activeForm": "Creating implementation plan following 8-step process guidelines"}]
