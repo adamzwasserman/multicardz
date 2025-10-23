@@ -13,7 +13,7 @@ import uvicorn
 # Import routes
 from routes import landing_pages
 from routes import analytics  # Phase 6: Analytics API
-# from routes import admin_dashboard  # Phase 9+
+from routes import admin  # Phase 9: Admin Dashboard
 
 
 def create_app() -> FastAPI:
@@ -80,7 +80,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(landing_pages.router)
     app.include_router(analytics.router)  # Phase 6: Analytics API
-    # app.include_router(admin_dashboard.router, prefix="/admin")  # Phase 9+
+    app.include_router(admin.router)  # Phase 9: Admin Dashboard
 
     return app
 
