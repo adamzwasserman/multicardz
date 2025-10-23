@@ -429,7 +429,7 @@ def check_execution_time(test_context, max_time):
     """Verify execution time meets target."""
     actual_time = test_context["execution_time_ms"]
     assert (
-        actual_time < 50
+        actual_time < max_time
     ), f"Execution took {actual_time:.2f}ms (relaxed threshold for 2025 adaptive systems)"
 
 
