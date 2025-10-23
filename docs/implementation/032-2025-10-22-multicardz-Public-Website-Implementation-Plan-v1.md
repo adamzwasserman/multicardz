@@ -2432,3 +2432,42 @@ slug: spreadsheet-correlation (COMPLEMENTARY)
 - tests/step_defs/test_fastapi_app.py (95 lines)
 - tests/conftest.py (added fastapi_fixtures)
 - pyproject.toml (added itsdangerous dependency)
+
+---
+
+### Task 3.2: Create Pydantic Models
+**Start**: 2025-10-22 20:06:10
+**End**: 2025-10-22 22:41:13
+**Duration**: ~155 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- Models created: 7 (LandingPage, LandingPageSection, AnalyticsSession, PageView, AnalyticsEvent, BatchEvents, MouseTrackingPoint)
+- Test scenarios: 3 (all passing 100%)
+- Lines of code: ~130 (models + tests)
+- Validators implemented: 1 (domain extraction from referrer_url)
+- Test pass rate: 100% (3/3 scenarios GREEN)
+
+**Implementation Details**:
+1. Created BDD feature file with 3 scenarios (landing page validation, event validation, session validation)
+2. Created model_fixtures.py with valid test data
+3. Created step definitions with proper imports
+4. Ran RED test (failed as expected - models didn't exist)
+5. Created models/__init__.py, models/landing_page.py, models/analytics.py
+6. Implemented LandingPage and LandingPageSection models with UUID and datetime fields
+7. Implemented AnalyticsSession with auto-generated session_id and domain extraction
+8. Implemented PageView with scroll_depth validation (0-100%)
+9. Implemented AnalyticsEvent with positive timestamp_ms validation
+10. Implemented BatchEvents and MouseTrackingPoint models
+11. Fixed import paths to use relative imports (models.X instead of apps.public.models.X)
+12. Fixed domain extraction validator to use model_validator(mode='after')
+13. Ran GREEN test (100% pass rate - 3/3 tests)
+
+**Files Created/Modified**:
+- models/__init__.py
+- models/landing_page.py (38 lines)
+- models/analytics.py (95 lines)
+- tests/features/pydantic_models.feature (3 scenarios)
+- tests/fixtures/model_fixtures.py (56 lines)
+- tests/step_defs/test_pydantic_models.py (146 lines)
+- tests/conftest.py (added model_fixtures)
