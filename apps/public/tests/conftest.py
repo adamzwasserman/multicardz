@@ -4,4 +4,5 @@
 pytest_plugins = [
     'tests.fixtures.landing_page_fixtures',
     'tests.fixtures.analytics_fixtures',
+    'tests.fixtures.conversion_fixtures',
 ]
