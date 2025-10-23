@@ -3753,3 +3753,88 @@ Future enhancements for Phase 9:
 
 ---
 
+### Task 10.4: Funnel Stage Tracking Service
+**Start**: 2025-10-23 15:30:15
+**Status**: IN PROGRESS
+
+**Objective**: Create comprehensive funnel analytics service to track user progression through conversion stages (landing → signup → first_card → upgrade)
+
+**Step 1 - BDD Feature File Created**: 2025-10-23 15:32:00 - Created funnel_tracking.feature with 6 comprehensive scenarios (overall metrics, user progression, drop-off analysis, stage durations, cohort analysis, page performance)
+
+**Step 2 - Test Fixtures Created**: 2025-10-23 15:34:30 - Created funnel_tracking_fixtures.py with 7 fixtures (422 lines): test_landing_page, analytics_sessions_with_funnel, user_with_complete_funnel, funnel_sessions_by_count, funnel_cohort_data, multiple_landing_pages_funnel
+
+**Step 3 - Step Definitions Created**: 2025-10-23 15:37:15 - Created test_funnel_tracking.py with 39 step definitions (277 lines) covering all 6 scenarios. Registered fixtures in conftest.py.
+
+**Step 4 - RED Test Run**: 2025-10-23 15:42:00 - All 6 tests FAIL as expected with ModuleNotFoundError: No module named 'services.funnel_service'. Ready to implement service.
+
+**Step 5 - Service Implementation**: 2025-10-23 15:45:30 - Created funnel_service.py with 6 functions (387 lines):
+- get_overall_funnel_metrics() - Stage counts, conversion rates, duration stats
+- get_user_funnel_progression() - Individual user journey tracking
+- get_funnel_dropoff_analysis() - Drop-off percentages between stages
+- get_average_stage_durations() - Average time between stages
+- get_funnel_cohort_analysis() - Cohort analysis by date
+- get_funnel_by_landing_page() - Performance by landing page (sorted)
+
+**Step 6 - GREEN Test Run**: 2025-10-23 15:50:00 - All 6 tests PASS (100% success rate). Fixed type casting for UUID/Text comparison in queries. All scenarios working correctly:
+- Overall funnel metrics ✅
+- User funnel progression ✅
+- Funnel drop-off analysis ✅
+- Average stage durations ✅
+- Cohort analysis by date ✅
+- Performance by landing page ✅
+
+**Step 7 - API Routes Created**: 2025-10-23 15:53:00 - Created funnel.py routes (199 lines) with 6 FastAPI endpoints:
+- GET /api/funnel/metrics - Overall funnel metrics
+- GET /api/funnel/user/{user_id} - User-specific progression
+- GET /api/funnel/dropoff - Drop-off analysis
+- GET /api/funnel/durations - Average stage durations
+- GET /api/funnel/cohort/{date} - Cohort analysis
+- GET /api/funnel/by-page - Performance by landing page
+Registered router in main.py
+
+**Step 8 - Validation**: 2025-10-23 15:54:00 - Ready for commit. All tests passing, routes registered, comprehensive funnel analytics complete.
+
+---
+
+### Task 10.4: COMPLETION SUMMARY
+**End**: 2025-10-23 15:54:00
+**Duration**: ~24 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- Service functions: 6 (funnel_service.py, 387 lines)
+- API endpoints: 6 (funnel.py routes, 199 lines)
+- Test scenarios: 6 (all passing 100%)
+- Test fixtures: 7 fixtures (422 lines)
+- Step definitions: 39 (277 lines)
+- Test pass rate: 100% (6/6 GREEN)
+- Total lines of code: ~1,300 (service + routes + tests)
+
+**Files Created/Modified**:
+- /apps/public/services/funnel_service.py (387 lines, 6 functions)
+- /apps/public/routes/funnel.py (199 lines, 6 endpoints)
+- /apps/public/main.py (registered funnel router)
+- /apps/public/tests/features/funnel_tracking.feature (58 lines, 6 scenarios)
+- /apps/public/tests/fixtures/funnel_tracking_fixtures.py (422 lines, 7 fixtures)
+- /apps/public/tests/step_defs/test_funnel_tracking.py (277 lines, 39 step definitions)
+- /apps/public/tests/conftest.py (added funnel_tracking_fixtures)
+
+**Features Implemented**:
+1. **Overall Funnel Metrics**: Stage counts, conversion rates, average durations
+2. **User Progression Tracking**: Individual journey through funnel with timestamps
+3. **Drop-off Analysis**: Percentage drop-off between each stage transition
+4. **Stage Duration Analytics**: Average time users spend between stages
+5. **Cohort Analysis**: Performance metrics for specific signup date cohorts
+6. **Landing Page Performance**: Conversion rates ranked by landing page
+
+**Validation Criteria Met**:
+✅ All BDD tests pass (100% success rate)
+✅ 6 comprehensive funnel analytics functions
+✅ Type-safe UUID/Text handling in queries
+✅ RESTful API endpoints with Pydantic models
+✅ Proper error handling (404 for missing users)
+✅ Sorted results (pages by conversion rate DESC)
+✅ Function-based architecture maintained (0 classes)
+✅ PostgreSQL aggregation queries optimized
+✅ Comprehensive test coverage
+

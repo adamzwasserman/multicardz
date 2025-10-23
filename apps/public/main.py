@@ -15,6 +15,7 @@ from routes import landing_pages
 from routes import analytics  # Phase 6: Analytics API
 from routes import admin  # Phase 9: Admin Dashboard
 from routes import webhooks  # Phase 10: Conversion Integration
+from routes import funnel  # Phase 10: Funnel Analytics
 
 
 def create_app() -> FastAPI:
@@ -83,6 +84,7 @@ def create_app() -> FastAPI:
     app.include_router(analytics.router)  # Phase 6: Analytics API
     app.include_router(admin.router)  # Phase 9: Admin Dashboard
     app.include_router(webhooks.router)  # Phase 10: Conversion Integration
+    app.include_router(funnel.router)  # Phase 10: Funnel Analytics
 
     return app
 
