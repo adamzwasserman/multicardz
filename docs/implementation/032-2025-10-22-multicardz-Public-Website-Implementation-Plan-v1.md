@@ -2350,3 +2350,45 @@ deploy_public_website.sh
 - tests/step_defs/test_content_migration.py (224 lines)
 - services/content_migration.py (251 lines)
 - tests/conftest.py (added migration_fixtures)
+
+---
+
+### Task 2.2: Execute Migration Script
+**Start**: 2025-10-22 19:54:37
+**End**: 2025-10-22 19:57:23
+**Duration**: ~3 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- Migration script created: run_migration.py (92 lines)
+- Test scenarios: 3 (all passing 100%)
+- Landing pages migrated: 7
+- Sections created: Verified via SQL
+- Idempotency check: Working (detects existing content)
+- Test pass rate: 100% (3/3 scenarios GREEN)
+
+**Implementation Details**:
+1. Created BDD feature file with 3 scenarios (execution, retrieval, idempotency)
+2. Created run_migration.py script with check_existing_content()
+3. Added main() function with error handling and verification
+4. Created step definitions with proper cleanup (delete dependent tables first)
+5. Fixed FK constraint violations by deleting analytics_sessions and a_b_test_variants first
+6. Ran GREEN test (100% pass rate - 3/3 tests)
+7. Verified migration result: 7 landing pages in database
+8. Verified all slugs exist: trello-performance, notion-performance, cross-platform-operations, data-privacy, legal-compliance-tagging, product-manager-multitool, spreadsheet-correlation
+
+**Files Created/Modified**:
+- scripts/run_migration.py (92 lines)
+- tests/features/migration_execution.feature
+- tests/step_defs/test_migration_execution.py (185 lines)
+
+**Database Verification**:
+```
+slug: trello-performance (REPLACEMENT)
+slug: notion-performance (REPLACEMENT)
+slug: cross-platform-operations (COMPLEMENTARY)
+slug: data-privacy (BOTH)
+slug: legal-compliance-tagging (COMPLEMENTARY)
+slug: product-manager-multitool (COMPLEMENTARY)
+slug: spreadsheet-correlation (COMPLEMENTARY)
+```
