@@ -2613,3 +2613,51 @@ slug: spreadsheet-correlation (COMPLEMENTARY)
 ✅ Function-based architecture maintained
 
 ---
+
+### Task 4.3: Smart Routing by Referrer
+**Start**: 2025-10-23 09:39:49
+**End**: 2025-10-23 09:41:41
+**Duration**: ~2 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- Functions created: 5 (route_by_referrer, _route_by_utm_campaign, _route_by_domain, _route_by_search_query, _is_search_engine, get_landing_page_for_competitor)
+- Test scenarios: 5 (all passing 100%)
+- Lines of code: ~250 (service + tests + fixtures)
+- Competitor mappings: 6 (Trello, Notion, Asana, Monday, ClickUp, Airtable)
+- Search engines supported: 7 (Google, Bing, Yahoo, DuckDuckGo, Baidu, Yandex, Ask)
+- Test pass rate: 100% (5/5 scenarios GREEN)
+
+**Implementation Details**:
+1. Created BDD feature file with 5 routing scenarios
+2. Created smart_routing_fixtures.py with referrer test data
+3. Created step definitions with context management
+4. Ran RED test (failed as expected - service didn't exist)
+5. Implemented route_by_referrer() with 4-priority routing:
+   - Priority 1: UTM campaign matching
+   - Priority 2: Referrer domain matching
+   - Priority 3: Search query keyword extraction
+   - Priority 4: Default fallback
+6. Implemented domain-based routing for competitor sites
+7. Implemented search query extraction for multiple search engines
+8. Added competitor keyword mapping (Trello → trello-performance, etc.)
+9. Ran GREEN test (100% pass rate - 5/5 tests)
+10. Verified routing from Trello.com, Google search, UTM campaigns, generic, and direct traffic
+
+**Files Created/Modified**:
+- tests/features/smart_routing.feature (5 scenarios)
+- tests/fixtures/smart_routing_fixtures.py (70 lines)
+- tests/step_defs/test_smart_routing.py (96 lines)
+- services/smart_routing_service.py (249 lines)
+- tests/conftest.py (added smart_routing_fixtures)
+
+**Validation Criteria Met**:
+✅ All BDD tests pass (100% success rate)
+✅ Referrer domain detection working
+✅ Search query keyword extraction functional
+✅ UTM campaign routing working
+✅ Default fallback for generic/direct traffic
+✅ Multi-search-engine support (Google, Bing, DuckDuckGo, etc.)
+✅ Function-based architecture maintained
+
+---
