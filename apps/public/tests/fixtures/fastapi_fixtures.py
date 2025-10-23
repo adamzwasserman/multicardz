@@ -5,8 +5,8 @@ from fastapi.testclient import TestClient
 
 
 @pytest.fixture
-def test_client():
-    """Create FastAPI test client."""
+def test_client(db_connection):
+    """Create FastAPI test client with shared database session."""
     import sys
     from pathlib import Path
 
@@ -16,7 +16,19 @@ def test_client():
         sys.path.insert(0, str(public_path))
 
     from main import create_app
+    from config.database import get_db
+
     app = create_app()
+
+    # Override get_db dependency to use test database session
+    def override_get_db():
+        try:
+            yield db_connection
+        finally:
+            pass  # Don't close - managed by db_connection fixture
+
+    app.dependency_overrides[get_db] = override_get_db
+
     return TestClient(app)
 
 

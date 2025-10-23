@@ -10,8 +10,9 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 import uvicorn
 
-# Import routes (will be added in Phase 4)
-# from apps.public.routes import landing_pages, analytics_api, admin_dashboard
+# Import routes
+from routes import landing_pages
+# from routes import analytics_api, admin_dashboard  # Phase 5+
 
 
 def create_app() -> FastAPI:
@@ -75,10 +76,10 @@ def create_app() -> FastAPI:
     async def health_check():
         return {"status": "healthy", "service": "public-website"}
 
-    # TODO: Include routers in Phase 4
-    # app.include_router(landing_pages.router)
-    # app.include_router(analytics_api.router, prefix="/api/analytics")
-    # app.include_router(admin_dashboard.router, prefix="/admin")
+    # Include routers
+    app.include_router(landing_pages.router)
+    # app.include_router(analytics_api.router, prefix="/api/analytics")  # Phase 5+
+    # app.include_router(admin_dashboard.router, prefix="/admin")  # Phase 9+
 
     return app
 
