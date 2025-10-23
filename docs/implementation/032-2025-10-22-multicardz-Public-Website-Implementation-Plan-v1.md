@@ -2556,3 +2556,60 @@ slug: spreadsheet-correlation (COMPLEMENTARY)
 ✅ Database session sharing in tests
 
 ---
+
+### PHASE 4 CONTINUATION
+**Continuation Start**: 2025-10-23 09:34:46
+**Agent**: Timestamp Enforcement Agent
+**Scope**: Complete remaining Phase 4 tasks (4.2, 4.3, 4.4)
+**Status**: IN PROGRESS
+
+---
+
+### Task 4.2: A/B Test Assignment Logic
+**Start**: 2025-10-23 09:34:46
+**End**: 2025-10-23 09:37:25
+**Duration**: ~3 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- Functions created: 3 (assign_variant_for_session, _select_variant_by_hash, 2 placeholder functions)
+- Test scenarios: 4 (all passing 100%)
+- Lines of code: ~200 (service + tests + fixtures)
+- Algorithm: Deterministic hash-based variant selection using MD5
+- Traffic split support: Weighted distribution (50/50, 70/30, any custom split)
+- Test pass rate: 100% (4/4 scenarios GREEN)
+
+**Implementation Details**:
+1. Created BDD feature file with 4 comprehensive scenarios
+2. Created ab_test_fixtures.py with sample A/B tests (50/50 and 70/30 splits)
+3. Added cleanup fixture to handle FK constraint dependencies
+4. Created step definitions with proper context management
+5. Ran RED test (failed as expected - service didn't exist)
+6. Implemented assign_variant_for_session() with:
+   - Check for existing assignment (deterministic)
+   - Query for active A/B test
+   - Retrieve variants with weights
+   - Hash-based variant selection
+   - Session creation/update with variant link
+7. Implemented _select_variant_by_hash() using MD5 hash modulo 100
+8. Ran GREEN test (100% pass rate - 4/4 tests)
+9. Verified deterministic assignment (same session → same variant)
+10. Verified traffic split accuracy (70/30 within 5% margin over 1000 sessions)
+
+**Files Created/Modified**:
+- tests/features/ab_test_assignment.feature (4 scenarios)
+- tests/fixtures/ab_test_fixtures.py (149 lines)
+- tests/step_defs/test_ab_test_assignment.py (226 lines)
+- services/ab_test_service.py (176 lines)
+- tests/conftest.py (added ab_test_fixtures)
+
+**Validation Criteria Met**:
+✅ All BDD tests pass (100% success rate)
+✅ Deterministic assignment (hash-based)
+✅ Traffic split weights respected
+✅ 70/30 split within 5% margin (tested with 1000 sessions)
+✅ Graceful handling when no active test exists
+✅ Session linkage to variant working
+✅ Function-based architecture maintained
+
+---
