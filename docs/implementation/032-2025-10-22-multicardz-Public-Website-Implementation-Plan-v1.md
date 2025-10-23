@@ -2314,3 +2314,39 @@ deploy_public_website.sh
 1. Commit Phase 1 completion
 2. Continue with Phase 2: Content Migration
 3. Execute remaining phases following established pattern
+
+---
+
+### Task 2.1: Parse HTML and Extract Content
+**Start**: 2025-10-22 19:49:02
+**End**: 2025-10-22 19:52:20
+**Duration**: ~3 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- Functions created: 4 (parse_html_file, transform_to_landing_page, transform_to_sections, migrate_content_to_database)
+- Test scenarios: 4 (all passing 100%)
+- Lines of code: ~250 (service + tests)
+- Segments parseable: 7 (2 replacement + 5 complementary)
+- Section types supported: 6 (pain_point, benefit, comparison_metric, testimonial, differentiator, pricing)
+- Test pass rate: 100% (4/4 scenarios GREEN)
+
+**Implementation Details**:
+1. Created BDD feature file with 4 comprehensive scenarios
+2. Created test fixtures with real HTML file path and sample data
+3. Created step definitions with proper pytest-bdd integration
+4. Implemented parse_html_file() - regex extraction of JavaScript segmentsData
+5. Implemented transform_to_landing_page() - segment to DB format conversion
+6. Implemented transform_to_sections() - polymorphic JSONB section creation
+7. Implemented migrate_content_to_database() - full migration orchestration
+8. Fixed SQL syntax for JSONB casting (CAST(:data AS jsonb))
+9. Updated test count to match actual data (5 complementary, not 6)
+10. Added cleanup fixture to prevent duplicate key violations
+11. Ran GREEN test (100% pass rate - 4/4 tests)
+
+**Files Created/Modified**:
+- tests/features/content_migration.feature
+- tests/fixtures/migration_fixtures.py
+- tests/step_defs/test_content_migration.py (224 lines)
+- services/content_migration.py (251 lines)
+- tests/conftest.py (added migration_fixtures)
