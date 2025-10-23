@@ -2806,3 +2806,158 @@ Phase 4 is complete. Ready to proceed with:
 - **Phase 11**: Performance & Testing
 
 ---
+
+## PHASE 5: ANALYTICS JAVASCRIPT
+
+**Phase 5 Start**: 2025-10-23 10:15:00
+**Executor**: Timestamp Enforcement Agent
+**Scope**: Client-side analytics tracking (4 tasks)
+**Target**: 100% test coverage for analytics JavaScript
+
+---
+
+### Task 5.1: Core Analytics JavaScript
+**Start**: 2025-10-23 10:15:30
+**End**: 2025-10-23 10:22:15
+**Duration**: ~7 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- JavaScript file created: static/js/analytics.js (361 lines)
+- Functions created: 14 (all pure functions, no classes)
+- Test scenarios: 5 (all passing 100%)
+- Features implemented:
+  - Session ID creation/retrieval (localStorage)
+  - UUID generation
+  - UTM parameter extraction
+  - Viewport dimension tracking
+  - Page view tracking
+  - Click event tracking
+  - Element position calculation
+  - CSS selector generation
+  - Scroll depth calculation
+  - Event batching (10 events or 5 seconds)
+  - Batch submission to API
+  - sendBeacon/fetch fallback
+- Test pass rate: 100% (5/5 scenarios GREEN)
+
+**Implementation Details**:
+1. Created BDD feature file with 5 comprehensive scenarios
+2. Created analytics_js_fixtures.py with browser testing fixtures
+3. Created step definitions for JavaScript behavior testing
+4. Updated conftest.py to include analytics_js_fixtures
+5. Ran RED test (1 failed as expected - analytics.js didn't exist)
+6. Implemented analytics.js with function-based architecture:
+   - Session management with localStorage persistence
+   - Automatic page view tracking on initialization
+   - Click tracking with event delegation
+   - Scroll depth tracking with debouncing
+   - Event batching with size and time triggers
+   - API submission using sendBeacon (with fetch fallback)
+   - beforeunload handler to flush remaining events
+7. Ran GREEN test (100% pass rate - 5/5 tests)
+
+**Files Created/Modified**:
+- static/js/analytics.js (361 lines)
+- tests/features/core_analytics_js.feature (5 scenarios)
+- tests/fixtures/analytics_js_fixtures.py (99 lines)
+- tests/step_defs/test_core_analytics_js.py (254 lines)
+- tests/conftest.py (added analytics_js_fixtures)
+
+**Validation Criteria Met**:
+✅ All BDD tests pass (100% success rate)
+✅ Function-based JavaScript (no classes)
+✅ Session ID creation/retrieval working
+✅ UTM parameter extraction working
+✅ Page view tracking implemented
+✅ Click event tracking with element details
+✅ Scroll depth calculation working
+✅ Event batching (10 events or 5 seconds)
+✅ API submission with sendBeacon/fetch fallback
+✅ localStorage persistence for session
+✅ beforeunload event handler for flushing
+
+**Notes**:
+- Pure function-based JavaScript (0 classes)
+- Uses modern browser APIs (localStorage, sendBeacon, fetch)
+- Automatic initialization on page load
+- Event batching reduces API calls
+- Debounced scroll tracking (500ms)
+- Event delegation for click tracking
+- Graceful fallback from sendBeacon to fetch
+
+**Commit Status**: ⏳ Ready for git-commit-manager
+
+---
+
+### Task 5.2: Mouse Tracking JavaScript (Session Replay)
+**Start**: 2025-10-23 10:23:00
+**End**: 2025-10-23 10:28:45
+**Duration**: ~6 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- JavaScript file created: static/js/mouse-tracking.js (289 lines)
+- Functions created: 9 (all pure functions, no classes)
+- Test scenarios: 5 (all passing 100%)
+- Features implemented:
+  - Mouse movement sampling (configurable rate, default 100ms)
+  - Document-relative coordinate conversion
+  - Click tracking with position recording
+  - Efficient position buffering (batch size 50)
+  - Time-based batching (10 seconds)
+  - Privacy-respecting (DNT detection)
+  - Compact position format (x, y, t, c)
+  - sendBeacon/fetch fallback for API calls
+  - beforeunload event flushing
+- Test pass rate: 100% (5/5 scenarios GREEN)
+- Sampling efficiency: 10 samples/second (reduces data by ~90%)
+
+**Implementation Details**:
+1. Created BDD feature file with 5 scenarios for mouse tracking
+2. Created mouse_tracking_fixtures.py with test configuration
+3. Created step definitions for mouse tracking behavior
+4. Updated conftest.py to include mouse_tracking_fixtures
+5. Ran RED test (1 failed as expected - mouse-tracking.js didn't exist)
+6. Implemented mouse-tracking.js with function-based architecture:
+   - Configurable sampling rate (default 100ms = 10 samples/sec)
+   - Viewport to document coordinate conversion with scroll offset
+   - Compact position format {x, y, t, c} for bandwidth efficiency
+   - Click events marked with c: 1 flag
+   - DNT (Do Not Track) respect
+   - Event listener attachment with passive flag for performance
+   - Batch submission (50 positions or 10 seconds)
+   - Public API: stop(), flush(), getBufferSize(), getSampleRate()
+7. Ran GREEN test (100% pass rate - 5/5 tests)
+
+**Files Created/Modified**:
+- static/js/mouse-tracking.js (289 lines)
+- tests/features/mouse_tracking_js.feature (5 scenarios)
+- tests/fixtures/mouse_tracking_fixtures.py (46 lines)
+- tests/step_defs/test_mouse_tracking_js.py (233 lines)
+- tests/conftest.py (added mouse_tracking_fixtures)
+
+**Validation Criteria Met**:
+✅ All BDD tests pass (100% success rate)
+✅ Function-based JavaScript (no classes)
+✅ Mouse position sampling at configurable intervals
+✅ Document-relative coordinates (scroll-aware)
+✅ Click tracking with position capture
+✅ Efficient batching (50 positions or 10 seconds)
+✅ Privacy-respecting (DNT detection)
+✅ Compact data format for bandwidth
+✅ sendBeacon/fetch fallback
+✅ beforeunload event flushing
+✅ Public API for control (stop, flush, etc.)
+
+**Notes**:
+- Sampling reduces data volume by ~90% vs tracking every mousemove
+- Compact position format {x, y, t, c} minimizes JSON size
+- Passive event listeners prevent scroll jank
+- DNT detection respects user privacy preferences
+- Coordinates are document-relative (work with scrolling)
+- Click events marked with c: 1 for session replay
+
+**Commit Status**: ⏳ Ready for git-commit-manager
+
+---
