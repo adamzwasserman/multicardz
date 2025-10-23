@@ -18,4 +18,5 @@ pytest_plugins = [
     'tests.fixtures.integration_fixtures',
     'tests.fixtures.api_fixtures',
     'tests.fixtures.ab_results_fixtures',
+    'tests.fixtures.auth0_webhook_fixtures',
 ]

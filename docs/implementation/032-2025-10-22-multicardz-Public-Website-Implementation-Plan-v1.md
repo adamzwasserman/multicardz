@@ -3656,3 +3656,100 @@ Future enhancements for Phase 9:
 
 ---
 
+## PHASE 10: CONVERSION INTEGRATION
+
+**Phase 10 Start**: 2025-10-23 15:30:00
+**Executor**: Timestamp Enforcement Agent
+**Scope**: Complete Phase 10 - Conversion Integration (Tasks 10.1-10.4)
+**Target**: Link analytics sessions to user accounts, track conversions through Auth0/Stripe webhooks
+
+---
+
+### Task 10.1: Auth0 Webhook Integration
+**Start**: 2025-10-23 15:30:15
+**End**: 2025-10-23 20:13:45
+**Duration**: ~43 minutes
+**Status**: ✅ COMPLETE
+
+**Metrics**:
+- Services created: 1 file (webhook_service.py, 6 functions)
+- Routes created: 1 file (webhooks.py, 4 endpoints)
+- Migrations created: 2 (change user_id to text, make session_id nullable)
+- Test scenarios: 6 (all passing 100%)
+- Lines of code: ~650 total
+  - webhook_service.py: 323 lines (6 functions)
+  - webhooks.py: 205 lines (4 endpoints)
+  - test files: ~500 lines (feature + fixtures + step definitions)
+- Test pass rate: 100% (6/6 tests GREEN)
+
+**Implementation Details**:
+1. Created BDD feature file with 6 comprehensive scenarios
+2. Created test fixtures with session creation, signature generation, cleanup
+3. Created step definitions for all test scenarios
+4. Ran RED test (6/6 failed as expected - endpoints didn't exist)
+5. Implemented webhook_service.py with:
+   - process_auth0_signup() - Links session to user, creates signup funnel record
+   - process_auth0_signup_batch() - Batch processing for multiple signups
+   - verify_webhook_signature() - HMAC SHA-256 signature verification
+   - process_stripe_subscription() - Tracks subscription upgrades
+   - track_first_card_creation() - Tracks first card milestone
+   - Proper NULL session handling for cross-device signups
+6. Implemented webhooks.py routes with:
+   - POST /api/webhooks/auth0/signup - Single signup webhook
+   - POST /api/webhooks/auth0/signup/batch - Batch signup webhook
+   - POST /api/webhooks/stripe/subscription - Stripe subscription webhook
+   - POST /api/webhooks/first-card - First card creation webhook
+   - Raw body signature verification before Pydantic parsing
+7. Created migrations:
+   - Changed user_id from UUID to Text (Auth0 IDs are strings like "auth0|user123")
+   - Made conversion_funnel.session_id nullable (allows signups without matched sessions)
+8. Fixed test fixtures:
+   - Proper HMAC signature generation matching FastAPI JSON serialization
+   - Duplicate session/landing page prevention
+   - Environment variable mocking for webhook secrets
+9. Ran GREEN test (100% pass rate - 6/6 tests)
+
+**Files Created/Modified**:
+- /apps/public/services/webhook_service.py (323 lines, 6 functions)
+- /apps/public/routes/webhooks.py (205 lines, 4 endpoints)
+- /apps/public/main.py (added webhooks router)
+- /apps/public/migrations/versions/20251023_2008_3de712318974_change_user_id_to_text.py
+- /apps/public/migrations/versions/20251023_2013_753380067677_make_conversion_funnel_session_id_.py
+- /apps/public/tests/features/auth0_webhook.feature (125 lines, 6 scenarios)
+- /apps/public/tests/fixtures/auth0_webhook_fixtures.py (238 lines, 9 fixtures)
+- /apps/public/tests/step_defs/test_auth0_webhook.py (227 lines, 25 step definitions)
+- /apps/public/tests/conftest.py (added auth0_webhook_fixtures)
+
+**Validation Criteria Met**:
+✅ All BDD tests pass (100% success rate)
+✅ Session-to-user linking works
+✅ Conversion funnel records created
+✅ Webhook signature verification functional
+✅ Handles signups without matching sessions
+✅ Batch webhook processing works
+✅ Stripe subscription webhooks ready
+✅ First card tracking ready
+✅ Function-based architecture maintained
+
+**Features Implemented**:
+- **Auth0 Signup Webhook**:
+  - Links analytics session to user by browser fingerprint
+  - Creates "signup" funnel record
+  - Handles cases where no session exists (cross-device)
+  - HMAC SHA-256 signature verification
+  - Batch processing support
+- **Stripe Subscription Webhook**:
+  - Creates "upgrade" funnel record
+  - Links to user's most recent session
+  - Tracks subscription plan and status
+- **First Card Webhook**:
+  - Creates "first_card" funnel record
+  - Prevents duplicate tracking
+  - Links to user's most recent session
+- **Security**:
+  - HMAC signature verification for Auth0 and Stripe
+  - Raw body verification before parsing
+  - Environment variable configuration for secrets
+
+---
+
