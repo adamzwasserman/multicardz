@@ -21,4 +21,5 @@ pytest_plugins = [
     'tests.fixtures.auth0_webhook_fixtures',
     'tests.fixtures.funnel_tracking_fixtures',
     'tests.fixtures.performance_fixtures',
+    'tests.fixtures.load_testing_fixtures',
 ]

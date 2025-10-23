@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from typing import Dict, Any, List
 from pydantic import BaseModel
 
-from core.database import get_db
+from config.database import get_db
 from services.funnel_service import (
     get_overall_funnel_metrics,
     get_user_funnel_progression,
