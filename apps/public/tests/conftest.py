@@ -11,4 +11,5 @@ pytest_plugins = [
     'tests.fixtures.route_fixtures',
     'tests.fixtures.ab_test_fixtures',
     'tests.fixtures.smart_routing_fixtures',
+    'tests.fixtures.template_fixtures',
 ]
