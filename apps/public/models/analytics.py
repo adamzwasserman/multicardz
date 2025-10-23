@@ -86,3 +86,73 @@ class MouseTrackingPoint(BaseModel):
     y: int | None = None
     scroll_x: int | None = None
     scroll_y: int | None = None
+
+
+# API Request/Response Models
+
+class SessionCreateRequest(BaseModel):
+    """Request model for session creation."""
+    session_id: str | UUID  # Allow string to be converted
+    referrer_url: str | None = None
+    utm_source: str | None = None
+    utm_medium: str | None = None
+    utm_campaign: str | None = None
+    utm_term: str | None = None
+    utm_content: str | None = None
+    user_agent: str | None = None
+    viewport_width: int | None = None
+    viewport_height: int | None = None
+    timestamp: int | None = None  # Milliseconds since epoch
+
+
+class SessionResponse(BaseModel):
+    """Response model for session creation."""
+    session_id: str
+    status: str  # 'created' or 'updated'
+    message: str | None = None
+
+
+class PageViewRequest(BaseModel):
+    """Request model for page view logging."""
+    session_id: str | UUID
+    url: str
+    referrer: str | None = None
+    duration_ms: int | None = None
+    scroll_depth_percent: int | None = Field(None, ge=0, le=100)
+    viewport_width: int | None = None
+    viewport_height: int | None = None
+
+
+class PageViewResponse(BaseModel):
+    """Response model for page view logging."""
+    page_view_id: str
+    status: str
+    message: str | None = None
+
+
+class EventBatchRequest(BaseModel):
+    """Request model for batch event submission."""
+    session_id: str | UUID
+    page_view_id: str | UUID
+    events: list[dict]  # Array of event data
+
+
+class EventBatchResponse(BaseModel):
+    """Response model for batch event submission."""
+    events_created: int
+    status: str
+    message: str | None = None
+
+
+class MouseTrackingRequest(BaseModel):
+    """Request model for mouse tracking data."""
+    session_id: str | UUID
+    page_view_id: str | UUID
+    coordinates: list[dict]  # Array of {x, y, timestamp_ms, event_type}
+
+
+class MouseTrackingResponse(BaseModel):
+    """Response model for mouse tracking data."""
+    points_created: int
+    status: str
+    message: str | None = None

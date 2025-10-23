@@ -16,4 +16,5 @@ pytest_plugins = [
     'tests.fixtures.mouse_tracking_fixtures',
     'tests.fixtures.conversion_tracking_fixtures',
     'tests.fixtures.integration_fixtures',
+    'tests.fixtures.api_fixtures',
 ]
