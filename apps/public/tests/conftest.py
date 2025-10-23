@@ -6,4 +6,5 @@ pytest_plugins = [
     'tests.fixtures.analytics_fixtures',
     'tests.fixtures.conversion_fixtures',
     'tests.fixtures.migration_fixtures',
+    'tests.fixtures.fastapi_fixtures',
 ]
