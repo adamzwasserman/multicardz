@@ -10,12 +10,12 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 import uvicorn
 
-# Import routes
-from routes import landing_pages
-from routes import analytics  # Phase 6: Analytics API
-from routes import admin  # Phase 9: Admin Dashboard
-from routes import webhooks  # Phase 10: Conversion Integration
-from routes import funnel  # Phase 10: Funnel Analytics
+# Import routes (using relative imports)
+from .routes import landing_pages
+from .routes import analytics  # Phase 6: Analytics API
+from .routes import admin  # Phase 9: Admin Dashboard
+from .routes import webhooks  # Phase 10: Conversion Integration
+from .routes import funnel  # Phase 10: Funnel Analytics
 
 
 def create_app() -> FastAPI:

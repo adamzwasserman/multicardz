@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 import logging
 import os
 
-from config.database import get_db
-from services.webhook_service import (
+from ..config.database import get_db
+from ..services.webhook_service import (
     process_auth0_signup,
     process_auth0_signup_batch,
     verify_webhook_signature,

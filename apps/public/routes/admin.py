@@ -18,8 +18,8 @@ from pathlib import Path
 # Import services
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from config.database import get_db
-from services.dashboard_service import (
+from ..config.database import get_db
+from ..services.dashboard_service import (
     get_dashboard_overview,
     get_top_landing_pages,
     get_active_ab_tests_summary,

@@ -8,8 +8,8 @@ from uuid import UUID
 from datetime import datetime, UTC
 import logging
 
-from config.database import get_db
-from models.analytics import (
+from ..config.database import get_db
+from ..models.analytics import (
     SessionCreateRequest,
     SessionResponse,
     PageViewRequest,

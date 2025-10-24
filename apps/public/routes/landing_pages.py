@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from config.database import get_db
-from services.landing_page_service import (
+from ..config.database import get_db
+from ..services.landing_page_service import (
     get_landing_page_by_slug,
     get_all_active_landing_pages
 )
