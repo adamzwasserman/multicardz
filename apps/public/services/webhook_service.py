@@ -20,71 +20,95 @@ logger = logging.getLogger(__name__)
 def process_auth0_signup(
     db: Session,
     user_id: str,
-    browser_fingerprint: str,
-    email: str,
+    anonymous_user_id: str,
+    browser_fingerprint: Optional[str] = None,
+    email: str = "",
     metadata: Optional[Dict[str, Any]] = None
 ) -> Dict[str, Any]:
     """
     Process Auth0 signup webhook.
 
-    Links analytics session to user account and creates signup funnel record.
+    Links ALL analytics sessions with the anonymous_user_id to the real user_id.
+    This allows complete tracking from first visit → signup → paid conversion.
 
     Args:
         db: Database session
         user_id: Auth0 user ID (e.g., "auth0|user123")
-        browser_fingerprint: Browser fingerprint from session
+        anonymous_user_id: Persistent anonymous user ID from cookie
+        browser_fingerprint: Browser fingerprint from session (legacy, optional)
         email: User email address
         metadata: Additional metadata from Auth0
 
     Returns:
-        dict with 'session_updated', 'funnel_created', 'session_id', 'user_id'
+        dict with 'sessions_updated', 'funnel_created', 'user_id'
     """
-    session_updated = False
-    session_id = None
+    sessions_updated = 0
+    session_ids = []
 
-    # Find session by browser fingerprint
-    result = db.execute(text("""
-        SELECT session_id, user_id
+    # Find ALL sessions with this anonymous user ID
+    # This is the magic that links the entire journey!
+    results = db.execute(text("""
+        SELECT session_id, first_seen
         FROM analytics_sessions
-        WHERE browser_fingerprint = :fingerprint
-        LIMIT 1
-    """), {'fingerprint': browser_fingerprint}).fetchone()
+        WHERE user_id = :anonymous_user_id
+        ORDER BY first_seen ASC
+    """), {'anonymous_user_id': anonymous_user_id}).fetchall()
 
-    if result:
-        existing_session_id, existing_user_id = result
+    if results:
+        # Update ALL sessions from anonymous to real user ID
+        db.execute(text("""
+            UPDATE analytics_sessions
+            SET user_id = :user_id, last_seen = :now
+            WHERE user_id = :anonymous_user_id
+        """), {
+            'user_id': user_id,
+            'anonymous_user_id': anonymous_user_id,
+            'now': datetime.now(timezone.utc)
+        })
 
-        # Only update if not already linked
-        if existing_user_id is None:
-            db.execute(text("""
-                UPDATE analytics_sessions
-                SET user_id = :user_id, last_seen = :now
-                WHERE session_id = :session_id
-            """), {
-                'user_id': user_id,
-                'session_id': existing_session_id,
-                'now': datetime.now(timezone.utc)
-            })
-            session_updated = True
-            session_id = existing_session_id
-            logger.info(f"Linked session {existing_session_id} to user {user_id}")
-        else:
-            # Already linked - don't create duplicate funnel record
-            logger.info(f"Session {existing_session_id} already linked to {existing_user_id}")
-            return {
-                'session_updated': False,
-                'funnel_created': False,
-                'session_id': str(existing_session_id),
-                'user_id': user_id,
-                'message': 'Session already linked'
-            }
+        sessions_updated = len(results)
+        session_ids = [str(row[0]) for row in results]
+        first_session_id = session_ids[0] if session_ids else None
+
+        logger.info(f"Linked {sessions_updated} sessions from anonymous user {anonymous_user_id} to {user_id}")
     else:
-        logger.info(f"No session found for fingerprint {browser_fingerprint}")
+        # Fallback to browser fingerprint if provided (legacy)
+        if browser_fingerprint:
+            result = db.execute(text("""
+                SELECT session_id
+                FROM analytics_sessions
+                WHERE browser_fingerprint = :fingerprint
+                LIMIT 1
+            """), {'fingerprint': browser_fingerprint}).fetchone()
+
+            if result:
+                first_session_id = result[0]
+                db.execute(text("""
+                    UPDATE analytics_sessions
+                    SET user_id = :user_id, last_seen = :now
+                    WHERE session_id = :session_id
+                """), {
+                    'user_id': user_id,
+                    'session_id': first_session_id,
+                    'now': datetime.now(timezone.utc)
+                })
+                sessions_updated = 1
+                session_ids = [str(first_session_id)]
+                logger.info(f"Linked session {first_session_id} to user {user_id} via fingerprint")
+            else:
+                logger.warning(f"No sessions found for anonymous_user_id {anonymous_user_id} or fingerprint {browser_fingerprint}")
+                first_session_id = None
+        else:
+            logger.warning(f"No sessions found for anonymous_user_id {anonymous_user_id}")
+            first_session_id = None
 
     # Create conversion funnel record
     import json as json_module
     funnel_data = {
         'email': email,
-        'auth0_metadata': metadata or {}
+        'auth0_metadata': metadata or {},
+        'sessions_linked': sessions_updated,
+        'session_ids': session_ids
     }
 
     db.execute(text("""
@@ -93,7 +117,7 @@ def process_auth0_signup(
         VALUES (:id, :session_id, :user_id, :stage, CAST(:data AS jsonb), :created)
     """), {
         'id': uuid4(),
-        'session_id': session_id,
+        'session_id': first_session_id,  # Use first session for attribution
         'user_id': user_id,
         'stage': 'signup',
         'data': json_module.dumps(funnel_data),
@@ -102,12 +126,13 @@ def process_auth0_signup(
 
     db.commit()
 
-    logger.info(f"Created signup funnel record for user {user_id}")
+    logger.info(f"Created signup funnel record for user {user_id} (linked {sessions_updated} sessions)")
 
     return {
-        'session_updated': session_updated,
+        'sessions_updated': sessions_updated,
         'funnel_created': True,
-        'session_id': str(session_id) if session_id else None,
+        'session_ids': session_ids,
+        'first_session_id': str(first_session_id) if first_session_id else None,
         'user_id': user_id
     }
 

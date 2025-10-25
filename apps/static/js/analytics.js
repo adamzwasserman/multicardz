@@ -427,14 +427,4 @@
     // Expose to window
     window.MulticardzAnalytics = MulticardzAnalytics;
 
-    // Auto-initialize analytics on page load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            window.MulticardzAnalytics();
-        });
-    } else {
-        // DOM already loaded, initialize immediately
-        window.MulticardzAnalytics();
-    }
-
 })(window);

@@ -28,12 +28,14 @@
     let eventQueue = [];
     let batchTimer = null;
     let initialized = false;
+    let initRetries = 0;
+    const MAX_INIT_RETRIES = 50;  // 5 seconds max wait (50 * 100ms)
 
     /**
      * Get session ID from localStorage (set by analytics.js)
      */
     function getSessionId() {
-        return localStorage.getItem('mcz_session');
+        return localStorage.getItem('multicardz_session_id');
     }
 
     /**
@@ -203,6 +205,11 @@
 
         const sessionId = getSessionId();
         if (!sessionId) {
+            initRetries++;
+            if (initRetries > MAX_INIT_RETRIES) {
+                console.error('ConversionTracking: Failed to get session ID after max retries. Analytics may not be initialized.');
+                return;
+            }
             console.warn('ConversionTracking: Waiting for session ID from analytics.js');
             // Retry after a short delay
             setTimeout(init, 100);

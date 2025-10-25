@@ -7,6 +7,7 @@ Serves landing pages, analytics tracking, and admin dashboard.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 import uvicorn
 
@@ -16,6 +17,10 @@ from .routes import analytics  # Phase 6: Analytics API
 from .routes import admin  # Phase 9: Admin Dashboard
 from .routes import webhooks  # Phase 10: Conversion Integration
 from .routes import funnel  # Phase 10: Funnel Analytics
+from .routes import ab_testing  # A/B Testing API
+
+# Import middleware
+from .middleware.ab_test_middleware import ABTestMiddleware
 
 
 def create_app() -> FastAPI:
@@ -57,14 +62,17 @@ def create_app() -> FastAPI:
         ]
     )
 
-    # Session middleware (for analytics session_id)
+    # A/B Test middleware (needs session to be available - added before SessionMiddleware)
+    app.add_middleware(ABTestMiddleware)
+
+    # Session middleware (for analytics session_id - added last so it wraps ABTestMiddleware)
     app.add_middleware(
         SessionMiddleware,
         secret_key="CHANGE-ME-IN-PRODUCTION",  # TODO: Use env var
         max_age=86400 * 90  # 90 days
     )
 
-    # Security headers middleware
+    # Security headers and cache control middleware
     @app.middleware("http")
     async def add_security_headers(request, call_next):
         response = await call_next(request)
@@ -72,7 +80,17 @@ def create_app() -> FastAPI:
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+
+        # Add efficient cache headers for static assets
+        if request.url.path.startswith("/static/") or request.url.path.startswith("/public/static/"):
+            # Cache static assets for 1 year (immutable)
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+
         return response
+
+    # Mount static files
+    app.mount("/static", StaticFiles(directory="apps/static"), name="static")
+    app.mount("/public/static", StaticFiles(directory="apps/public/static"), name="public-static")
 
     # Health check endpoint
     @app.get("/health")
@@ -85,6 +103,7 @@ def create_app() -> FastAPI:
     app.include_router(admin.router)  # Phase 9: Admin Dashboard
     app.include_router(webhooks.router)  # Phase 10: Conversion Integration
     app.include_router(funnel.router)  # Phase 10: Funnel Analytics
+    app.include_router(ab_testing.router)  # A/B Testing API
 
     return app
 

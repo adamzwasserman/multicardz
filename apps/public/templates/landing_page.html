@@ -1,0 +1,824 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.name }} - multicardz{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Hero Section */
+    .hero-section {
+        max-width: 1366px;
+        margin: 0 auto;
+        padding: 60px 40px 40px;
+        text-align: center;
+    }
+
+    .hero-tagline {
+        font-size: 56px;
+        font-weight: 300;
+        letter-spacing: -0.02em;
+        margin-bottom: 12px;
+        color: var(--color-text-primary);
+        text-align: center;
+        width: 100%;
+        /* Reserve space to prevent layout shift */
+        min-height: 68px;
+    }
+
+    .hero-tagline .dot {
+        color: var(--color-red);
+        font-weight: 700;
+    }
+
+    .hero-subtitle {
+        font-size: 20px;
+        color: var(--color-text-secondary);
+        font-weight: 300;
+        margin-bottom: 48px;
+        text-align: center;
+        width: 100%;
+        /* Reserve space to prevent layout shift */
+        min-height: 30px;
+    }
+
+    /* Tab Navigation */
+    .tab-navigation {
+        display: flex;
+        justify-content: center;
+        gap: 0;
+        border-bottom: 1px solid var(--color-border);
+        margin-bottom: 40px;
+        /* Reserve space to prevent layout shift */
+        min-height: 48px;
+    }
+
+    .tab-item {
+        position: relative;
+        padding: 12px 24px;
+        font-size: 15px;
+        font-family: inherit !important;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .tab-item:hover {
+        color: var(--color-text-primary);
+        background: rgba(0,0,0,0.02);
+    }
+
+    .tab-item.active {
+        color: var(--color-text-primary);
+        border-bottom-color: var(--color-blue);
+    }
+
+    .tab-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        min-width: 200px;
+        display: none;
+        margin-top: 2px;
+        padding-top: 6px;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+    }
+
+    .tab-item:hover .tab-dropdown,
+    .tab-dropdown:hover {
+        display: block;
+        opacity: 1;
+        transition-delay: 0s;
+    }
+
+    /* Add a pseudo-element to bridge the gap */
+    .tab-item:hover::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 8px;
+        background: transparent;
+    }
+
+    .tab-dropdown-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        font-size: 14px;
+        font-family: inherit !important;
+        color: var(--color-text-secondary);
+    }
+
+    .tab-dropdown-item:hover {
+        background: rgba(0,0,0,0.04);
+        color: var(--color-text-primary);
+    }
+
+    /* Demo Area */
+    .demo-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 32px;
+        /* Reserve space for full demo content to prevent layout shift */
+        min-height: 800px;
+    }
+
+    .demo-layout {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        grid-template-rows: auto auto auto auto;
+        gap: 16px 32px;
+        height: 100%;
+    }
+
+    /* Tag Cloud */
+    .tag-cloud {
+        grid-column: 1;
+        grid-row: 1;
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        padding: 20px;
+    }
+
+    .zone-union-sidebar {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    .zone-column-sidebar {
+        grid-column: 1;
+        grid-row: 3;
+    }
+
+    .zone-row-sidebar {
+        grid-column: 1;
+        grid-row: 4;
+    }
+
+    .tag-cloud-title {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text-tertiary);
+        margin-bottom: 16px;
+        font-weight: 500;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 6px 12px;
+        margin: 4px;
+        background: var(--color-tag-1);
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: move;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .tag:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tag:active {
+        cursor: grabbing;
+    }
+
+    /* Drop Zones and Cards Area */
+    .workspace {
+        grid-column: 2;
+        grid-row: 1 / -1;
+    }
+
+    .drop-zone {
+        background: var(--color-bg);
+        border: 2px dashed var(--color-border);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        padding: 12px;
+    }
+
+    .drop-zone.drag-over {
+        background: rgba(13, 110, 253, 0.05);
+        border-color: var(--color-blue);
+    }
+
+    .drop-zone-label {
+        font-size: 12px;
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 500;
+    }
+
+    .zone-column .drop-zone-label,
+    .zone-row .drop-zone-label,
+    .zone-union .drop-zone-label {
+        writing-mode: horizontal-tb;
+    }
+
+    .zone-content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .cards-area {
+        background: var(--color-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        padding: 20px;
+        overflow-y: auto;
+        /* Fixed height to prevent layout shift when cards load */
+        height: 600px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-content: flex-start;
+    }
+
+    .card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        padding: 16px;
+        transition: all 0.2s ease;
+        flex: 0 0 calc(33.333% - 8px);
+        min-width: 200px;
+    }
+
+    .card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .card-title {
+        font-size: 15px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--color-text-primary);
+    }
+
+    .card-tags {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .card-tag {
+        font-size: 11px;
+        padding: 4px 10px !important;
+        background: #e8e8e7;
+        border-radius: 4px;
+        color: #2d2d2d !important;
+        border: 1px solid #d0d0cf !important;
+        font-weight: 500 !important;
+    }
+
+    .empty-state {
+        text-align: center;
+        color: var(--color-text-tertiary);
+        padding: 60px 20px;
+        font-size: 14px;
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.3;
+    }
+
+    /* Content sections */
+    .content-section {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 40px;
+    }
+
+    .section-title {
+        font-size: 32px;
+        font-weight: 300;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+
+    .section-content {
+        font-size: 16px;
+        line-height: 1.8;
+        color: var(--color-text-secondary);
+    }
+
+    /* A/B Test Disclaimer */
+    .demo-disclaimer {
+        max-width: 1200px;
+        margin: 16px auto;
+        padding: 16px 24px;
+        background: rgba(13, 110, 253, 0.05);
+        border: 1px solid rgba(13, 110, 253, 0.2);
+        border-radius: 6px;
+        font-size: 14px;
+        color: var(--color-text-secondary);
+        line-height: 1.6;
+        display: none; /* Hidden until variant loaded */
+    }
+
+    .disclaimer-cta {
+        color: var(--color-blue);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.2s ease;
+    }
+
+    .disclaimer-cta:hover {
+        border-bottom-color: var(--color-blue);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1 class="hero-tagline">Drag<span class="dot">.</span> Drop<span class="dot">.</span> Discover<span class="dot">.</span></h1>
+    <p class="hero-subtitle">Worlds within Worlds</p>
+
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
+        <button class="tab-item active" onclick="switchDemo('tutorial')">
+            Guided Tutorial
+        </button>
+        <button class="tab-item">
+            Trello Replacement
+            <div class="tab-dropdown">
+                <div class="tab-dropdown-item" onclick="switchDemo('trello-pm')">Product Management</div>
+                <div class="tab-dropdown-item" onclick="switchDemo('trello-marketing')">Marketing Campaigns</div>
+                <div class="tab-dropdown-item" onclick="switchDemo('trello-sales')">Sales Pipeline</div>
+                <div class="tab-dropdown-item" onclick="switchDemo('trello-events')">Event Planning</div>
+            </div>
+        </button>
+        <button class="tab-item">
+            Project Management
+            <div class="tab-dropdown">
+                <div class="tab-dropdown-item" onclick="switchDemo('pm-construction')">Construction</div>
+                <div class="tab-dropdown-item" onclick="switchDemo('pm-it')">IT Projects</div>
+                <div class="tab-dropdown-item" onclick="switchDemo('pm-product')">Product Development</div>
+            </div>
+        </button>
+        <button class="tab-item">
+            Knowledge Organization
+            <div class="tab-dropdown">
+                <div class="tab-dropdown-item" onclick="switchDemo('know-content')">Content Creation</div>
+                <div class="tab-dropdown-item" onclick="switchDemo('know-research')">Research Notes</div>
+                <div class="tab-dropdown-item" onclick="switchDemo('know-docs')">Documentation</div>
+            </div>
+        </button>
+        <button class="tab-item" onclick="showAllUseCases()">
+            See Other Use Cases
+        </button>
+    </div>
+
+    <!-- A/B Test: Demo Disclaimer (server-side rendered) -->
+    {% if page.ab_test_variant and page.ab_test_variant.content %}
+    <div class="demo-disclaimer" style="display: block;">
+        {{ page.ab_test_variant.content | safe }}
+    </div>
+    {% endif %}
+
+    <!-- Demo Container -->
+    <div class="demo-container">
+        <div class="demo-layout">
+            <!-- Tag Cloud -->
+            <div class="tag-cloud cloud" data-cloud-type="user" data-zone-type="tag-cloud">
+                <div class="tag-cloud-title">Tags</div>
+                <div class="tags-wrapper" id="tagCloudContent">
+                    <div class="tag tag-cloud" draggable="true" data-tag="Sprint 24">Sprint 24</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="Frontend">Frontend</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="Backend">Backend</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="Design">Design</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="Bug">Bug</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="Feature">Feature</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="Q1">Q1</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="Q2">Q2</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="Q3">Q3</div>
+                    <div class="tag tag-cloud" draggable="true" data-tag="High Priority">High Priority</div>
+                </div>
+            </div>
+
+            <!-- Union Zone (Below Tag Cloud) -->
+            <div class="drop-zone zone-union zone-union-sidebar" data-zone-type="union">
+                <div class="tag-collection">
+                    <span class="drop-zone-label">Filter</span>
+                </div>
+            </div>
+
+            <!-- Column Zone (Below Union) -->
+            <div class="drop-zone zone-column zone-column-sidebar" data-zone-type="column">
+                <div class="tag-collection">
+                    <span class="drop-zone-label">Columns</span>
+                </div>
+            </div>
+
+            <!-- Row Zone (Below Columns) -->
+            <div class="drop-zone zone-row zone-row-sidebar" data-zone-type="row">
+                <div class="tag-collection">
+                    <span class="drop-zone-label">Rows</span>
+                </div>
+            </div>
+
+            <!-- Workspace with Cards -->
+            <div class="workspace">
+                <!-- Cards Area -->
+                <div class="cards-area" id="cardsArea">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👆</div>
+                        <div>Drag a tag to any zone to see the magic</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic content sections from database -->
+{% for section in page.sections %}
+<div class="content-section">
+    {% if section.section_type == 'pain_point' %}
+        <h2 class="section-title">{{ section.data.title }}</h2>
+        <div class="section-content">{{ section.data.description }}</div>
+    {% elif section.section_type == 'benefit' %}
+        <h2 class="section-title">{{ section.data.title }}</h2>
+        <div class="section-content">{{ section.data.description }}</div>
+    {% elif section.section_type == 'comparison_metric' %}
+        <h2 class="section-title">{{ section.data.metric_name }}</h2>
+        <div class="section-content">
+            <p><strong>Before:</strong> {{ section.data.before_value }}</p>
+            <p><strong>After:</strong> {{ section.data.after_value }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Demo data sets for different use cases
+    const demoData = {
+        'tutorial': {
+            tags: ['Sprint 24', 'Frontend', 'Backend', 'Design', 'Bug', 'Feature', 'Q1', 'Q2', 'Q3', 'High Priority'],
+            cards: [
+                { id: 1, title: 'Login page redesign', tags: ['Sprint 24', 'Frontend', 'Design', 'Feature'] },
+                { id: 2, title: 'API authentication bug', tags: ['Sprint 24', 'Backend', 'Bug', 'High Priority'] },
+                { id: 3, title: 'Dashboard performance', tags: ['Q1', 'Frontend', 'Feature'] },
+                { id: 4, title: 'Database migration', tags: ['Backend', 'Q1', 'High Priority'] },
+                { id: 5, title: 'Mobile responsive layout', tags: ['Frontend', 'Design', 'Feature'] },
+                { id: 6, title: 'User profile redesign', tags: ['Q2', 'Frontend', 'Design', 'Feature'] },
+                { id: 7, title: 'Search optimization', tags: ['Q2', 'Backend', 'Feature'] },
+                { id: 8, title: 'Notification system', tags: ['Q2', 'Backend', 'Feature', 'High Priority'] },
+                { id: 9, title: 'Dark mode support', tags: ['Q2', 'Frontend', 'Design', 'Feature'] },
+                { id: 10, title: 'Analytics dashboard', tags: ['Q3', 'Frontend', 'Feature'] },
+                { id: 11, title: 'Data export API', tags: ['Q3', 'Backend', 'Feature'] },
+                { id: 12, title: 'Advanced filtering', tags: ['Q3', 'Frontend', 'Feature', 'High Priority'] },
+                { id: 13, title: 'Cache optimization', tags: ['Q3', 'Backend', 'Feature'] }
+            ]
+        },
+        'trello-pm': {
+            tags: ['Sprint 24', 'Sprint 25', 'Backend', 'Frontend', 'In Progress', 'Blocked', 'Review', 'Done'],
+            cards: [
+                { id: 1, title: 'User authentication', tags: ['Sprint 24', 'Backend', 'Done'] },
+                { id: 2, title: 'Payment integration', tags: ['Sprint 24', 'Backend', 'In Progress'] },
+                { id: 3, title: 'Dashboard UI', tags: ['Sprint 25', 'Frontend', 'Review'] },
+                { id: 4, title: 'API rate limiting', tags: ['Sprint 24', 'Backend', 'Blocked'] }
+            ]
+        },
+        'trello-marketing': {
+            tags: ['Q1 Campaign', 'Q2 Campaign', 'Social', 'Email', 'Blog', 'Draft', 'Scheduled', 'Published'],
+            cards: [
+                { id: 1, title: 'Product launch announcement', tags: ['Q1 Campaign', 'Social', 'Published'] },
+                { id: 2, title: 'Customer success stories', tags: ['Q1 Campaign', 'Blog', 'Draft'] },
+                { id: 3, title: 'Newsletter template', tags: ['Q2 Campaign', 'Email', 'Scheduled'] },
+                { id: 4, title: 'LinkedIn campaign', tags: ['Q1 Campaign', 'Social', 'Scheduled'] }
+            ]
+        },
+        'trello-sales': {
+            tags: ['Prospecting', 'Qualified', 'Demo', 'Proposal', 'Negotiation', 'Closed Won', 'Closed Lost'],
+            cards: [
+                { id: 1, title: 'Acme Corp - Enterprise Plan', tags: ['Negotiation', 'Qualified'] },
+                { id: 2, title: 'TechStart Inc', tags: ['Demo', 'Qualified'] },
+                { id: 3, title: 'BigCo Industries', tags: ['Proposal', 'Qualified'] },
+                { id: 4, title: 'StartupXYZ', tags: ['Prospecting'] }
+            ]
+        },
+        'trello-events': {
+            tags: ['Planning', 'Venue', 'Catering', 'Marketing', 'Confirmed', 'Pending', 'Complete'],
+            cards: [
+                { id: 1, title: 'Annual conference venue', tags: ['Venue', 'Confirmed', 'Planning'] },
+                { id: 2, title: 'Speaker invitations', tags: ['Marketing', 'Pending'] },
+                { id: 3, title: 'Catering menu selection', tags: ['Catering', 'Planning'] },
+                { id: 4, title: 'Registration system', tags: ['Marketing', 'Complete'] }
+            ]
+        },
+        'pm-construction': {
+            tags: ['Phase 1', 'Phase 2', 'Foundation', 'Framing', 'Electrical', 'Plumbing', 'On Track', 'Delayed'],
+            cards: [
+                { id: 1, title: 'Foundation pour', tags: ['Phase 1', 'Foundation', 'On Track'] },
+                { id: 2, title: 'Wall framing', tags: ['Phase 1', 'Framing', 'Delayed'] },
+                { id: 3, title: 'Electrical rough-in', tags: ['Phase 2', 'Electrical'] },
+                { id: 4, title: 'Plumbing installation', tags: ['Phase 2', 'Plumbing'] }
+            ]
+        },
+        'pm-it': {
+            tags: ['Sprint 1', 'Sprint 2', 'Infrastructure', 'Security', 'Testing', 'Production', 'Critical'],
+            cards: [
+                { id: 1, title: 'Cloud migration planning', tags: ['Sprint 1', 'Infrastructure'] },
+                { id: 2, title: 'Security audit', tags: ['Sprint 1', 'Security', 'Critical'] },
+                { id: 3, title: 'Load testing', tags: ['Sprint 2', 'Testing'] },
+                { id: 4, title: 'Production deployment', tags: ['Sprint 2', 'Production'] }
+            ]
+        },
+        'pm-product': {
+            tags: ['Discovery', 'Design', 'Development', 'Testing', 'Launch', 'P0', 'P1', 'P2'],
+            cards: [
+                { id: 1, title: 'User research interviews', tags: ['Discovery', 'P0'] },
+                { id: 2, title: 'Prototype design', tags: ['Design', 'P0'] },
+                { id: 3, title: 'MVP development', tags: ['Development', 'P0'] },
+                { id: 4, title: 'Beta testing', tags: ['Testing', 'P1'] }
+            ]
+        },
+        'know-content': {
+            tags: ['Draft', 'Review', 'Published', 'Blog', 'Video', 'Tutorial', 'SEO'],
+            cards: [
+                { id: 1, title: 'Getting started guide', tags: ['Tutorial', 'Published', 'SEO'] },
+                { id: 2, title: 'Feature spotlight video', tags: ['Video', 'Review'] },
+                { id: 3, title: 'Best practices blog', tags: ['Blog', 'Draft', 'SEO'] },
+                { id: 4, title: 'API documentation', tags: ['Tutorial', 'Review'] }
+            ]
+        },
+        'know-research': {
+            tags: ['Literature', 'Experiments', 'Analysis', 'Writing', 'To Read', 'In Progress', 'Complete'],
+            cards: [
+                { id: 1, title: 'ML architecture paper', tags: ['Literature', 'To Read'] },
+                { id: 2, title: 'Dataset collection', tags: ['Experiments', 'In Progress'] },
+                { id: 3, title: 'Results analysis', tags: ['Analysis', 'In Progress'] },
+                { id: 4, title: 'Draft paper', tags: ['Writing', 'Complete'] }
+            ]
+        },
+        'know-docs': {
+            tags: ['API', 'User Guide', 'Architecture', 'Migration', 'Draft', 'Review', 'Published'],
+            cards: [
+                { id: 1, title: 'REST API reference', tags: ['API', 'Published'] },
+                { id: 2, title: 'System architecture diagram', tags: ['Architecture', 'Review'] },
+                { id: 3, title: 'v2.0 migration guide', tags: ['Migration', 'Draft'] },
+                { id: 4, title: 'Admin user guide', tags: ['User Guide', 'Published'] }
+            ]
+        }
+    };
+
+    let currentDemo = 'tutorial';
+
+    // Initialize rendering
+    document.addEventListener('DOMContentLoaded', () => {
+        renderCards();
+
+        // Listen for drag-drop changes and re-render cards
+        document.body.addEventListener('drop', () => {
+            setTimeout(renderCards, 100);
+        });
+    });
+
+    // Get current filter state from DOM
+    function getFiltersFromDOM() {
+        const filters = { union: [], row: [], column: [] };
+
+        // Read union zone tags
+        const unionZone = document.querySelector('[data-zone-type="union"] .tag-collection');
+        if (unionZone) {
+            unionZone.querySelectorAll('.tag').forEach(tag => {
+                const tagName = tag.getAttribute('data-tag');
+                if (tagName) filters.union.push(tagName);
+            });
+        }
+
+        // Read row zone tags
+        const rowZone = document.querySelector('[data-zone-type="row"] .tag-collection');
+        if (rowZone) {
+            rowZone.querySelectorAll('.tag').forEach(tag => {
+                const tagName = tag.getAttribute('data-tag');
+                if (tagName) filters.row.push(tagName);
+            });
+        }
+
+        // Read column zone tags
+        const columnZone = document.querySelector('[data-zone-type="column"] .tag-collection');
+        if (columnZone) {
+            columnZone.querySelectorAll('.tag').forEach(tag => {
+                const tagName = tag.getAttribute('data-tag');
+                if (tagName) filters.column.push(tagName);
+            });
+        }
+
+        return filters;
+    }
+
+    function renderCards() {
+        const cardsArea = document.getElementById('cardsArea');
+        const cards = demoData[currentDemo].cards;
+        const currentFilters = getFiltersFromDOM();
+        let filteredCards = cards;
+
+        // Filter cards based on union zone (AND logic - all tags must be present)
+        if (currentFilters.union.length > 0) {
+            filteredCards = cards.filter(card =>
+                currentFilters.union.every(tag => card.tags.includes(tag))
+            );
+        }
+
+        if (filteredCards.length === 0) {
+            cardsArea.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔍</div>
+                    <div>No cards match your filters</div>
+                </div>
+            `;
+            return;
+        }
+
+        // Determine rendering mode based on zones
+        const hasColumns = currentFilters.column.length > 0;
+        const hasRows = currentFilters.row.length > 0;
+
+        if (hasColumns && hasRows) {
+            // Matrix view: both columns and rows
+            renderMatrixCards(filteredCards, currentFilters.column, currentFilters.row);
+        } else if (hasColumns) {
+            // Column view: horizontal groups
+            renderColumnCards(filteredCards, currentFilters.column);
+        } else if (hasRows) {
+            // Row view: vertical groups
+            renderRowCards(filteredCards, currentFilters.row);
+        } else {
+            // Simple view: no grouping
+            renderSimpleCards(filteredCards);
+        }
+    }
+
+    function renderSimpleCards(cards) {
+        const cardsArea = document.getElementById('cardsArea');
+        cardsArea.innerHTML = cards.map(card => `
+            <div class="card">
+                <div class="card-title">${card.title}</div>
+                <div class="card-tags">
+                    ${card.tags.map(tag => `<span class="card-tag">${tag}</span>`).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderColumnCards(cards, columnTags) {
+        const cardsArea = document.getElementById('cardsArea');
+        const groups = {};
+
+        // Group cards by column tags
+        columnTags.forEach(tag => {
+            groups[tag] = cards.filter(card => card.tags.includes(tag));
+        });
+
+        // Render as horizontal columns
+        cardsArea.innerHTML = `
+            <div style="display: grid; grid-template-columns: repeat(${columnTags.length}, 1fr); gap: 0;">
+                ${Object.entries(groups).map(([tag, groupCards], index) => `
+                    <div>
+                        <div style="font-size: 14px; font-weight: 500; margin-bottom: 12px; color: var(--color-text-secondary); text-align: center;">${tag}</div>
+                        <div style="padding: 0 16px; ${index < Object.keys(groups).length - 1 ? 'border-right: 1px solid var(--color-border);' : ''}">
+                            ${groupCards.map(card => `
+                                <div class="card" style="margin-bottom: 12px;">
+                                    <div class="card-title">${card.title}</div>
+                                    <div class="card-tags">
+                                        ${card.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function renderRowCards(cards, rowTags) {
+        const cardsArea = document.getElementById('cardsArea');
+        const groups = {};
+
+        // Group cards by row tags
+        rowTags.forEach(tag => {
+            groups[tag] = cards.filter(card => card.tags.includes(tag));
+        });
+
+        // Render as vertical rows
+        cardsArea.innerHTML = Object.entries(groups).map(([tag, groupCards], index) => `
+            <div style="margin-bottom: 24px;">
+                <div style="font-size: 14px; font-weight: 500; margin-bottom: 12px; color: var(--color-text-secondary);">${tag}</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-bottom: 24px; ${index < Object.keys(groups).length - 1 ? 'border-bottom: 1px solid var(--color-border);' : ''}">
+                    ${groupCards.map(card => `
+                        <div class="card" style="flex: 0 0 calc(33.333% - 8px); min-width: 200px;">
+                            <div class="card-title">${card.title}</div>
+                            <div class="card-tags">
+                                ${card.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderMatrixCards(cards, columnTags, rowTags) {
+        const cardsArea = document.getElementById('cardsArea');
+
+        // Create matrix structure
+        cardsArea.innerHTML = `
+            <div style="display: grid; grid-template-columns: 150px repeat(${columnTags.length}, 1fr); gap: 0;">
+                <!-- Header row -->
+                <div style="padding: 12px;"></div>
+                ${columnTags.map((colTag) => `
+                    <div style="font-size: 14px; font-weight: 500; color: var(--color-text-secondary); text-align: center; padding: 12px;">${colTag}</div>
+                `).join('')}
+
+                <!-- Data rows -->
+                ${rowTags.map((rowTag, rowIndex) => `
+                    <div style="font-size: 14px; font-weight: 500; color: var(--color-text-secondary); align-self: center; padding: 12px;">${rowTag}</div>
+                    ${columnTags.map((colTag, colIndex) => {
+                        const cellCards = cards.filter(card =>
+                            card.tags.includes(rowTag) && card.tags.includes(colTag)
+                        );
+                        return `
+                            <div style="padding: 12px; ${rowIndex < rowTags.length - 1 ? 'border-bottom: 1px solid var(--color-border);' : ''} ${colIndex < columnTags.length - 1 ? 'border-right: 1px solid var(--color-border);' : ''}">
+                                ${cellCards.map(card => `
+                                    <div class="card" style="margin-bottom: 12px;">
+                                        <div class="card-title">${card.title}</div>
+                                        <div class="card-tags">
+                                            ${card.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }).join('')}
+                `).join('')}
+            </div>
+        `;
+    }
+
+    function switchDemo(demoId) {
+        if (demoData[demoId]) {
+            currentDemo = demoId;
+
+            // Update tags with proper data-tag attributes
+            const tagCloud = document.getElementById('tagCloudContent');
+            tagCloud.innerHTML = demoData[demoId].tags.map(tag =>
+                `<div class="tag tag-cloud" draggable="true" data-tag="${tag}">${tag}</div>`
+            ).join('');
+
+            // Clear all zones - move tags back to cloud
+            const zones = document.querySelectorAll('.drop-zone .tag-collection');
+            zones.forEach(zoneCollection => {
+                const tags = zoneCollection.querySelectorAll('.tag');
+                tags.forEach(tag => {
+                    tagCloud.appendChild(tag);
+                });
+            });
+
+            // Render cards
+            renderCards();
+
+            // Update active tab
+            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            if (event && event.target.closest('.tab-item')) {
+                event.target.closest('.tab-item').classList.add('active');
+            }
+        }
+    }
+
+    function showAllUseCases() {
+        alert('This would show a grid of all 12 role-based landing pages');
+    }
+</script>
+{% endblock %}

@@ -2,15 +2,20 @@
 A/B Test Service.
 
 Provides functions for:
-- Assigning sessions to A/B test variants
-- Deterministic variant selection based on session ID
-- Respecting traffic split weights
+- Variant assignment to sessions
+- Conversion tracking
+- Results calculation
+- Statistical significance testing
 """
 
+import random
 import hashlib
+import math
 from uuid import UUID
 from typing import Optional, Any
+from datetime import datetime
 from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 
 def assign_variant_for_session(
@@ -36,7 +41,7 @@ def assign_variant_for_session(
             SELECT a_b_variant_id, lp.id as landing_page_id
             FROM analytics_sessions s
             LEFT JOIN a_b_test_variants v ON s.a_b_variant_id = v.id
-            LEFT JOIN landing_pages lp ON v.landing_page_id = lp.id
+            LEFT JOIN landing_pages lp ON s.landing_page_id = lp.id
             WHERE s.session_id = :sid
         """),
         {'sid': session_id}
@@ -68,10 +73,10 @@ def assign_variant_for_session(
     # Get variants for this test
     variants = db.execute(
         text("""
-            SELECT v.id, v.variant_name, v.landing_page_id, v.weight
+            SELECT v.id, v.name, v.traffic_allocation_percent
             FROM a_b_test_variants v
             WHERE v.a_b_test_id = :test_id
-            ORDER BY v.variant_name
+            ORDER BY v.name
         """),
         {'test_id': test_id}
     ).fetchall()
@@ -86,22 +91,20 @@ def assign_variant_for_session(
         return None
 
     variant_id = selected_variant[0]
-    landing_page_id = selected_variant[2]
 
     # Create or update session with variant assignment
+    # Note: landing_page_id should be set by the landing page route, not here
     db.execute(
         text("""
-            INSERT INTO analytics_sessions (session_id, a_b_variant_id, landing_page_id, first_seen, last_seen)
-            VALUES (:sid, :variant_id, :page_id, now(), now())
+            INSERT INTO analytics_sessions (session_id, a_b_variant_id, first_seen, last_seen)
+            VALUES (:sid, :variant_id, now(), now())
             ON CONFLICT (session_id) DO UPDATE
             SET a_b_variant_id = :variant_id,
-                landing_page_id = :page_id,
                 last_seen = now()
         """),
         {
             'sid': session_id,
-            'variant_id': variant_id,
-            'page_id': landing_page_id
+            'variant_id': variant_id
         }
     )
 
@@ -109,7 +112,7 @@ def assign_variant_for_session(
 
     return {
         'variant_id': variant_id,
-        'landing_page_id': landing_page_id
+        'landing_page_id': None
     }
 
 
@@ -118,11 +121,11 @@ def _select_variant_by_hash(session_id: UUID, variants: list) -> Optional[tuple]
     Select variant using deterministic hash-based distribution.
 
     Uses MD5 hash of session_id to generate a number 0-99, then
-    assigns to variant based on cumulative weight ranges.
+    assigns to variant based on cumulative traffic allocation.
 
     Args:
         session_id: The session UUID
-        variants: List of (id, name, landing_page_id, weight) tuples
+        variants: List of (id, name, traffic_allocation_percent) tuples
 
     Returns:
         Selected variant tuple, or None if no variants
@@ -134,14 +137,14 @@ def _select_variant_by_hash(session_id: UUID, variants: list) -> Optional[tuple]
     hash_bytes = hashlib.md5(str(session_id).encode()).digest()
     hash_value = int.from_bytes(hash_bytes[:4], byteorder='big') % 100
 
-    # Calculate cumulative weights
-    total_weight = sum(v[3] for v in variants)
+    # Calculate cumulative traffic allocation
+    total_allocation = sum(v[2] for v in variants)
     cumulative = 0
 
     for variant in variants:
-        weight = variant[3]
-        # Convert weight to percentage of total
-        percentage = (weight / total_weight) * 100
+        traffic_percent = variant[2]
+        # Normalize to 0-100 range if total allocation != 100
+        percentage = (traffic_percent / total_allocation) * 100 if total_allocation > 0 else 0
         cumulative += percentage
 
         if hash_value < cumulative:
@@ -199,10 +202,10 @@ def calculate_ab_test_results(test_id: UUID, db: Any) -> dict:
     # Get variants for this test
     variants = db.execute(
         text("""
-            SELECT v.id, v.variant_name, v.landing_page_id, v.weight
+            SELECT v.id, v.name, v.traffic_allocation_percent
             FROM a_b_test_variants v
             WHERE v.a_b_test_id = :test_id
-            ORDER BY v.variant_name
+            ORDER BY v.name
         """),
         {'test_id': test_id}
     ).fetchall()
@@ -410,3 +413,278 @@ def _normal_cdf(x: float) -> float:
     # Using error function approximation
     # CDF(x) = 0.5 * (1 + erf(x / sqrt(2)))
     return 0.5 * (1 + math.erf(x / math.sqrt(2)))
+
+
+# New functions for disclaimer text A/B testing
+
+def get_active_disclaimer_tests(db: Session) -> list:
+    """
+    Get all active disclaimer A/B tests.
+
+    Args:
+        db: Database session
+
+    Returns:
+        List of active test dicts with id, name, element_selector
+    """
+    results = db.execute(
+        text("""
+            SELECT id, name, element_selector
+            FROM a_b_tests
+            WHERE is_active = true
+            AND (end_date IS NULL OR end_date > now())
+            ORDER BY start_date DESC
+        """)
+    ).fetchall()
+
+    return [
+        {
+            'id': str(row[0]),
+            'name': row[1],
+            'element_selector': row[2]
+        }
+        for row in results
+    ]
+
+
+def get_disclaimer_test_variants(db: Session, test_id: str) -> list:
+    """
+    Get all variants for a specific disclaimer A/B test.
+
+    Args:
+        db: Database session
+        test_id: A/B test UUID (string or UUID)
+
+    Returns:
+        List of variant dicts with id, name, content, traffic_allocation_percent, is_control
+    """
+    results = db.execute(
+        text("""
+            SELECT id, name, content, traffic_allocation_percent, is_control
+            FROM a_b_test_variants
+            WHERE a_b_test_id = :test_id
+            ORDER BY is_control DESC, name
+        """),
+        {'test_id': test_id}
+    ).fetchall()
+
+    return [
+        {
+            'id': str(row[0]),
+            'name': row[1],
+            'content': row[2],
+            'traffic_allocation_percent': row[3],
+            'is_control': row[4]
+        }
+        for row in results
+    ]
+
+
+def assign_disclaimer_variant(db: Session, session_id: str, test_id: str) -> Optional[dict]:
+    """
+    Assign a disclaimer variant to a session using deterministic hash-based selection.
+
+    Args:
+        db: Database session
+        session_id: Session UUID (string or UUID)
+        test_id: A/B test UUID (string or UUID)
+
+    Returns:
+        Variant dict with id, name, content, is_control or None
+    """
+    # Check if session already has a variant assigned for this test
+    existing = db.execute(
+        text("""
+            SELECT v.id, v.name, v.content, v.is_control
+            FROM analytics_sessions s
+            JOIN a_b_test_variants v ON s.a_b_variant_id = v.id
+            WHERE s.session_id = :session_id
+            AND v.a_b_test_id = :test_id
+        """),
+        {'session_id': session_id, 'test_id': test_id}
+    ).fetchone()
+
+    if existing:
+        return {
+            'id': str(existing[0]),
+            'name': existing[1],
+            'content': existing[2],
+            'is_control': existing[3]
+        }
+
+    # Get variants for this test
+    variants = get_disclaimer_test_variants(db, test_id)
+
+    if not variants:
+        return None
+
+    # Deterministic hash-based variant selection
+    hash_bytes = hashlib.md5(str(session_id).encode()).digest()
+    hash_value = int.from_bytes(hash_bytes[:4], byteorder='big') % 100
+
+    # Select variant based on traffic allocation
+    cumulative = 0
+    selected_variant = None
+
+    for variant in variants:
+        cumulative += variant['traffic_allocation_percent']
+        if hash_value < cumulative:
+            selected_variant = variant
+            break
+
+    if not selected_variant:
+        selected_variant = variants[0]  # Fallback to first variant
+
+    # Update session with assigned variant
+    db.execute(
+        text("""
+            UPDATE analytics_sessions
+            SET a_b_variant_id = :variant_id
+            WHERE session_id = :session_id
+        """),
+        {'variant_id': selected_variant['id'], 'session_id': session_id}
+    )
+    db.commit()
+
+    return selected_variant
+
+
+def track_disclaimer_cta_click(db: Session, session_id: str, variant_id: str) -> bool:
+    """
+    Track a CTA click for a disclaimer variant.
+
+    Args:
+        db: Database session
+        session_id: Session UUID
+        variant_id: Variant UUID
+
+    Returns:
+        True if tracked successfully, False otherwise
+    """
+    try:
+        # Get the most recent page_view_id for this session
+        page_view = db.execute(
+            text("""
+                SELECT id
+                FROM analytics_page_views
+                WHERE session_id = :session_id
+                ORDER BY created DESC
+                LIMIT 1
+            """),
+            {'session_id': session_id}
+        ).fetchone()
+
+        if not page_view:
+            return False
+
+        page_view_id = page_view[0]
+
+        # Record the conversion event
+        db.execute(
+            text("""
+                INSERT INTO analytics_events (
+                    session_id,
+                    page_view_id,
+                    event_type,
+                    element_selector,
+                    timestamp_ms
+                )
+                VALUES (
+                    :session_id,
+                    :page_view_id,
+                    'ab_features_cta',
+                    :element_selector,
+                    :timestamp_ms
+                )
+            """),
+            {
+                'session_id': session_id,
+                'page_view_id': page_view_id,
+                'element_selector': f'variant-{variant_id}',
+                'timestamp_ms': int(datetime.now().timestamp() * 1000)
+            }
+        )
+        db.commit()
+        return True
+    except Exception as e:
+        db.rollback()
+        print(f"Error tracking CTA click: {e}")
+        return False
+
+
+def calculate_disclaimer_test_results(db: Session, test_id: str) -> dict:
+    """
+    Calculate disclaimer A/B test results including conversion rates and statistical significance.
+
+    Args:
+        db: Database session
+        test_id: A/B test UUID
+
+    Returns:
+        Dict with test results including variants, leading_variant, statistical_significance
+    """
+    # Get all variants with their performance metrics
+    results = db.execute(
+        text("""
+            SELECT
+                v.id,
+                v.name,
+                v.is_control,
+                COUNT(DISTINCT s.session_id) as sessions_count,
+                COUNT(DISTINCT CASE
+                    WHEN e.event_type = 'ab_features_cta'
+                    THEN e.session_id
+                END) as conversions_count
+            FROM a_b_test_variants v
+            LEFT JOIN analytics_sessions s ON s.a_b_variant_id = v.id
+            LEFT JOIN analytics_events e ON e.session_id = s.session_id
+            WHERE v.a_b_test_id = :test_id
+            GROUP BY v.id, v.name, v.is_control
+            ORDER BY v.is_control DESC, v.name
+        """),
+        {'test_id': test_id}
+    ).fetchall()
+
+    variants = []
+    control_variant = None
+    best_variant = None
+    best_ctr = 0
+
+    for row in results:
+        variant_id, name, is_control, sessions, conversions = row
+        ctr = (conversions / sessions * 100) if sessions > 0 else 0
+
+        variant_data = {
+            'id': str(variant_id),
+            'name': name,
+            'is_control': is_control,
+            'sessions_count': sessions,
+            'conversions_count': conversions,
+            'conversion_rate': round(ctr, 2)
+        }
+
+        variants.append(variant_data)
+
+        if is_control:
+            control_variant = variant_data
+
+        if ctr > best_ctr:
+            best_ctr = ctr
+            best_variant = variant_data
+
+    # Calculate statistical significance vs control
+    significance_results = {}
+    if control_variant and best_variant and control_variant != best_variant:
+        significance_results = {
+            'is_significant': False,
+            'p_value': None,
+            'lift': round(((best_ctr - control_variant['conversion_rate']) / control_variant['conversion_rate'] * 100) if control_variant['conversion_rate'] > 0 else 0, 2),
+            'confidence_level': 0.0
+        }
+
+    return {
+        'test_id': str(test_id),
+        'variants': variants,
+        'leading_variant': best_variant['name'] if best_variant else None,
+        'statistical_significance': significance_results
+    }

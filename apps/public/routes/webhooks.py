@@ -27,7 +27,8 @@ router = APIRouter(prefix='/api/webhooks', tags=['webhooks'])
 class Auth0SignupWebhook(BaseModel):
     """Auth0 user signup webhook payload."""
     user_id: str = Field(..., description="Auth0 user ID")
-    browser_fingerprint: str = Field(..., description="Browser fingerprint from analytics")
+    anonymous_user_id: str = Field(..., description="Persistent anonymous user ID from cookie")
+    browser_fingerprint: Optional[str] = Field(None, description="Browser fingerprint from analytics (legacy)")
     email: str = Field(..., description="User email address")
     created_at: str = Field(..., description="ISO timestamp of signup")
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional Auth0 metadata")
@@ -86,6 +87,7 @@ async def auth0_signup_webhook(
         result = process_auth0_signup(
             db=db,
             user_id=payload.user_id,
+            anonymous_user_id=payload.anonymous_user_id,
             browser_fingerprint=payload.browser_fingerprint,
             email=payload.email,
             metadata=payload.metadata

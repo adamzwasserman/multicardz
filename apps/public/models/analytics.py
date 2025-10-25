@@ -93,6 +93,7 @@ class MouseTrackingPoint(BaseModel):
 class SessionCreateRequest(BaseModel):
     """Request model for session creation."""
     session_id: str | UUID  # Allow string to be converted
+    anonymous_user_id: str | None = None  # Persistent cookie-based anonymous user ID
     referrer_url: str | None = None
     utm_source: str | None = None
     utm_medium: str | None = None

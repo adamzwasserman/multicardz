@@ -127,6 +127,7 @@ def create_session_in_db(
         text("""
         INSERT INTO analytics_sessions (
             session_id,
+            user_id,
             referrer_url,
             referrer_domain,
             utm_source,
@@ -140,6 +141,7 @@ def create_session_in_db(
             last_seen
         ) VALUES (
             :session_id,
+            :user_id,
             :referrer_url,
             :referrer_domain,
             :utm_source,
@@ -155,6 +157,7 @@ def create_session_in_db(
         """),
         {
             "session_id": session.session_id,
+            "user_id": session_data.anonymous_user_id,  # Store anonymous user ID for tracking
             "referrer_url": session.referrer_url,
             "referrer_domain": session.referrer_domain,
             "utm_source": session.utm_source,
