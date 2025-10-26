@@ -1,0 +1,286 @@
+/**
+ * Group Tags Visual Styling
+ *
+ * Muji-inspired minimal design principles:
+ * - Subtle borders instead of bright colors
+ * - Opacity variations for depth
+ * - Minimal texture patterns
+ * - No color contrast, only grayscale
+ * - Clean, functional aesthetics
+ */
+
+/* ============ Base Group Tag Styling ============ */
+
+.tag.group-tag {
+    /* Subtle border instead of color */
+    border: 1px dashed rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.95);
+
+    /* Minimal texture pattern - barely visible dots */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><circle cx="1" cy="1" r="0.5" fill="rgba(0,0,0,0.03)"/></svg>');
+    background-size: 4px 4px;
+
+    /* Subtle depth through opacity */
+    opacity: 0.95;
+
+    /* Smooth transitions for interactions */
+    transition: all 0.2s ease;
+
+    /* Prevent text selection during drag */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+
+    /* Cursor indicates draggable */
+    cursor: move;
+
+    /* Spacing and layout */
+    padding: 6px 12px;
+    margin: 4px;
+    border-radius: 4px;
+
+    /* Flexbox for icon + text layout */
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    /* Typography */
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+/* ============ Nesting Depth Variations ============ */
+
+/* Each nesting level gets slightly more transparent */
+.tag.group-tag[data-nesting-level="1"] {
+    opacity: 0.90;
+    border-style: dotted;
+}
+
+.tag.group-tag[data-nesting-level="2"] {
+    opacity: 0.85;
+    border-style: double;
+}
+
+.tag.group-tag[data-nesting-level="3"] {
+    opacity: 0.80;
+    border-style: groove;
+}
+
+.tag.group-tag[data-nesting-level="4"],
+.tag.group-tag[data-nesting-level="5"],
+.tag.group-tag[data-nesting-level="6"],
+.tag.group-tag[data-nesting-level="7"],
+.tag.group-tag[data-nesting-level="8"],
+.tag.group-tag[data-nesting-level="9"],
+.tag.group-tag[data-nesting-level="10"] {
+    opacity: 0.75;
+    border-style: ridge;
+}
+
+/* ============ Interaction States ============ */
+
+/* Hover state - no color change, just border and subtle lift */
+.tag.group-tag:hover {
+    border-style: solid;
+    border-width: 1px;
+    opacity: 1.0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Focus state for accessibility */
+.tag.group-tag:focus,
+.tag.group-tag:focus-visible {
+    outline: 2px solid rgba(0, 0, 0, 0.5);
+    outline-offset: 2px;
+}
+
+/* Active/dragging state */
+.tag.group-tag.dragging {
+    border-width: 2px;
+    opacity: 0.6;
+    transform: rotate(2deg);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Selected state */
+.tag.group-tag.selected {
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0.4);
+    background: rgba(240, 240, 240, 0.98);
+}
+
+/* Expanded state */
+.tag.group-tag[data-expanded="true"] {
+    border-style: solid;
+    background: rgba(250, 250, 250, 0.98);
+}
+
+/* ============ Group Icon ============ */
+
+.group-tag .group-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.group-tag .group-icon svg {
+    width: 100%;
+    height: 100%;
+    stroke: currentColor;
+    stroke-width: 1.5;
+}
+
+/* Rotate icon when expanded */
+.group-tag[data-expanded="true"] .group-icon {
+    transform: rotate(90deg);
+}
+
+/* ============ Member Count Badge ============ */
+
+.group-tag .member-count {
+    font-size: 0.75em;
+    opacity: 0.6;
+    margin-left: 2px;
+    font-weight: normal;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============ Loading/Expanding State ============ */
+
+.tag.group-tag.expanding {
+    position: relative;
+    pointer-events: none;
+}
+
+.tag.group-tag.expanding::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}
+
+/* ============ Drop Zone Feedback ============ */
+
+.drop-zone.group-hover {
+    border-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.drop-zone.group-valid-drop {
+    border-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* ============ Collapsed View Mode ============ */
+
+.tag.group-tag.collapsed .member-count {
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+/* ============ Disabled State ============ */
+
+.tag.group-tag.disabled,
+.tag.group-tag[aria-disabled="true"] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ============ Error State ============ */
+
+.tag.group-tag.error {
+    border-color: rgba(255, 0, 0, 0.3);
+    background-color: rgba(255, 0, 0, 0.05);
+}
+
+/* ============ Dark Mode Support ============ */
+
+@media (prefers-color-scheme: dark) {
+    .tag.group-tag {
+        border-color: rgba(255, 255, 255, 0.2);
+        background: rgba(40, 40, 40, 0.95);
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .tag.group-tag:hover {
+        background: rgba(50, 50, 50, 0.98);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .tag.group-tag.selected {
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(60, 60, 60, 0.98);
+    }
+
+    .tag.group-tag[data-expanded="true"] {
+        background: rgba(55, 55, 55, 0.98);
+    }
+
+    .drop-zone.group-hover {
+        border-color: rgba(255, 255, 255, 0.3);
+        background-color: rgba(255, 255, 255, 0.02);
+    }
+}
+
+/* ============ Reduced Motion Support ============ */
+
+@media (prefers-reduced-motion: reduce) {
+    .tag.group-tag,
+    .group-tag .group-icon {
+        transition: none;
+    }
+
+    .tag.group-tag.expanding::after {
+        animation: none;
+    }
+}
+
+/* ============ High Contrast Mode ============ */
+
+@media (prefers-contrast: high) {
+    .tag.group-tag {
+        border-width: 2px;
+        border-color: rgba(0, 0, 0, 0.6);
+    }
+
+    .tag.group-tag:hover,
+    .tag.group-tag:focus {
+        border-color: rgba(0, 0, 0, 0.8);
+    }
+}
+
+/* ============ Print Styles ============ */
+
+@media print {
+    .tag.group-tag {
+        border: 1px solid black;
+        background: white;
+        opacity: 1;
+        box-shadow: none;
+    }
+
+    .tag.group-tag .group-icon {
+        display: none;
+    }
+}

@@ -163,3 +163,71 @@ class SavedView(SavedViewBase):
     modified: datetime = Field(default_factory=datetime.utcnow)
 
     model_config = ConfigDict(from_attributes=True)
+
+
+# ============ Group Tag Models ============
+
+class GroupTagBase(BaseModel):
+    """Base group tag model with common fields."""
+    name: str = Field(..., min_length=1, max_length=100)
+    workspace_id: str
+    created_by: str
+    visual_style: dict = Field(
+        default_factory=lambda: {
+            'border_style': 'dashed',
+            'opacity': 0.95,
+            'icon': 'folder-minimal',
+            'border_color': 'rgba(0, 0, 0, 0.2)',
+            'background_pattern': 'subtle-dots'
+        },
+        description="Visual styling configuration following Muji principles"
+    )
+    max_nesting_depth: int = Field(default=10, ge=1, le=20)
+
+class GroupTagCreate(GroupTagBase):
+    """Model for creating a new group tag."""
+    initial_member_ids: frozenset[str] = Field(
+        default_factory=frozenset,
+        description="Initial member tag IDs to add to group"
+    )
+
+class GroupTagUpdate(BaseModel):
+    """Model for updating a group tag."""
+    name: str | None = Field(None, min_length=1, max_length=100)
+    visual_style: dict | None = None
+    max_nesting_depth: int | None = Field(None, ge=1, le=20)
+
+class GroupTag(GroupTagBase):
+    """Complete group tag model with all fields."""
+    id: str = Field(default_factory=lambda: f"group_{uuid4().hex[:12]}")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    member_tag_ids: frozenset[str] = Field(
+        default_factory=frozenset,
+        description="Set of member tag/group IDs"
+    )
+    parent_group_ids: frozenset[str] = Field(
+        default_factory=frozenset,
+        description="Groups that contain this group"
+    )
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# ============ Group Membership Models ============
+
+class GroupMembershipBase(BaseModel):
+    """Base group membership model."""
+    group_id: str
+    member_tag_id: str
+    member_type: str = Field(..., pattern="^(tag|group)$")
+    added_by: str
+
+class GroupMembershipCreate(GroupMembershipBase):
+    """Model for creating a group membership."""
+    pass
+
+class GroupMembership(GroupMembershipBase):
+    """Complete group membership model."""
+    added_at: datetime = Field(default_factory=datetime.utcnow)
+
+    model_config = ConfigDict(from_attributes=True)
