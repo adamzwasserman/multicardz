@@ -77,3 +77,4 @@ debug_*.log
 venv_*/
 ENV_*/
 data/multicardz_dev.db
+.claude/settings.local.json
