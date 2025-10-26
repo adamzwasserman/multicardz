@@ -399,7 +399,7 @@
     <!-- A/B Test: Demo Disclaimer (server-side rendered) -->
     {% if page.ab_test_variant and page.ab_test_variant.content %}
     <div class="demo-disclaimer" style="display: block;">
-        {{ page.ab_test_variant.content | safe }}
+        {{ page.ab_test_variant.content.html | safe }}
     </div>
     {% endif %}
 
@@ -424,21 +424,21 @@
             </div>
 
             <!-- Union Zone (Below Tag Cloud) -->
-            <div class="drop-zone zone-union zone-union-sidebar" data-zone-type="union">
+            <div class="drop-zone zone-union zone-union-sidebar" data-zone-type="union" data-behavior="union" data-accepts="tags">
                 <div class="tag-collection">
                     <span class="drop-zone-label">Filter</span>
                 </div>
             </div>
 
             <!-- Column Zone (Below Union) -->
-            <div class="drop-zone zone-column zone-column-sidebar" data-zone-type="column">
+            <div class="drop-zone zone-column zone-column-sidebar" data-zone-type="column" data-behavior="standard" data-accepts="tags">
                 <div class="tag-collection">
                     <span class="drop-zone-label">Columns</span>
                 </div>
             </div>
 
             <!-- Row Zone (Below Columns) -->
-            <div class="drop-zone zone-row zone-row-sidebar" data-zone-type="row">
+            <div class="drop-zone zone-row zone-row-sidebar" data-zone-type="row" data-behavior="standard" data-accepts="tags">
                 <div class="tag-collection">
                     <span class="drop-zone-label">Rows</span>
                 </div>
@@ -644,10 +644,10 @@
         const currentFilters = getFiltersFromDOM();
         let filteredCards = cards;
 
-        // Filter cards based on union zone (AND logic - all tags must be present)
+        // Filter cards based on union zone (OR logic - any tag matches)
         if (currentFilters.union.length > 0) {
             filteredCards = cards.filter(card =>
-                currentFilters.union.every(tag => card.tags.includes(tag))
+                currentFilters.union.some(tag => card.tags.includes(tag))
             );
         }
 

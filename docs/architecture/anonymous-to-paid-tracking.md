@@ -187,7 +187,7 @@ first_seen          | utm_source | funnel_stage | created
 ### Frontend (Your Auth0 signup form)
 ```javascript
 // When user signs up, send anonymous_user_id to Auth0
-const analytics = window.MulticardzAnalytics();
+const analytics = window.multicardzAnalytics();
 const anonymousUserId = analytics.anonymousUserId;
 
 // Include in Auth0 metadata or webhook payload

@@ -1,4 +1,4 @@
-# Playwright Tests Analysis for MultiCardz™
+# Playwright Tests Analysis for multicardz™
 
 ## Final Decision: Keep Only One Test
 

@@ -1,5 +1,5 @@
 Feature: Database Storage Layer for Two-Tier Architecture
-  As a MultiCardz system
+  As a multicardz system
   I want to persist cards using two-tier architecture
   So that I can efficiently load card summaries and details on-demand
 

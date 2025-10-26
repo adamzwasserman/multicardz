@@ -1,7 +1,7 @@
 [project]
 name = "multicardz-user"
 version = "0.1.0"
-description = "MultiCardz User Application - Frontend spatial tag manipulation interface"
+description = "multicardz User Application - Frontend spatial tag manipulation interface"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.116.2",

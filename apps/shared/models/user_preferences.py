@@ -54,7 +54,7 @@ class ThemeSettings(BaseModel):
 
     theme: str = Field(
         default="system",
-        pattern="^(light|dark|system)$",
+        pattern="^(light|dark|system|earth)$",
         description="Color theme preference",
     )
     font_family: str = Field(

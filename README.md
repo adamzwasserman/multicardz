@@ -1,10 +1,10 @@
-# MultiCardz
+# multicardz
 
 A JavaScript-based spatial tag manipulation system maintaining patent compliance and set theory operations.
 
 ## Architecture
 
-MultiCardz implements a clean, patent-compliant system where:
+multicardz implements a clean, patent-compliant system where:
 - Backend generates ALL HTML content using Python/FastAPI
 - Frontend uses JavaScript ONLY for polymorphic dispatch and HTMX integration
 - All filtering uses mathematical set theory operations
@@ -115,8 +115,8 @@ All code must follow:
 
 ## Documentation
 
-- Architecture: `docs/architecture/001-2025-09-16-MultiCardz-JavaScript-Architecture-v1.md`
-- Implementation: `docs/implementation/002-2025-09-16-MultiCardz-JavaScript-Implementation-Plan-v1.md`
+- Architecture: `docs/architecture/001-2025-09-16-multicardz-JavaScript-Architecture-v1.md`
+- Implementation: `docs/implementation/002-2025-09-16-multicardz-JavaScript-Implementation-Plan-v1.md`
 - Standards: `docs/standards/elite-javascript-programming-standards.md`
 
 ## License

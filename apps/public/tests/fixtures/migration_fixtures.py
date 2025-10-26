@@ -39,7 +39,7 @@ def sample_segment_data():
             },
             {
                 "title": "Same drag-and-drop flow",
-                "description": "If you know Trello, you already know MultiCardz."
+                "description": "If you know Trello, you already know multicardz."
             },
             {
                 "title": "50% cheaper pricing",
@@ -65,7 +65,7 @@ def sample_segment_data():
             "title": "Built for scale from day one",
             "stat": "1000× more capacity<br>80× faster",
             "description": [
-                "While Trello slows down as you add cards, MultiCardz stays fast.",
+                "While Trello slows down as you add cards, multicardz stays fast.",
                 "Our patent-pending architecture means the 500,000th card is as fast as the 1st."
             ]
         },
@@ -77,7 +77,7 @@ def sample_segment_data():
         "pricing": {
             "competitor_name": "Trello Premium",
             "competitor_price": "$10",
-            "our_name": "MultiCardz Premium",
+            "our_name": "multicardz Premium",
             "our_price": "$5",
             "savings": "Save 50% + better performance"
         }

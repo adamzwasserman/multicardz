@@ -1,7 +1,7 @@
 [project]
 name = "multicardz-admin"
 version = "0.1.0"
-description = "MultiCardz Admin Application - Administrative interface and management"
+description = "multicardz Admin Application - Administrative interface and management"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.116.2",

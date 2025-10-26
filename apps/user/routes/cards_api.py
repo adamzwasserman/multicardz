@@ -77,6 +77,7 @@ def compute_card_sets(
     boost_tags = []
     exclude_tags = []
     temporal_filters = {}
+    include_empty_cards = False  # Flag for EMPTY tag
 
     for zone_type, zone_data in tags_in_play.zones.items():
         if not zone_data.tags:  # Skip empty zones
@@ -120,10 +121,37 @@ def compute_card_sets(
             if temporal_range:
                 temporal_filters[temporal_range] = zone_data.tags
 
+    # Check for EMPTY tag and remove it from tag lists
+    if 'EMPTY' in union_tags:
+        union_tags = [t for t in union_tags if t != 'EMPTY']
+        include_empty_cards = True
+        logger.info("[DEBUG] EMPTY tag found in union - will include cards with no dimensional tags")
+
+    if 'EMPTY' in dimensional_tags:
+        dimensional_tags = [t for t in dimensional_tags if t != 'EMPTY']
+        include_empty_cards = True
+        logger.info("[DEBUG] EMPTY tag found in dimensional zones - will include cards with no dimensional tags")
+
+    # Also clean EMPTY from dimensional_zones for rendering
+    if dimensional_zones.get('row'):
+        if 'EMPTY' in dimensional_zones['row']:
+            dimensional_zones['row'] = [t for t in dimensional_zones['row'] if t != 'EMPTY']
+            include_empty_cards = True
+
+    if dimensional_zones.get('column'):
+        if 'EMPTY' in dimensional_zones['column']:
+            dimensional_zones['column'] = [t for t in dimensional_zones['column'] if t != 'EMPTY']
+            include_empty_cards = True
+
     # Merge union tags and dimensional tags into single union operation
     all_union_tags = union_tags + dimensional_tags
     if all_union_tags:
+        logger.info(f"[DEBUG] Creating union operation with tags: {all_union_tags}")
         operations.insert(0, ('union', [(tag, 1) for tag in all_union_tags]))
+    elif include_empty_cards:
+        # If ONLY the EMPTY tag was provided (no other dimensional tags), include all cards
+        logger.info("[DEBUG] Only EMPTY tag provided - including all cards")
+        # Don't create any union operation - this will include all cards
 
     # Add exclude operation if needed
     if exclude_tags:
@@ -196,13 +224,43 @@ def compute_card_sets(
 
         # Apply set operations if any
         if operations:
-            logger.info(f"Applying {len(operations)} set operations")
+            logger.info(f"[DEBUG] Applying {len(operations)} set operations: {operations}")
             result = apply_unified_operations(
                 frozenset(all_cards),
                 operations
             )
             filtered_cards = list(result.cards)
-            logger.info(f"Set operations completed: {len(filtered_cards)} cards result")
+            logger.info(f"[DEBUG] Set operations completed: {len(filtered_cards)} cards result from {len(all_cards)} total cards")
+
+            # If EMPTY tag was used, also include cards with no dimensional tags
+            if include_empty_cards:
+                if all_union_tags:
+                    # EMPTY + other tags: include cards without the other dimensional tags
+                    empty_cards = [
+                        card for card in all_cards
+                        if not any(tag in card.tags for tag in all_union_tags)
+                    ]
+                    logger.info(f"[DEBUG] EMPTY tag: adding {len(empty_cards)} cards with no dimensional tags")
+                else:
+                    # ONLY EMPTY tag: include cards with literally no tags
+                    empty_cards = [
+                        card for card in all_cards
+                        if len(card.tags) == 0
+                    ]
+                    logger.info(f"[DEBUG] EMPTY tag only: adding {len(empty_cards)} cards with zero tags")
+
+                # Combine filtered cards with empty cards (avoiding duplicates)
+                filtered_card_ids = {card.id for card in filtered_cards}
+                for card in empty_cards:
+                    if card.id not in filtered_card_ids:
+                        filtered_cards.append(card)
+                logger.info(f"[DEBUG] Total cards after including EMPTY: {len(filtered_cards)}")
+
+        elif include_empty_cards:
+            # ONLY EMPTY tag dragged (no other operations)
+            filtered_cards = [card for card in all_cards if len(card.tags) == 0]
+            logger.info(f"[DEBUG] EMPTY tag only (no operations): showing {len(filtered_cards)} cards with zero tags")
+
         elif tags_in_play.controls.startWithAllCards:
             filtered_cards = list(all_cards)
             logger.info(f"Showing all cards (lesson-filtered): {len(filtered_cards)}")
@@ -1054,6 +1112,7 @@ def _flatten_preferences_for_frontend(prefs: dict) -> dict:
         'colorPalette': view_settings.get('color_palette', 'muji'),
         'verticalLayout': view_settings.get('tag_layout', 'horizontal') == 'vertical',
         'advancedView': tag_settings.get('separate_user_ai_tags', True),
+        'theme': theme_settings.get('theme', 'system'),
         'fontSelector': f"font-{theme_settings.get('font_family', 'Inter').lower()}",
         'zoneLayout': workspace_settings.get('zone_layout', {}),
         'collapsedSections': workspace_settings.get('collapsed_sections', []),
@@ -1134,6 +1193,7 @@ async def save_user_preferences(request: Request):
             'colorPalette': ('view_settings', 'color_palette'),
             'verticalLayout': ('view_settings', 'tag_layout'),  # boolean -> "vertical"/"horizontal"
             'advancedView': ('tag_settings', 'separate_user_ai_tags'),
+            'theme': ('theme_settings', 'theme'),  # light|dark|system|earth
             'fontSelector': ('theme_settings', 'font_family'),
             'zoneLayout': ('workspace_settings', 'zone_layout'),  # dict of zone positions
             'collapsedSections': ('workspace_settings', 'collapsed_sections'),  # list of collapsed section IDs

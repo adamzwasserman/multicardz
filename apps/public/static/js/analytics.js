@@ -338,7 +338,7 @@
      *
      * @returns {object} Analytics instance
      */
-    function MulticardzAnalytics() {
+    function multicardzAnalytics() {
         // Create or retrieve persistent anonymous user ID (90-day cookie)
         const anonymousUserId = getOrCreateAnonymousUserId();
 
@@ -425,16 +425,16 @@
     }
 
     // Expose to window
-    window.MulticardzAnalytics = MulticardzAnalytics;
+    window.multicardzAnalytics = multicardzAnalytics;
 
     // Auto-initialize analytics on page load
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
-            window.MulticardzAnalytics();
+            window.multicardzAnalytics();
         });
     } else {
         // DOM already loaded, initialize immediately
-        window.MulticardzAnalytics();
+        window.multicardzAnalytics();
     }
 
 })(window);

@@ -114,10 +114,69 @@ def create_app():
             # Fallback to basic tags if lesson system fails
             available_tags = [{"name": "drag me to first box", "count": 0}]
 
+        # Load user preferences (zone layout, font, theme, and column widths)
+        import json
+        zone_layout = {"left": ["column", "row"], "top": ["filter"], "right": [], "bottom": []}
+        font_class = ""  # Default: no custom font class
+        font_preload_url = ""  # Font file to preload
+        theme = "system"  # Default theme
+        left_width = 120  # Default left column width
+        right_width = 120  # Default right column width
+
+        # Map font classes to their self-hosted woff2 files
+        FONT_PRELOAD_MAP = {
+            'font-inconsolata': '/static/fonts/inconsolata-regular.woff2',
+            'font-avenir': '/static/fonts/mulish-regular.woff2',
+            'font-akzidenz': '/static/fonts/worksans-regular.woff2',
+            'font-lato': '/static/fonts/lato-regular.woff2',
+            'font-libre-franklin': '/static/fonts/librefranklin-regular.woff2',
+            'font-merriweather': '/static/fonts/merriweathersans-regular.woff2',
+            'font-roboto': '/static/fonts/roboto-regular.woff2',
+            'font-sanfrancisco': '/static/fonts/roboto-regular.woff2',  # Roboto as substitute
+            'font-optima': '/static/fonts/lato-regular.woff2',  # Lato as substitute
+        }
+
+        try:
+            with sqlite3.connect("/Users/adam/dev/multicardz/data/multicardz_dev.db") as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT preferences_json FROM user_preferences WHERE user_id = ?", ("default-user",))
+                row = cursor.fetchone()
+                if row:
+                    prefs = json.loads(row[0])
+
+                    # Load zone layout
+                    workspace_settings = prefs.get('workspace_settings', {})
+                    saved_layout = workspace_settings.get('zone_layout', {})
+                    if saved_layout and any(saved_layout.values()):
+                        zone_layout = saved_layout
+
+                    # Load font preference
+                    theme_settings = prefs.get('theme_settings', {})
+                    font_selector = theme_settings.get('font_selector', '')
+                    if font_selector and font_selector != 'font-system':
+                        font_class = font_selector
+                        font_preload_url = FONT_PRELOAD_MAP.get(font_selector, '')
+
+                    # Load theme preference
+                    theme = theme_settings.get('theme', 'system')
+
+                    # Load column widths
+                    left_width = prefs.get('leftControlWidth', 120)
+                    right_width = prefs.get('rightControlWidth', 120)
+        except Exception as e:
+            logger.warning(f"Could not load user preferences: {e}. Using defaults.")
+
         response = templates.TemplateResponse("user_home.html", {
             "request": request,
             "available_tags": available_tags,
-            "groups": []
+            "groups": [],
+            "zone_layout": zone_layout,
+            "font_class": font_class,
+            "font_preload_url": font_preload_url,
+            "theme": theme,
+            "left_width": left_width,
+            "right_width": right_width,
+            "show_settings": True
         })
 
         # Set cache headers for authenticated content

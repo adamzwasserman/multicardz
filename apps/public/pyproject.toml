@@ -1,7 +1,7 @@
 [project]
 name = "multicardz-public"
 version = "0.1.0"
-description = "MultiCardz Public API - External facing API and documentation"
+description = "multicardz Public API - External facing API and documentation"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.116.2",

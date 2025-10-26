@@ -27,7 +27,7 @@
 
                     {% if cell_cards %}
                         {% for card in cell_cards %}
-                        <div class="card-item" data-card-id="{{ card.id }}">
+                        <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                             <div class="card-content">
                                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                                 <div class="card-header">
@@ -51,7 +51,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
-                    <button class="grid-cell-add-button" onclick="createNewCard('{{ row_tag }}', '{{ col_tag }}')" title="Add card to this cell">+</button>
+                    <button class="grid-cell-add-button" onclick="const cell = this.closest('.grid-cell'); createNewCard((cell && cell.dataset.row) || null, (cell && cell.dataset.col) || null)" title="Add card to this cell">+</button>
                 </div>
                 {% endfor %}
 
@@ -67,7 +67,7 @@
 
                     {% if other_cards %}
                         {% for card in other_cards %}
-                        <div class="card-item" data-card-id="{{ card.id }}">
+                        <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                             <div class="card-content">
                                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                                 <div class="card-header">
@@ -91,7 +91,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
-                    <button class="grid-cell-add-button" onclick="createNewCard('{{ row_tag }}', 'other')" title="Add card to this cell">+</button>
+                    <button class="grid-cell-add-button" onclick="const cell = this.closest('.grid-cell'); createNewCard((cell && cell.dataset.row) || null, (cell && cell.dataset.col) || null)" title="Add card to this cell">+</button>
                 </div>
             </div>
             {% endfor %}
@@ -111,7 +111,7 @@
 
                     {% if other_cards %}
                         {% for card in other_cards %}
-                        <div class="card-item" data-card-id="{{ card.id }}">
+                        <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                             <div class="card-content">
                                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                                 <div class="card-header">
@@ -135,7 +135,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
-                    <button class="grid-cell-add-button" onclick="createNewCard('other', '{{ col_tag }}')" title="Add card to this cell">+</button>
+                    <button class="grid-cell-add-button" onclick="const cell = this.closest('.grid-cell'); createNewCard((cell && cell.dataset.row) || null, (cell && cell.dataset.col) || null)" title="Add card to this cell">+</button>
                 </div>
                 {% endfor %}
 
@@ -151,7 +151,7 @@
 
                     {% if other_other_cards %}
                         {% for card in other_other_cards %}
-                        <div class="card-item" data-card-id="{{ card.id }}">
+                        <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                             <div class="card-content">
                                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                                 <div class="card-header">
@@ -175,7 +175,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
-                    <button class="grid-cell-add-button" onclick="createNewCard('other', 'other')" title="Add card to this cell">+</button>
+                    <!-- No add button in other/other cell - cards with no tags can't be filtered into dimensional view -->
                 </div>
             </div>
         </div>
@@ -201,7 +201,7 @@
 
                     {% if col_cards %}
                         {% for card in col_cards %}
-                        <div class="card-item" data-card-id="{{ card.id }}">
+                        <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                             <div class="card-content">
                                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                                 <div class="card-header">
@@ -225,7 +225,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
-                    <button class="grid-cell-add-button" onclick="createNewCard(null, '{{ col_tag }}')" title="Add card to this cell">+</button>
+                    <button class="grid-cell-add-button" onclick="const cell = this.closest('.grid-cell'); createNewCard((cell && cell.dataset.row) || null, (cell && cell.dataset.col) || null)" title="Add card to this cell">+</button>
                 </div>
                 {% endfor %}
 
@@ -240,7 +240,7 @@
 
                     {% if other_cards %}
                         {% for card in other_cards %}
-                        <div class="card-item" data-card-id="{{ card.id }}">
+                        <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                             <div class="card-content">
                                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                                 <div class="card-header">
@@ -264,7 +264,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
-                    <button class="grid-cell-add-button" onclick="createNewCard(null, 'other')" title="Add card to this cell">+</button>
+                    <!-- No add button in other column - cards with no column tags can't be filtered into dimensional view -->
                 </div>
             </div>
         </div>
@@ -285,7 +285,7 @@
 
                     {% if row_cards %}
                         {% for card in row_cards %}
-                        <div class="card-item" data-card-id="{{ card.id }}">
+                        <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                             <div class="card-content">
                                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                                 <div class="card-header">
@@ -309,7 +309,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
-                    <button class="grid-cell-add-button" onclick="createNewCard('{{ row_tag }}', null)" title="Add card to this cell">+</button>
+                    <button class="grid-cell-add-button" onclick="const cell = this.closest('.grid-cell'); createNewCard((cell && cell.dataset.row) || null, (cell && cell.dataset.col) || null)" title="Add card to this cell">+</button>
                 </div>
             </div>
             {% endfor %}
@@ -327,7 +327,7 @@
 
                     {% if other_cards %}
                         {% for card in other_cards %}
-                        <div class="card-item" data-card-id="{{ card.id }}">
+                        <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                             <div class="card-content">
                                 <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                                 <div class="card-header">
@@ -351,7 +351,7 @@
                     {% else %}
                         <div class="empty-cell">∅</div>
                     {% endif %}
-                    <button class="grid-cell-add-button" onclick="createNewCard('other', null)" title="Add card to this cell">+</button>
+                    <!-- No add button in other row - cards with no row tags can't be filtered into dimensional view -->
                 </div>
             </div>
         </div>
@@ -361,7 +361,7 @@
         <div class="dimensional-grid zero-dimensional {% if show_expanded %}cards-expanded{% endif %} {% if show_colors %}show-colors{% endif %}" data-palette="{{ color_palette|default('muji') }}">
             <div class="grid-cell" data-row="all" data-col="all">
                 {% for card in cards %}
-                <div class="card-item" data-card-id="{{ card.id }}">
+                <div class="card-item" data-card-id="{{ card.id }}" draggable="true">
                     <div class="card-content">
                         <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                         <div class="card-header">
@@ -382,7 +382,7 @@
                     </div>
                 </div>
                 {% endfor %}
-                <button class="grid-cell-add-button" onclick="createNewCard(null, null)" title="Add card to this cell">+</button>
+                <button class="grid-cell-add-button" onclick="const cell = this.closest('.grid-cell'); createNewCard(cell ? cell.dataset.row : null, cell ? cell.dataset.col : null)" title="Add card to this cell">+</button>
             </div>
         </div>
     {% endif %}

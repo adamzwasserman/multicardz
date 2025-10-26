@@ -19,6 +19,9 @@ from .routes import webhooks  # Phase 10: Conversion Integration
 from .routes import funnel  # Phase 10: Funnel Analytics
 from .routes import ab_testing  # A/B Testing API
 
+# Import shared routes from user app (monorepo code reuse)
+from ..user.routes.cards_api import router as cards_router
+
 # Import middleware
 from .middleware.ab_test_middleware import ABTestMiddleware
 
@@ -104,6 +107,7 @@ def create_app() -> FastAPI:
     app.include_router(webhooks.router)  # Phase 10: Conversion Integration
     app.include_router(funnel.router)  # Phase 10: Funnel Analytics
     app.include_router(ab_testing.router)  # A/B Testing API
+    app.include_router(cards_router)  # Cards API (shared from user app)
 
     return app
 

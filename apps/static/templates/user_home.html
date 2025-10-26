@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="spatial-grid" id="spatialGrid"
+<div class="spatial-grid row-4-collapsed" id="spatialGrid"
      {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
-     {% if user_id %}data-user="{{ user_id }}"{% endif %}>
+     {% if user_id %}data-user="{{ user_id }}"{% endif %}
+     style="grid-template-columns: {{ left_width }}px 1fr {{ right_width }}px;">
     <!-- Row 1: Tag Management (Middle Column Only) -->
     <button class="collapse-toggle collapse-row1" onclick="toggleRow(1)" title="Toggle Row 1" aria-label="Toggle row 1">
         <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
@@ -107,13 +108,15 @@
                 </div>
 
                 <!-- System Tags Cloud -->
-                <div class="cloud cloud-system">
+                <div class="cloud cloud-system"
+                     data-cloud-type="system">
                     <div class="cloud-title cloud-title-system">
-                        system tags<span class="tag-count">(2)</span>
+                        system tags<span class="tag-count">(3)</span>
                     </div>
                     <div class="tags-wrapper">
                         <span class="tag tag-system" data-type="system-tag" draggable="true">Priority</span>
                         <span class="tag tag-system" data-type="system-tag" draggable="true">Archive</span>
+                        <span class="tag tag-system tag-empty" data-tag="EMPTY" data-type="system-tag" draggable="true">EMPTY (no tags)</span>
                     </div>
                 </div>
             </div>
@@ -148,6 +151,7 @@
                 <div class="drop-zone filter-subzone union-zone"
                      id="union_tags"
                      data-zone-type="union"
+                     data-behavior="union"
                      data-accepts="tags,group-tags"
 >
                     <span class="zone-label">SHOW cards with these tags</span>
@@ -163,6 +167,7 @@
                 <div class="drop-zone filter-subzone intersection-zone"
                      id="intersection_tags"
                      data-zone-type="intersection"
+                     data-behavior="intersection"
                      data-accepts="tags,group-tags"
 >
                     <span class="zone-label">FILTER cards by these tags</span>
@@ -202,6 +207,22 @@
              ondragleave="this.classList.remove('zone-drag-over')"
              ondrop="if(event.dataTransfer.types.includes('text/zone')) { handleZoneDrop(event, this); }">
             <!-- Drop zones accept both tags and can be dragged to move -->
+            <!-- Default layout: column first, then row -->
+            <div class="drop-zone column-zone"
+                 id="columns"
+                 data-zone-type="column"
+                 data-accepts="tags,group-tags"
+                 draggable="true"
+                 ondragstart="event.dataTransfer.setData('text/zone', 'column')">
+                <div class="zone-drag-handle" title="Drag to move zone">
+                    <span class="drag-grip">⋮⋮</span>
+                </div>
+                <span class="zone-label">columns</span>
+                <div class="tag-collection" id="column-tags-container"></div>
+                <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
+                    <span class="drag-grip">⋮⋮</span>
+                </div>
+            </div>
             <div class="drop-zone row-zone"
                  id="rows"
                  data-zone-type="row"
@@ -222,8 +243,7 @@
 
     <div class="card-display">
         <div class="card-container" id="cardContainer">
-            <!-- Cards will be populated by JavaScript based on checkbox state and active filters -->
-            <p id="emptyStateMessage">No cards to display</p>
+            <!-- Cards will be populated by JavaScript - starts empty to avoid layout shift -->
         </div>
     </div>
 
@@ -233,27 +253,12 @@
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
              ondragleave="this.classList.remove('zone-drag-over')"
              ondrop="if(event.dataTransfer.types.includes('text/zone')) { handleZoneDrop(event, this); }">
-            <!-- Drop zones accept both tags and can be dragged to move -->
-            <div class="drop-zone column-zone"
-                 id="columns"
-                 data-zone-type="column"
-                 data-accepts="tags,group-tags"
-                 draggable="true"
-                 ondragstart="event.dataTransfer.setData('text/zone', 'column')">
-                <div class="zone-drag-handle" title="Drag to move zone">
-                    <span class="drag-grip">⋮⋮</span>
-                </div>
-                <span class="zone-label">columns</span>
-                <div class="tag-collection" id="column-tags-container"></div>
-                <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
-                    <span class="drag-grip">⋮⋮</span>
-                </div>
-            </div>
+            <!-- Right control area - empty by default -->
         </div>
     </div>
 
     <!-- Row 4 collapse toggle - positioned outside collapsible area -->
-    <button class="collapse-toggle collapse-row4" onclick="toggleRow(4)" title="Toggle Row 4" aria-label="Toggle row 4">
+    <button class="collapse-toggle collapse-row4 is-collapsed" onclick="toggleRow(4)" title="Toggle Row 4" aria-label="Toggle row 4">
         <svg class="chevron chevron-down" width="16" height="16" viewBox="0 0 16 16">
             <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -261,7 +266,7 @@
 
 
     <!-- Row 4: Bottom Area (Middle Column Only) -->
-    <div class="bottom-control collapsible-row row-4">
+    <div class="bottom-control collapsible-row row-4 collapsed">
         <!-- Control areas are DROP TARGETS for zones -->
         <div class="control-area-container zone-container"
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"

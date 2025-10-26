@@ -19,10 +19,125 @@ function handleZoneDrop(event, container) {
       draggedZone = document.querySelector('.' + zoneType + '-zone');
     }
 
-    if (draggedZone && !container.contains(draggedZone)) {
+    if (draggedZone) {
+      // Move zone to the container (even if already there - this reorders to end)
       container.appendChild(draggedZone);
+
+      // Save the new zone layout
+      saveZoneLayout();
     }
   }
+}
+
+// Save zone layout to preferences
+function saveZoneLayout() {
+  const layout = {
+    top: [],
+    left: [],
+    right: [],
+    bottom: []
+  };
+
+  // Map containers to layout keys
+  const containerMap = {
+    '.top-control': 'top',
+    '.left-control': 'left',
+    '.right-control': 'right',
+    '.bottom-control': 'bottom'
+  };
+
+  // Collect zones from each area
+  Object.entries(containerMap).forEach(([containerSelector, key]) => {
+    const container = document.querySelector(containerSelector);
+    if (container) {
+      const controlAreaContainer = container.querySelector('.control-area-container');
+      if (controlAreaContainer) {
+        // Only get direct children zones, not nested subzones
+        const zones = controlAreaContainer.querySelectorAll(':scope > [data-zone-type]');
+        zones.forEach(zone => {
+          const zoneType = zone.dataset.zoneType;
+          if (zoneType && zoneType !== 'tag-cloud') {
+            layout[key].push(zoneType);
+          }
+        });
+      }
+    }
+  });
+
+  fetch('/api/user/preferences', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ zoneLayout: layout })
+  }).catch(err => console.error('Failed to save zone layout:', err));
+}
+
+// Load and apply saved zone layout
+function loadZoneLayout() {
+  fetch('/api/user/preferences')
+    .then(res => res.json())
+    .then(prefs => {
+      // Use saved layout or default layout
+      let layout = prefs.zoneLayout;
+
+      // Default layout matches HTML initial state
+      const defaultLayout = {
+        left: ['column', 'row'],
+        top: ['filter'],
+        right: [],
+        bottom: []
+      };
+
+      // Check if layout is empty (all arrays empty or no layout saved)
+      const isEmpty = !layout ||
+        (layout.top.length === 0 && layout.left.length === 0 &&
+         layout.right.length === 0 && layout.bottom.length === 0);
+
+      if (isEmpty) {
+        layout = defaultLayout;
+      }
+
+      // Check if layout matches default - if so, skip repositioning to avoid layout shift
+      const isDefault = layout.left.length === 2 && layout.left[0] === 'column' && layout.left[1] === 'row' &&
+                       layout.top.length === 1 && layout.top[0] === 'filter' &&
+                       layout.right.length === 0 && layout.bottom.length === 0;
+
+      if (isDefault) {
+        // Layout matches HTML default - no need to reposition zones
+        return;
+      }
+
+      // Non-default layout - apply it
+      const containerMap = {
+        'top': '.top-control',
+        'left': '.left-control',
+        'right': '.right-control',
+        'bottom': '.bottom-control'
+      };
+
+      // Apply layout for each area
+      Object.entries(layout).forEach(([area, zoneTypes]) => {
+        const containerSelector = containerMap[area];
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        const controlAreaContainer = container.querySelector('.control-area-container');
+        if (!controlAreaContainer) return;
+
+        // Move zones in the specified order
+        zoneTypes.forEach(zoneType => {
+          let zone;
+          if (zoneType === 'filter') {
+            zone = document.querySelector('.filter-zone-container[data-zone-type="filter"]');
+          } else {
+            zone = document.querySelector(`.${zoneType}-zone`);
+          }
+          if (zone) {
+            controlAreaContainer.appendChild(zone);
+          }
+        });
+      });
+    })
+    .catch(err => console.error('Failed to load zone layout:', err));
 }
 
 // Toggle AI tags cloud visibility
@@ -153,6 +268,7 @@ async function createTag(tagName, cloudType = 'user') {
 
 // Create new card with tags from zones or from specific grid cell
 async function createNewCard(rowTag = null, colTag = null) {
+  console.log('[DEBUG] createNewCard called with:', { rowTag, colTag });
   let tagNames = [];
   let tagIds = [];
 
@@ -160,6 +276,20 @@ async function createNewCard(rowTag = null, colTag = null) {
   if (rowTag || colTag) {
     if (rowTag && rowTag !== 'other') tagNames.push(rowTag);
     if (colTag && colTag !== 'other') tagNames.push(colTag);
+
+    console.log('[DEBUG] After adding row/col tags:', { tagNames });
+
+    // Look up tag IDs for the row/col tags from the tag cloud
+    const rowColTagIds = [];
+    for (const tagName of tagNames) {
+      const tagElement = document.querySelector(`.tag[data-tag="${tagName}"]`);
+      if (tagElement) {
+        const tagId = tagElement.getAttribute('data-tag-id');
+        if (tagId) rowColTagIds.push(tagId);
+      }
+    }
+
+    console.log('[DEBUG] Row/col tag IDs:', rowColTagIds);
 
     // Also include any filter tags from union/intersection zones
     const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'));
@@ -169,8 +299,12 @@ async function createNewCard(rowTag = null, colTag = null) {
     const filterTagNames = filterTags.map(t => t.getAttribute('data-tag')).filter(Boolean);
     const filterTagIds = filterTags.map(t => t.getAttribute('data-tag-id')).filter(Boolean);
 
+    console.log('[DEBUG] Filter tags:', { filterTagNames, filterTagIds });
+
     tagNames = [...new Set([...tagNames, ...filterTagNames])];
-    tagIds = filterTagIds;
+    tagIds = [...new Set([...rowColTagIds, ...filterTagIds])];
+
+    console.log('[DEBUG] Final tags for new card:', { tagNames, tagIds });
   } else {
     // Legacy behavior: use union/intersection zone tags only
     const unionTags = Array.from(document.querySelectorAll('[data-zone-type="union"] .tag'));
@@ -183,12 +317,16 @@ async function createNewCard(rowTag = null, colTag = null) {
 
   const cardId = crypto.randomUUID();
 
+  console.log('[DEBUG] Creating card with tag_ids:', tagIds);
+
   try {
     const response = await fetch('/api/cards/create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: 'Untitled', tag_ids: tagIds })
     });
+
+    console.log('[DEBUG] API response status:', response.status);
 
     if (!response.ok) {
       const error = await response.json();
@@ -198,6 +336,7 @@ async function createNewCard(rowTag = null, colTag = null) {
     }
 
     const result = await response.json();
+    console.log('[DEBUG] Card created successfully:', result);
     const createdCardId = result.card_id || cardId;
 
     // Trigger re-render to update dimensional grid with new card
@@ -324,6 +463,74 @@ function initializeApp() {
     }
   });
 
+  // Card cell move handling
+  window.addEventListener('cardCellMove', async (e) => {
+    const { cardId, sourceRow, sourceCol, destRow, destCol } = e.detail;
+
+    // Get current row/column tags from zones
+    const rowZone = document.querySelector('[data-zone-type="row"]');
+    const colZone = document.querySelector('[data-zone-type="column"]');
+
+    const rowTags = Array.from(rowZone?.querySelectorAll('[data-tag]') || [])
+      .map(t => t.dataset.tag);
+    const colTags = Array.from(colZone?.querySelectorAll('[data-tag]') || [])
+      .map(t => t.dataset.tag);
+
+    const tagsToRemove = [];
+    const tagsToAdd = [];
+
+    // Handle row changes
+    if (sourceRow !== destRow) {
+      if (sourceRow && sourceRow !== 'other' && rowTags.includes(sourceRow)) {
+        tagsToRemove.push(sourceRow);
+      }
+      if (destRow && destRow !== 'other') {
+        tagsToAdd.push(destRow);
+      }
+    }
+
+    // Handle column changes
+    if (sourceCol !== destCol) {
+      if (sourceCol && sourceCol !== 'other' && colTags.includes(sourceCol)) {
+        tagsToRemove.push(sourceCol);
+      }
+      if (destCol && destCol !== 'other') {
+        tagsToAdd.push(destCol);
+      }
+    }
+
+    // Execute tag changes
+    for (const tagName of tagsToRemove) {
+      const tagElement = document.querySelector(`[data-tag="${tagName}"][data-tag-id]`);
+      const tagId = tagElement?.dataset.tagId;
+      if (tagId) {
+        await fetch('/api/cards/remove-tag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ card_id: cardId, tag_id: tagId })
+        });
+      }
+    }
+
+    for (const tagName of tagsToAdd) {
+      const tagElement = document.querySelector(`[data-tag="${tagName}"][data-tag-id]`);
+      const tagId = tagElement?.dataset.tagId;
+      if (tagId) {
+        await fetch('/api/cards/add-tag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ card_id: cardId, tag_id: tagId })
+        });
+      }
+    }
+
+    // Trigger re-render
+    if (window.dragDropSystem) {
+      window.dragDropSystem.invalidateCache();
+      window.dragDropSystem.updateStateAndRender();
+    }
+  });
+
   // Wait for drag-drop system with exponential backoff
   const initDragDrop = (attempt = 0) => {
     if (window.dragDropSystem) {
@@ -373,7 +580,13 @@ function initializeColumnResize() {
     .then(prefs => {
       const leftWidth = prefs.leftControlWidth || 120;
       const rightWidth = prefs.rightControlWidth || 120;
-      grid.style.gridTemplateColumns = `${leftWidth}px 1fr ${rightWidth}px`;
+
+      // Only set grid columns if not already set server-side (to avoid layout shift)
+      const currentColumns = grid.style.gridTemplateColumns;
+      const targetColumns = `${leftWidth}px 1fr ${rightWidth}px`;
+      if (currentColumns !== targetColumns) {
+        grid.style.gridTemplateColumns = targetColumns;
+      }
 
       // Apply advancedView preference
       const advancedViewCheckbox = document.getElementById('advancedView');
@@ -389,9 +602,32 @@ function initializeColumnResize() {
         if (fontSelector) {
           fontSelector.value = prefs.fontSelector;
         }
-        document.body.className = document.body.className.replace(/font-\w+/g, '');
-        if (prefs.fontSelector !== 'font-system') {
-          document.body.classList.add(prefs.fontSelector);
+
+        // Only apply font if not already set server-side (to avoid layout shift)
+        const currentFontClass = Array.from(document.body.classList).find(c => c.startsWith('font-'));
+        const targetFontClass = prefs.fontSelector !== 'font-system' ? prefs.fontSelector : null;
+
+        if (currentFontClass !== targetFontClass) {
+          document.body.className = document.body.className.replace(/font-\w+/g, '');
+          if (targetFontClass) {
+            document.body.classList.add(targetFontClass);
+          }
+        }
+      }
+
+      // Apply theme preference
+      if (prefs.theme) {
+        const themeRadio = document.getElementById('theme-' + prefs.theme);
+        if (themeRadio) {
+          themeRadio.checked = true;
+        }
+      }
+
+      // Apply card options
+      if (prefs.expandNewCards !== undefined) {
+        const expandNewCardsCheckbox = document.getElementById('expandNewCards');
+        if (expandNewCardsCheckbox) {
+          expandNewCardsCheckbox.checked = prefs.expandNewCards;
         }
       }
     })
@@ -483,15 +719,72 @@ function loadCollapsedRows() {
     .catch(err => console.error('Failed to load collapsed rows:', err));
 }
 
+// Settings drawer functions
+function openSettingsDrawer(event) {
+  if (event) event.stopPropagation();
+  const drawer = document.getElementById('settingsDrawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (drawer && overlay) {
+    drawer.classList.add('open');
+    overlay.style.display = 'block';
+  }
+}
+
+function closeSettingsDrawer() {
+  const drawer = document.getElementById('settingsDrawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (drawer && overlay) {
+    drawer.classList.remove('open');
+    overlay.style.display = 'none';
+  }
+}
+
+function changeFontFromSelect(fontClass) {
+  // Apply font class to body
+  document.body.className = document.body.className.replace(/font-\w+/g, '');
+  if (fontClass !== 'font-system') {
+    document.body.classList.add(fontClass);
+  }
+
+  // Save preference
+  fetch('/api/user/preferences', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fontSelector: fontClass })
+  }).catch(err => console.error('Failed to save font preference:', err));
+}
+
+function saveThemeChoice(theme) {
+  // Save theme preference
+  fetch('/api/user/preferences', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ theme: theme })
+  }).catch(err => console.error('Failed to save theme preference:', err));
+}
+
+function saveCardOptions() {
+  const expandNewCards = document.getElementById('expandNewCards');
+  if (expandNewCards) {
+    fetch('/api/user/preferences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ expandNewCards: expandNewCards.checked })
+    }).catch(err => console.error('Failed to save card options:', err));
+  }
+}
+
 // Run when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     initializeApp();
     initializeColumnResize();
     loadCollapsedRows();
+    loadZoneLayout();
   });
 } else {
   initializeApp();
   initializeColumnResize();
   loadCollapsedRows();
+  loadZoneLayout();
 }

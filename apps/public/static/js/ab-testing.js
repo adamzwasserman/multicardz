@@ -15,8 +15,8 @@
      */
     async function initABTest() {
         // Get or create session ID (from analytics.js)
-        const sessionId = window.MulticardzAnalytics ?
-            window.MulticardzAnalytics().sessionId :
+        const sessionId = window.multicardzAnalytics ?
+            window.multicardzAnalytics().sessionId :
             localStorage.getItem('multicardz_session_id');
 
         if (!sessionId) {
@@ -162,7 +162,7 @@
     }
 
     // Expose for debugging
-    window.MulticardzABTest = {
+    window.multicardzABTest = {
         init: initABTest
     };
 

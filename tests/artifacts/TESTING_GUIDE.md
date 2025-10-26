@@ -1,4 +1,4 @@
-# MultiCardz™ Drag-Drop Testing Guide
+# multicardz™ Drag-Drop Testing Guide
 
 ## ✅ Automated Tests (PASSED)
 
@@ -34,7 +34,7 @@ Navigate to: `http://localhost:8011`
 
 #### Basic Functionality
 - [ ] Page loads without errors
-- [ ] Console shows "MultiCardz™ drag-drop system initialized"
+- [ ] Console shows "multicardz™ drag-drop system initialized"
 - [ ] No JavaScript errors in console
 
 #### Drag-Drop Interaction (Once Database Connected)

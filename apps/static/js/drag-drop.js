@@ -209,6 +209,9 @@ class DropTargetRegistry {
     this.register('tag-group', 'tag-cloud', new GroupToCloudHandler(this.system));
     this.register('tag-group', 'drop-zone', new GroupToZoneHandler(this.system));
     this.register('tag-group', 'card-tags', new GroupToCardHandler(this.system));
+
+    // Card handlers
+    this.register('card', 'matrix-cell', new CardToCellHandler(this.system));
   }
 }
 
@@ -232,7 +235,7 @@ class TagToCloudHandler extends DropHandler {
     const cloudType = dropElement.dataset.cloudType;
 
     // User and AI tags can both go to user cloud if preference is set
-    if (cloudType === 'user') return true;
+    if (cloudType === 'user') return tagType === 'user-tag' || tagType === 'ai-tag';
     if (cloudType === 'ai') return tagType === 'ai-tag';
     if (cloudType === 'system') return tagType === 'system-tag';
     if (cloudType === 'group') return tagType === 'group-tag';
@@ -379,7 +382,53 @@ class TagToCardHandler extends DropHandler {
   }
 
   requiresRerender() {
-    return false; // No card re-render needed
+    return true; // Cards may need to move to different grid cells based on new tags
+  }
+}
+
+/**
+ * Card → Grid Cell Handler
+ * MOVE card to different grid cell, UPDATE tags based on row/column
+ */
+class CardToCellHandler extends DropHandler {
+  constructor(system) {
+    super();
+    this.system = system;
+  }
+
+  canHandle(dragType, dropType, dragElement, dropElement) {
+    return dragType === 'card' && dropType === 'matrix-cell';
+  }
+
+  validate(dragElement, dropElement) {
+    const sourceCell = dragElement.closest('.grid-cell');
+    return sourceCell !== dropElement; // Can't drop in same cell
+  }
+
+  async handleDrop(event, dropElement, draggedElements) {
+    event.preventDefault();
+    dropElement.classList.remove('drag-over');
+
+    const card = draggedElements[0];
+    const sourceCell = card.closest('.grid-cell');
+
+    window.dispatchEvent(new CustomEvent('cardCellMove', {
+      detail: {
+        cardId: card.dataset.cardId,
+        sourceRow: sourceCell?.dataset.row,
+        sourceCol: sourceCell?.dataset.col,
+        destRow: dropElement.dataset.row,
+        destCol: dropElement.dataset.col
+      }
+    }));
+  }
+
+  mutatesTagsInPlay() {
+    return false; // Does not affect zone tags
+  }
+
+  requiresRerender() {
+    return true; // Card needs to move to new cell
   }
 }
 
@@ -777,6 +826,19 @@ class SpatialDragDrop {
       }
     });
 
+    // Card dragging
+    tagContainer.addEventListener('dragstart', (e) => {
+      if (e.target.matches('.card-item')) {
+        this.handleCardDragStart(e);
+      }
+    }, true); // Capture phase
+
+    tagContainer.addEventListener('dragend', (e) => {
+      if (e.target.matches('.card-item')) {
+        this.handleCardDragEnd(e);
+      }
+    });
+
     // Set draggable on all tags and add ARIA
     document.querySelectorAll('[data-tag]').forEach(tag => {
       tag.draggable = true;
@@ -824,6 +886,27 @@ class SpatialDragDrop {
       el.setAttribute('aria-grabbed', 'false');
     });
     this.draggedElements = [];
+  }
+
+  // Handle card drag start
+  handleCardDragStart(event) {
+    const card = event.target.closest('.card-item');
+    if (!card) return;
+
+    card.classList.add('dragging');
+    this.draggedElements = [card];
+
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+    }
+  }
+
+  // Handle card drag end
+  handleCardDragEnd(event) {
+    const card = event.target.closest('.card-item');
+    if (!card) return;
+
+    card.classList.remove('dragging');
   }
 
   // Handle tag click for selection
@@ -900,6 +983,9 @@ class SpatialDragDrop {
     // Set new timer
     this.renderDebounceTimer = setTimeout(async () => {
       const tagsInPlay = this.deriveStateFromDOM();
+
+      // DEBUG: Log zone state
+      console.log('[DEBUG] Zones state:', JSON.stringify(tagsInPlay.zones, null, 2));
 
       // Update display
       const tagsField = document.getElementById('tagsInPlay');

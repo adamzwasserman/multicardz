@@ -1,5 +1,5 @@
 /**
- * MultiCardz Conversion Tracking JavaScript
+ * multicardz Conversion Tracking JavaScript
  *
  * Tracks conversion funnel progression:
  * - view: Page loaded

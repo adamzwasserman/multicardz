@@ -1,9 +1,9 @@
 #!/bin/bash
-# Setup Python 3.13 with JIT for MultiCardz Development Environment
+# Setup Python 3.13 with JIT for multicardz Development Environment
 
 set -e  # Exit on any error
 
-echo "🐍 Setting up Python 3.13 with JIT for MultiCardz™"
+echo "🐍 Setting up Python 3.13 with JIT for multicardz™"
 echo "=================================================="
 
 # Check if running on macOS
@@ -213,7 +213,7 @@ echo "⚡ Configuring JIT environment variables..."
 
 # Create .env file for JIT configuration
 cat > .env << EOF
-# Python 3.13 JIT Configuration for MultiCardz™
+# Python 3.13 JIT Configuration for multicardz™
 PYTHON_JIT=1
 PYTHON_JIT_OPTIMIZE_LEVEL=3
 PYTHON_JIT_THRESHOLD_HOT=50
@@ -231,9 +231,9 @@ EOF
 # Create activation script that sets JIT environment
 cat > activate_jit.sh << 'EOF'
 #!/bin/bash
-# Activate MultiCardz development environment with JIT
+# Activate multicardz development environment with JIT
 
-echo "🚀 Activating MultiCardz™ JIT Development Environment"
+echo "🚀 Activating multicardz™ JIT Development Environment"
 echo "=================================================="
 
 # Load environment variables

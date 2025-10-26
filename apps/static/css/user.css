@@ -1,4 +1,66 @@
-/* MultiCardz Spatial Interface CSS - 4×3 Grid System */
+/* multicardz Spatial Interface CSS - 4×3 Grid System */
+
+/* Global box-sizing to prevent layout shift from padding/borders */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* Font Face Declarations - Self-hosted fonts */
+@font-face {
+    font-family: 'Inconsolata';
+    src: url('/static/fonts/inconsolata-regular.woff2') format('woff2');
+    font-weight: 200;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Lato';
+    src: url('/static/fonts/lato-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Libre Franklin';
+    src: url('/static/fonts/librefranklin-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Merriweather Sans';
+    src: url('/static/fonts/merriweathersans-regular.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Mulish';
+    src: url('/static/fonts/mulish-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Roboto';
+    src: url('/static/fonts/roboto-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: 'Work Sans';
+    src: url('/static/fonts/worksans-regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
 
 /* Base body styling */
 body {
@@ -1367,12 +1429,20 @@ body {
 
     /* Multi-zone layout */
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 12px;
     height: 100%;
-    align-items: flex-start;
+    align-items: stretch;
     justify-content: flex-start;
     padding: 8px;
+}
+
+/* Drop zones in left/right control areas share space equally */
+.left-control .control-area-container > .drop-zone,
+.right-control .control-area-container > .drop-zone {
+    flex: 1;
+    height: auto;
+    min-height: 100px;
 }
 
 .control-area-container.drag-over {
@@ -1742,6 +1812,13 @@ body {
     border-radius: 1px;
 }
 
+.tag-empty {
+    background-color: light-dark(#fef3c7, var(--color-neutral-400));
+    border: 1px dashed light-dark(#f59e0b, var(--color-neutral-600));
+    color: light-dark(#92400e, var(--color-text-primary));
+    font-style: italic;
+}
+
 .input-wrapper {
     display: flex;
     gap: 8px;
@@ -1999,6 +2076,7 @@ body {
     width: 100%;
     max-width: 100%;
     overflow: wrap;
+    min-height: 260px; /* Reserve space to prevent layout shift when cards load */
 }
 
 /* TRUE MUJI AESTHETIC - Pure Minimalism */
@@ -2028,18 +2106,27 @@ body {
     border: 1px solid light-dark(#d4d4d8, var(--color-neutral-300));
     border-radius: 4px;
     padding: 8px;
-    margin: 4px;
-    max-width: 300px;
-    width: 100%;
+    margin: 0;
+    width: 300px;
+    min-height: 120px;
+    max-height: 120px;
+    overflow: hidden;
     box-sizing: border-box;
     transition: all 0.2s ease;
     font-family: inherit;
+    flex: 0 0 300px;
+    cursor: move;
 }
 
 .card-item:hover {
     border-color: light-dark(#a4a4a7, var(--color-neutral-400));
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
+}
+
+.card-item.dragging {
+    opacity: 0.5;
+    cursor: move;
 }
 
 /* Lesson card specific styles */
@@ -2367,9 +2454,9 @@ body {
     display: inline-block;
     background: light-dark(#e8e8e8, var(--color-neutral-300));
     color: light-dark(#666, var(--color-text-secondary));
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 400;
-    padding: 3px 8px;
+    padding: 4px 8px;
     margin: 2px 4px 2px 0;
     border-radius: 2px; /* No rounded corners - Muji style */
     border: none;
@@ -2461,38 +2548,43 @@ body.font-source-sans {
 
 .font-avenir,
 body.font-avenir {
-    font-family: 'Mulish', 'Avenir', 'Avenir Next', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', sans-serif !important;
+    font-family: 'Mulish' !important;
 }
 
 .font-akzidenz,
 body.font-akzidenz {
-    font-family: 'Work Sans', 'Akzidenz-Grotesk', 'IBM Plex Sans', Arial, 'Helvetica Neue', sans-serif !important;
+    font-family: 'Work Sans' !important;
 }
 
 .font-sanfrancisco,
 body.font-sanfrancisco {
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'San Francisco', 'SF Pro Display', system-ui, 'Segoe UI', sans-serif !important;
+    font-family: 'Roboto' !important;
 }
 
 .font-roboto,
 body.font-roboto {
-    font-family: 'Roboto', 'Open Sans', system-ui, 'Segoe UI', 'Liberation Sans', sans-serif !important;
+    font-family: 'Roboto' !important;
 }
 
 .font-optima,
 body.font-optima {
-    font-family: 'Lato', 'Optima', 'Montserrat', 'Segoe UI', system-ui, 'Liberation Sans', sans-serif !important;
+    font-family: 'Lato' !important;
+}
+
+.font-lato,
+body.font-lato {
+    font-family: 'Lato' !important;
 }
 
 .font-merriweather,
 body.font-merriweather {
-    font-family: 'Merriweather Sans', 'Open Sans', 'IBM Plex Sans', Georgia, 'Times New Roman', serif !important;
+    font-family: 'Merriweather Sans' !important;
     font-weight: 300 !important;
 }
 
 .font-inconsolata,
 body.font-inconsolata {
-    font-family: 'Inconsolata', 'Consolas', 'Monaco', 'Menlo', 'Courier New', monospace !important;
+    font-family: 'Inconsolata' !important;
     font-weight: 200 !important;
 }
 
@@ -2957,7 +3049,7 @@ body.font-berkeley-mono {
     border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-400));
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
     color: light-dark(var(--color-neutral-700), var(--color-text-primary));
     cursor: pointer;
@@ -3296,6 +3388,11 @@ body.font-berkeley-mono {
     border: 1px solid var(--color-muji-border);
 }
 
+.grid-cell.drag-over {
+    background-color: light-dark(rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.2));
+    border: 2px dashed light-dark(rgb(59, 130, 246), rgb(96, 165, 250));
+}
+
 .empty-cell {
     color: var(--color-text-tertiary);
     font-size: 2rem;
@@ -3598,9 +3695,9 @@ body.font-berkeley-mono {
 }
 
 .card-item .card-tag {
-    font-size: 10px;
-    padding: 2px 4px;
-    margin: 1px;
+    font-size: 11px;
+    padding: 4px 8px;
+    margin: 2px 4px 2px 0;
 }
 
 /* Settings Drawer */
@@ -3619,6 +3716,10 @@ body.font-berkeley-mono {
     z-index: 1000;
     transition: right 0.3s ease;
     display: flex;
+}
+
+.settings-drawer.open {
+    right: 0;
     flex-direction: column;
 }
 

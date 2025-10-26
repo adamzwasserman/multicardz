@@ -34,8 +34,8 @@ def test_html_page():
     <script src="/static/js/analytics.js"></script>
     <script>
         // Initialize analytics on page load
-        if (window.MulticardzAnalytics) {
-            window.analytics = new MulticardzAnalytics();
+        if (window.multicardzAnalytics) {
+            window.analytics = new multicardzAnalytics();
         }
     </script>
 </body>

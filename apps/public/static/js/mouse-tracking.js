@@ -85,7 +85,7 @@
      * @param {object} options - Configuration options
      * @returns {object} Mouse tracking instance
      */
-    function MulticardzMouseTracking(options = {}) {
+    function multicardzMouseTracking(options = {}) {
         // Configuration
         const sampleRate = options.sampleRate || DEFAULT_SAMPLE_RATE_MS;
         const batchSize = options.batchSize || DEFAULT_BATCH_SIZE;
@@ -263,6 +263,6 @@
     }
 
     // Expose to window
-    window.MulticardzMouseTracking = MulticardzMouseTracking;
+    window.multicardzMouseTracking = multicardzMouseTracking;
 
 })(window);
