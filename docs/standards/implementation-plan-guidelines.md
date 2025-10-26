@@ -92,7 +92,7 @@ def mock_external_service():
 
 ### Step 4: Run Red Test
 ```bash
-pytest tests/features/[feature_name].feature -v
+uv run pytest tests/features/[feature_name].feature -v
 # EXPECTED OUTPUT: Tests fail (red state)
 # This validates that tests are actually testing something
 ```
@@ -127,18 +127,18 @@ def implement_feature(
 **Architecture Requirements**:
 - Function-based design (NO classes except Pydantic/SQLAlchemy)
 - Pure set theory operations for filtering
-- No JavaScript except approved WASM bridge
+- No JavaScript except approved spatial manipulation code
 - HTMX for all interactivity
 - Follow patent specifications
 
 ### Step 6: Run Green Test - Block Until 100% Pass
 ```bash
-pytest tests/features/[feature_name].feature -v
+uv run pytest tests/features/[feature_name].feature -v
 # MUST achieve 100% pass rate before proceeding
 # This is a hard quality gate - do not continue with failures
 
 # Also run with coverage
-pytest tests/features/[feature_name].feature --cov=[module] --cov-report=term-missing
+uv run pytest tests/features/[feature_name].feature --cov=[module] --cov-report=term-missing
 # Target: >90% coverage for new code
 ```
 
@@ -320,7 +320,7 @@ Assessment of existing code and identified issues
 
 4. **Run Red Test**
    ```bash
-   pytest tests/features/[feature_name].feature -v
+   uv run pytest tests/features/[feature_name].feature -v
    # Tests fail - red state verified ✓
    ```
 
@@ -334,7 +334,7 @@ Assessment of existing code and identified issues
 
 6. **Run Green Test**
    ```bash
-   pytest tests/features/[feature_name].feature -v
+   uv run pytest tests/features/[feature_name].feature -v
    # All tests pass - 100% success rate ✓
    ```
 
@@ -539,7 +539,7 @@ The mandatory 8-step process ensures proper test-driven development:
 #### Testing Integration Standards
 ```bash
 # Example test execution pattern
-pytest tests/features/[feature_name].feature -v --cov=[module] --cov-report=term-missing
+uv run pytest tests/features/[feature_name].feature -v --cov=[module] --cov-report=term-missing
 # Target: >90% coverage, 100% pass rate
 ```
 
@@ -748,7 +748,7 @@ Every task MUST be reviewed against:
 
 4. **Run Red Test**
    ```bash
-   pytest tests/features/user_authentication.feature -v
+   uv run pytest tests/features/user_authentication.feature -v
    # Tests fail - red state verified ✓
    ```
 
@@ -762,7 +762,7 @@ Every task MUST be reviewed against:
 
 6. **Run Green Test**
    ```bash
-   pytest tests/features/user_authentication.feature -v
+   uv run pytest tests/features/user_authentication.feature -v
    # All tests pass - 100% success rate ✓
    ```
 

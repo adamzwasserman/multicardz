@@ -1,13 +1,21 @@
-{% extends "base_wasm.html" %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="spatial-grid">
+<div class="spatial-grid row-4-collapsed" id="spatialGrid"
+     {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
+     {% if user_id %}data-user="{{ user_id }}"{% endif %}
+     style="grid-template-columns: {{ left_width }}px 1fr {{ right_width }}px;">
     <!-- Row 1: Tag Management (Middle Column Only) -->
-    <div class="debug-group">
+    <button class="collapse-toggle collapse-row1" onclick="toggleRow(1)" title="Toggle Row 1" aria-label="Toggle row 1">
+        <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+    <div class="debug-group collapsible-row row-1" style="position: relative; display: none;">
         <label for="tagsInPlay">tags in play</label>
-        <textarea class="tags-in-play" id="tagsInPlay" placeholder="waiting for zone activity..." readonly rows="8">{"union":[],"intersection":[],"row":[],"column":[]}</textarea>
+        <textarea class="tags-in-play" id="tagsInPlay" placeholder="waiting for zone activity..." aria-label="Tags in play" readonly rows="8">{"union":[],"intersection":[],"exclusion":[],"row":[],"column":[]}</textarea>
     </div>
-    <div class="tag-management">
+    <div class="tag-management collapsible-row row-1" style="position: relative;">
         <div class="clouds-container horizontal" id="cloudsContainer" data-zone-type="tag-cloud" data-accepts="tags,group-tags">
             <!-- User Tags Cloud -->
             <div class="cloud cloud-user"
@@ -19,17 +27,20 @@
                 <div class="tags-wrapper">
                     {% for tag in available_tags %}
                     <span class="tag tag-user"
-                          data-tag="{{ tag }}"
+                          data-tag="{{ tag.name }}"
+                          data-tag-id="{{ tag.id }}"
                           data-type="tag"
                           draggable="true"
-                          id="tag-{{ tag }}"
+                          id="tag-{{ tag.name }}"
+                          style="--tag-index: {{ loop.index0 }}"
 >
-                        {{ tag }}
+                        <span class="tag-color-dot"></span>{{ tag.name }} ({{ tag.count }})
+                        <button class="tag-delete" onclick="deleteTag('{{ tag.id }}', this)" title="Delete tag">×</button>
                     </span>
                     {% endfor %}
                 </div>
                 <div class="input-wrapper">
-                    <input type="text" class="tag-input" placeholder="Add user tag..."
+                    <input type="text" class="tag-input" placeholder="Add user tag..." aria-label="add user tag"
 >
                 </div>
             </div>
@@ -46,29 +57,31 @@
                     <div class="tags-wrapper">
                         <span class="tag tag-ai"
                               data-tag="machine-learning"
+                              data-tag-id="ai-ml"
                               data-type="ai-tag"
                               draggable="true"
 >
                             machine-learning
+                            <button class="tag-delete" onclick="deleteTag('ai-ml', this)" title="Delete tag">×</button>
                         </span>
                         <span class="tag tag-ai"
                               data-tag="data-processing"
+                              data-tag-id="ai-dp"
                               data-type="ai-tag"
                               draggable="true"
 >
                             data-processing
+                            <button class="tag-delete" onclick="deleteTag('ai-dp', this)" title="Delete tag">×</button>
                         </span>
                         <span class="tag tag-ai"
                               data-tag="automation"
+                              data-tag-id="ai-auto"
                               data-type="ai-tag"
                               draggable="true"
 >
                             automation
+                            <button class="tag-delete" onclick="deleteTag('ai-auto', this)" title="Delete tag">×</button>
                         </span>
-                    </div>
-                    <div class="input-wrapper">
-                        <input type="text" class="tag-input" placeholder="Add AI tag..."
->
                     </div>
                 </div>
 
@@ -89,19 +102,21 @@
                         {% endfor %}
                     </div>
                     <div class="input-wrapper">
-                        <input type="text" class="tag-input" placeholder="Add group..."
+                        <input type="text" class="tag-input" placeholder="Add group..." aria-label="Add group"
 >
                     </div>
                 </div>
 
                 <!-- System Tags Cloud -->
-                <div class="cloud cloud-system">
+                <div class="cloud cloud-system"
+                     data-cloud-type="system">
                     <div class="cloud-title cloud-title-system">
-                        system tags<span class="tag-count">(2)</span>
+                        system tags<span class="tag-count">(3)</span>
                     </div>
                     <div class="tags-wrapper">
                         <span class="tag tag-system" data-type="system-tag" draggable="true">Priority</span>
                         <span class="tag tag-system" data-type="system-tag" draggable="true">Archive</span>
+                        <span class="tag tag-system tag-empty" data-tag="EMPTY" data-type="system-tag" draggable="true">EMPTY (no tags)</span>
                     </div>
                 </div>
             </div>
@@ -109,51 +124,19 @@
     </div>
 
     <!-- Row 2: Control Areas (All 3 Columns) -->
-    <div class="universal-control">
-        <h3>universal control</h3>
-        <div class="controls">
+    <button class="collapse-toggle collapse-row2" onclick="toggleRow(2)" title="Toggle Row 2" aria-label="Toggle row 2">
+        <svg class="chevron chevron-up" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M4 10L8 6L12 10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+    <!-- Global settings section removed - controls moved to settings drawer -->
 
-            <div class="database-group">
-                <select id="databaseSelector" class="database-selector"
-                        hx-get="/api/database-options"
-                        hx-trigger="load"
-                        hx-swap="innerHTML"
-                        onchange="switchDatabase(this.value)">
-                    <option value="">Loading databases...</option>
-                </select>
-                <label for="fontSelector">pick a project</label>
-                <!-- <label for="databaseSelector">active database</label>
-                <div class="database-info">
-                    <span id="currentDatabaseInfo"
-                          hx-get="/api/current-database-info"
-                          hx-trigger="load"
-                          hx-swap="innerHTML">Loading...</span>
-                </div> -->
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('start_with_all_cards', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_start_with_all_cards', null, ['number'], [this.checked ? 1 : 0])">
-                <label for="startWithAllCards">start with all cards visible</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('start_with_cards_expanded', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_start_with_cards_expanded', null, ['number'], [this.checked ? 1 : 0])">
-                <label for="startWithCardsExpanded">start with cards expanded</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="updateCheckboxStateWithWasm('show_colors', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_show_colors', null, ['number'], [this.checked ? 1 : 0])">
-                <label for="showColors">show colors on tags/card</label>
-            </div>
-
-
-        </div>
-    </div>
-
-    <div class="top-control">
+    <div class="top-control collapsible-row row-2" style="position: relative;">
         <!-- Control areas are DROP TARGETS for zones -->
         <div class="control-area-container zone-container"
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
              ondragleave="this.classList.remove('zone-drag-over')"
-             ondrop="handleZoneDrop(event, this)">
+             ondrop="if(event.dataTransfer.types.includes('text/zone')) { handleZoneDrop(event, this); }">
             <!-- Filter zone container - NOT a drop zone, just a visual container -->
             <div class="filter-zone-container"
                  id="filter"
@@ -168,9 +151,10 @@
                 <div class="drop-zone filter-subzone union-zone"
                      id="union_tags"
                      data-zone-type="union"
+                     data-behavior="union"
                      data-accepts="tags,group-tags"
 >
-                    <span class="zone-label">Select (ANY matches)</span>
+                    <span class="zone-label">SHOW cards with these tags</span>
                     <div class="tag-collection" id="union-tags-container"></div>
                 </div>
 
@@ -183,12 +167,29 @@
                 <div class="drop-zone filter-subzone intersection-zone"
                      id="intersection_tags"
                      data-zone-type="intersection"
+                     data-behavior="intersection"
                      data-accepts="tags,group-tags"
 >
-                    <span class="zone-label">Filter (ALL required)</span>
+                    <span class="zone-label">FILTER cards by these tags</span>
                     <div class="tag-collection" id="intersection-tags-container"></div>
                 </div>
 
+                <!-- Red Dot Separator -->
+                <div class="zone-separator">
+                    <div class="separator-dot separator-dot-red"></div>
+                </div>
+
+                <!-- Exclusion Drop Zone (NONE) -->
+                <div class="drop-zone filter-subzone exclusion-zone"
+                     id="exclusion_tags"
+                     data-zone-type="exclusion"
+                     data-zone-behavior="exclusion"
+                     data-accepts="tags,group-tags"
+>
+                    <span class="zone-label">HIDE cards with these tags</span>
+                    <div class="tag-collection" id="exclusion-tags-container"></div>
+                </div>
+
                 <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>
@@ -196,106 +197,17 @@
         </div>
     </div>
 
-    <div class="ui-control">
-        <h3>user interface</h3>
-
-        <div class="controls">
-            <!-- Theme Switcher -->
-            <div class="theme-switch-group">
-                <label class="theme-label">theme picker</label>
-                <div class="theme-radio-group">
-                    <div class="theme-radio-item">
-                        <input type="radio" id="theme-system" name="theme" value="system" checked
-                               onclick="document.documentElement.style.colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); if(typeof callWasm !== 'undefined') { callWasm('toggle_dark_mode', null, ['number'], [0]); callWasm('toggle_earth_tones', null, ['number'], [0]); } saveThemeChoice('system');">
-                        <label for="theme-system">system</label>
-                    </div>
-                    <div class="theme-radio-item">
-                        <input type="radio" id="theme-light" name="theme" value="light"
-                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); if(typeof callWasm !== 'undefined') { callWasm('toggle_dark_mode', null, ['number'], [0]); callWasm('toggle_earth_tones', null, ['number'], [0]); } saveThemeChoice('light');">
-                        <label for="theme-light">light</label>
-                    </div>
-                    <div class="theme-radio-item">
-                        <input type="radio" id="theme-dark" name="theme" value="dark"
-                               onclick="document.documentElement.style.colorScheme = 'dark'; document.body.classList.add('dark-mode'); document.body.classList.remove('earth-tones'); if(typeof callWasm !== 'undefined') { callWasm('toggle_dark_mode', null, ['number'], [1]); callWasm('toggle_earth_tones', null, ['number'], [0]); } saveThemeChoice('dark');">
-                        <label for="theme-dark">dark</label>
-                    </div>
-                    <div class="theme-radio-item">
-                        <input type="radio" id="theme-earth" name="theme" value="earth"
-                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.add('earth-tones'); document.body.classList.remove('dark-mode'); if(typeof callWasm !== 'undefined') { callWasm('toggle_earth_tones', null, ['number'], [1]); callWasm('toggle_dark_mode', null, ['number'], [0]); } saveThemeChoice('earth');">
-                        <label for="theme-earth">earth tones</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="font-group">
-                <div class="font-dropdown-wrapper">
-                    <label class="theme-label">font picker</label>
-                    <div class="font-dropdown-current font-inconsolata" tabindex="0">Inconsolata 200</div>
-                    <div class="font-dropdown-options">
-                        <!-- <div class="font-dropdown-option font-berkeley-mono" onclick="callWasm('set_font', null, ['string'], ['berkeley-mono']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Berkeley Mono'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-berkeley-mono';">Berkeley Mono</div> -->
-                        <div class="font-dropdown-option font-inconsolata" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['inconsolata']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Inconsolata 200'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-inconsolata'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-inconsolata'; saveFontChoice('font-inconsolata'); this.parentNode.parentNode.classList.remove('active');">Inconsolata 200</div>
-                        <div class="font-dropdown-option font-optima" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['optima']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Lato'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-optima'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-optima'; saveFontChoice('font-optima'); this.parentNode.parentNode.classList.remove('active');">Lato</div>
-                        <div class="font-dropdown-option font-helvetica" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['helvetica']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Libre Franklin'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-helvetica'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-helvetica'; saveFontChoice('font-helvetica'); this.parentNode.parentNode.classList.remove('active');">Libre Franklin</div>
-                        <div class="font-dropdown-option font-merriweather" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['merriweather']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Merriweather Sans Light'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-merriweather'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-merriweather'; saveFontChoice('font-merriweather'); this.parentNode.parentNode.classList.remove('active');">Merriweather Sans Light</div>
-                        <div class="font-dropdown-option font-avenir" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['avenir']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Mulish'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-avenir'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-avenir'; saveFontChoice('font-avenir'); this.parentNode.parentNode.classList.remove('active');">Mulish</div>
-                        <div class="font-dropdown-option font-sanfrancisco" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['sanfrancisco']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Roboto'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-sanfrancisco'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-sanfrancisco'; saveFontChoice('font-sanfrancisco'); this.parentNode.parentNode.classList.remove('active');">Roboto</div>
-                        <div class="font-dropdown-option font-akzidenz" onclick="if(typeof callWasm !== 'undefined') callWasm('set_font', null, ['string'], ['akzidenz']); this.parentNode.parentNode.querySelector('.font-dropdown-current').textContent = 'Work Sans'; this.parentNode.parentNode.querySelector('.font-dropdown-current').className = 'font-dropdown-current font-akzidenz'; document.body.className = document.body.className.replace(/font-\w+/g, '') + ' font-akzidenz'; saveFontChoice('font-akzidenz'); this.parentNode.parentNode.classList.remove('active');">Work Sans</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="advancedView" onchange="updateCheckboxStateWithWasm('advanced_view', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_advanced_view', null, ['number'], [this.checked ? 1 : 0])">
-                <label for="advancedView">separate user tags / ai tags</label>
-            </div>
-
-            <div class="checkbox-group">
-                <input type="checkbox" id="verticalLayout" onchange="updateCheckboxStateWithWasm('vertical_layout', this.checked); if(typeof callWasm !== 'undefined') callWasm('toggle_vertical_layout', null, ['number'], [this.checked ? 1 : 0])">
-                <label for="verticalLayout">stack tags vertically</label>
-            </div>
-        </div>
-    </div>
+    <!-- User interface section removed - controls moved to settings drawer -->
 
     <!-- Row 3: Main Content (All 3 Columns) -->
-    <div class="left-control">
+    <div class="left-control collapsible-col col-1" style="position: relative;">
         <!-- Control areas are DROP TARGETS for zones -->
         <div class="control-area-container zone-container"
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
              ondragleave="this.classList.remove('zone-drag-over')"
-             ondrop="handleZoneDrop(event, this)">
-            <!-- Drop zones are DRAGGABLE ONLY - NO drop handlers -->
-            <div class="drop-zone row-zone"
-                 id="rows"
-                 data-zone-type="row"
-                 data-accepts="tags,group-tags"
-                 draggable="true"
-                 ondragstart="event.dataTransfer.setData('text/zone', 'row')">
-                <div class="zone-drag-handle" title="Drag to move zone">
-                    <span class="drag-grip">⋮⋮</span>
-                </div>
-                <span class="zone-label">row zone</span>
-                <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
-                    <span class="drag-grip">⋮⋮</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card-display">
-        <p>drag a <em>tag</em> to a <em>zone</em> to see the cards that have that tag</p>
-        <div class="card-container" id="cardContainer">
-            <!-- Cards will be populated by WASM based on checkbox state and active filters -->
-            <p id="emptyStateMessage">No cards to display</p>
-        </div>
-    </div>
-
-    <div class="right-control">
-        <!-- Control areas are DROP TARGETS for zones -->
-        <div class="control-area-container zone-container"
-             ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
-             ondragleave="this.classList.remove('zone-drag-over')"
-             ondrop="handleZoneDrop(event, this)">
-            <!-- Drop zones are DRAGGABLE ONLY - NO drop handlers -->
+             ondrop="if(event.dataTransfer.types.includes('text/zone')) { handleZoneDrop(event, this); }">
+            <!-- Drop zones accept both tags and can be dragged to move -->
+            <!-- Default layout: column first, then row -->
             <div class="drop-zone column-zone"
                  id="columns"
                  data-zone-type="column"
@@ -305,7 +217,23 @@
                 <div class="zone-drag-handle" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>
-                <span class="zone-label">column zone</span>
+                <span class="zone-label">columns</span>
+                <div class="tag-collection" id="column-tags-container"></div>
+                <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
+                    <span class="drag-grip">⋮⋮</span>
+                </div>
+            </div>
+            <div class="drop-zone row-zone"
+                 id="rows"
+                 data-zone-type="row"
+                 data-accepts="tags,group-tags"
+                 draggable="true"
+                 ondragstart="event.dataTransfer.setData('text/zone', 'row')">
+                <div class="zone-drag-handle" title="Drag to move zone">
+                    <span class="drag-grip">⋮⋮</span>
+                </div>
+                <span class="zone-label">rows</span>
+                <div class="tag-collection" id="row-tags-container"></div>
                 <div class="zone-drag-handle zone-drag-handle-right" title="Drag to move zone">
                     <span class="drag-grip">⋮⋮</span>
                 </div>
@@ -313,13 +241,37 @@
         </div>
     </div>
 
-    <!-- Row 4: Bottom Area (Middle Column Only) -->
-    <div class="bottom-control">
+    <div class="card-display">
+        <div class="card-container" id="cardContainer">
+            <!-- Cards will be populated by JavaScript - starts empty to avoid layout shift -->
+        </div>
+    </div>
+
+    <div class="right-control collapsible-col col-3" style="position: relative;">
         <!-- Control areas are DROP TARGETS for zones -->
         <div class="control-area-container zone-container"
              ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
              ondragleave="this.classList.remove('zone-drag-over')"
-             ondrop="handleZoneDrop(event, this)">
+             ondrop="if(event.dataTransfer.types.includes('text/zone')) { handleZoneDrop(event, this); }">
+            <!-- Right control area - empty by default -->
+        </div>
+    </div>
+
+    <!-- Row 4 collapse toggle - positioned outside collapsible area -->
+    <button class="collapse-toggle collapse-row4 is-collapsed" onclick="toggleRow(4)" title="Toggle Row 4" aria-label="Toggle row 4">
+        <svg class="chevron chevron-down" width="16" height="16" viewBox="0 0 16 16">
+            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
+
+
+    <!-- Row 4: Bottom Area (Middle Column Only) -->
+    <div class="bottom-control collapsible-row row-4 collapsed">
+        <!-- Control areas are DROP TARGETS for zones -->
+        <div class="control-area-container zone-container"
+             ondragover="if(event.dataTransfer.types.includes('text/zone')) { event.preventDefault(); this.classList.add('zone-drag-over'); }"
+             ondragleave="this.classList.remove('zone-drag-over')"
+             ondrop="if(event.dataTransfer.types.includes('text/zone')) { handleZoneDrop(event, this); }">
             <p>drag a drop zone here</p>
             <div class="zone-configuration">
                 <!-- Drop zones can be moved here -->
@@ -328,26 +280,6 @@
     </div>
 </div>
 
-<script>
-function handleZoneDrop(event, container) {
-    if(event.dataTransfer.types.includes('text/zone')) {
-        event.preventDefault();
-        container.classList.remove('zone-drag-over');
-
-        const zoneType = event.dataTransfer.getData('text/zone');
-        let draggedZone;
-
-        if(zoneType === 'filter') {
-            draggedZone = document.querySelector('.filter-zone-container[data-zone-type="filter"]');
-        } else {
-            draggedZone = document.querySelector('.' + zoneType + '-zone');
-        }
-
-        if(draggedZone && !container.contains(draggedZone)) {
-            container.appendChild(draggedZone);
-        }
-    }
-}
-</script>
+<!-- Application logic loaded from /static/js/app.js -->
 
 {% endblock %}

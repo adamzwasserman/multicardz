@@ -1,1 +1,1 @@
-"""Integration tests for MultiCardz™ drag-drop system."""
+"""Integration tests for multicardz™ drag-drop system."""

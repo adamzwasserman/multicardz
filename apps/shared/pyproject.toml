@@ -1,7 +1,7 @@
 [project]
 name = "multicardz-shared"
 version = "0.1.0"
-description = "MultiCardz Shared - Common utilities and set theory operations"
+description = "multicardz Shared - Common utilities and set theory operations"
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.0.0",

@@ -1,0 +1,124 @@
+<!-- Navigation Header -->
+<nav class="main-navigation">
+    <div class="nav-container">
+        <div class="brand">
+            <a href="/" class="brand-link">mult<span class="brand-i">i</span>cardz</a>
+        </div>
+        <div class="nav-menu">
+            <ul class="nav-items">
+                {% if show_learning_mode %}
+                <li class="nav-item learning-mode-container">
+                    <div class="learning-mode-menu highlighted-menu">
+                        <label for="navLessonSelector" class="learning-mode-label">Learning Mode:</label>
+                        <input type="hidden" id="completedLessons" name="completed" data-completed-lessons value="[]">
+                        <select id="navLessonSelector" class="nav-lesson-selector"
+                                hx-get="/api/lessons/options"
+                                hx-trigger="load"
+                                hx-swap="innerHTML"
+                                hx-include="#completedLessons"
+                                onchange="switchLesson(this.value)">
+                            <option value="1">Loading lessons...</option>
+                        </select>
+                        <div class="learning-mode-footer">
+                            <a href="#" class="hide-learning-mode" onclick="hideLearningMode()">hide this menu</a>
+                        </div>
+                    </div>
+                </li>
+                {% endif %}
+                <li class="nav-item"><a href="/features">features</a></li>
+                {% if show_projects %}
+                <li class="nav-item projects-menu-container">
+                    <div class="projects-menu">
+                        <a href="#" class="projects-link">projects</a>
+                    </div>
+                </li>
+                {% endif %}
+                <li class="nav-item"><a href="/pricing">pricing</a></li>
+                <li class="nav-item">
+                    <a href="/trial" class="cta-button">start free trial</a>
+                </li>
+                <li class="nav-item user-avatar-item">
+                    <div class="user-avatar"{% if show_settings %} onclick="openSettingsDrawer(event)"{% endif %}>
+                        <svg class="avatar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="10" r="3" fill="currentColor"/>
+                            <path d="M6.5 18.5C6.5 16.5 8.5 15 12 15C15.5 15 17.5 16.5 17.5 18.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% if show_settings %}
+<!-- Settings Drawer -->
+<div class="drawer-overlay" id="drawerOverlay" style="display: none;" onclick="closeSettingsDrawer()"></div>
+<div class="settings-drawer" id="settingsDrawer">
+    <div class="drawer-header">
+        <h3 class="drawer-title">settings</h3>
+        <button class="drawer-close" onclick="closeSettingsDrawer()">×</button>
+    </div>
+    <div class="drawer-content">
+        <div class="settings-section">
+            <h4 class="settings-section-title">account</h4>
+            <div class="settings-item">
+                <input type="email" value="user@example.com" readonly class="settings-input">
+            </div>
+            <div class="settings-item">
+                <a href="/logout" class="settings-button settings-button-logout">logout</a>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h4 class="settings-section-title">appearance</h4>
+            <div class="settings-item">
+                <label>font</label>
+                <select class="settings-select" id="fontSelector" onchange="changeFontFromSelect(this.value)">
+                    <option value="font-system">system sans</option>
+                    <option value="font-inconsolata">inconsolata 200</option>
+                    <option value="font-optima">lato</option>
+                    <option value="font-helvetica">libre franklin</option>
+                    <option value="font-merriweather">merriweather sans light</option>
+                    <option value="font-avenir">mulish</option>
+                    <option value="font-sanfrancisco">roboto</option>
+                    <option value="font-akzidenz">work sans</option>
+                </select>
+            </div>
+            <div class="settings-item">
+                <label>theme</label>
+                <div class="settings-theme-group">
+                    <div class="settings-theme-item">
+                        <input type="radio" id="theme-system" name="theme" value="system" checked
+                               onclick="document.documentElement.style.colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); saveThemeChoice('system');">
+                        <label for="theme-system">system</label>
+                    </div>
+                    <div class="settings-theme-item">
+                        <input type="radio" id="theme-light" name="theme" value="light"
+                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.remove('dark-mode', 'earth-tones'); saveThemeChoice('light');">
+                        <label for="theme-light">light</label>
+                    </div>
+                    <div class="settings-theme-item">
+                        <input type="radio" id="theme-dark" name="theme" value="dark"
+                               onclick="document.documentElement.style.colorScheme = 'dark'; document.body.classList.add('dark-mode'); document.body.classList.remove('earth-tones'); saveThemeChoice('dark');">
+                        <label for="theme-dark">dark</label>
+                    </div>
+                    <div class="settings-theme-item">
+                        <input type="radio" id="theme-earth" name="theme" value="earth"
+                               onclick="document.documentElement.style.colorScheme = 'light'; document.body.classList.add('earth-tones'); document.body.classList.remove('dark-mode'); saveThemeChoice('earth');">
+                        <label for="theme-earth">earth tones</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h4 class="settings-section-title">card options</h4>
+            <div class="settings-item">
+                <label>
+                    <input type="checkbox" id="expandNewCards" onchange="saveCardOptions()">
+                    expand new cards
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}

@@ -1,207 +1,158 @@
 {
   "summary": {
-    "total": 28,
-    "passed": 24,
+    "total": 21,
+    "passed": 17,
     "failed": 4,
-    "duration": 97.1997287273407,
-    "success_rate": 0.8571428571428571
+    "duration": 80.25177073478699,
+    "success_rate": 0.8095238095238095
   },
   "results": [
     {
       "test": "User tag \u2192 Union zone",
       "success": true,
-      "duration": 2.3855578899383545,
+      "duration": 2.3453288078308105,
       "details": ".tag-user[data-tag] \u2192 .union-zone",
-      "timestamp": 1758146286.81409
+      "timestamp": 1758468720.906163
     },
     {
       "test": "User tag \u2192 Intersection zone",
       "success": true,
-      "duration": 2.3505289554595947,
+      "duration": 2.3352460861206055,
       "details": ".tag-user[data-tag] \u2192 .intersection-zone",
-      "timestamp": 1758146289.67062
+      "timestamp": 1758468723.746468
     },
     {
       "test": "User tag \u2192 Row zone",
       "success": true,
-      "duration": 2.366665840148926,
+      "duration": 2.3575968742370605,
       "details": ".tag-user[data-tag] \u2192 .row-zone",
-      "timestamp": 1758146292.546014
+      "timestamp": 1758468726.60884
     },
     {
       "test": "User tag \u2192 Column zone",
       "success": true,
-      "duration": 2.368546724319458,
+      "duration": 2.336738109588623,
       "details": ".tag-user[data-tag] \u2192 .column-zone",
-      "timestamp": 1758146295.423192
+      "timestamp": 1758468729.450311
     },
     {
       "test": "AI tag \u2192 Union zone",
       "success": false,
-      "duration": 10.017593145370483,
-      "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".tag-ai[data-tag]\") to be visible\n    11 \u00d7 locator resolved to 3 elements. Proceeding with the first one: <span tabindex=\"0\" role=\"button\" draggable=\"true\" class=\"tag tag-ai\" data-type=\"ai-tag\" aria-grabbed=\"false\" data-tag=\"machine-learning\">\u21b5                            machine-learning\u21b5   \u2026</span>\n",
-      "timestamp": 1758146305.946914
+      "duration": 10.010488271713257,
+      "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".tag-ai[data-tag]\") to be visible\n    11 \u00d7 locator resolved to 3 elements. Proceeding with the first one: <span draggable=\"true\" class=\"tag tag-ai\" data-type=\"ai-tag\" data-tag=\"machine-learning\">\u21b5                            machine-learning\u21b5   \u2026</span>\n",
+      "timestamp": 1758468739.965995
     },
     {
       "test": "AI tag \u2192 Intersection zone",
       "success": false,
-      "duration": 10.017685890197754,
-      "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".tag-ai[data-tag]\") to be visible\n    11 \u00d7 locator resolved to 3 elements. Proceeding with the first one: <span tabindex=\"0\" role=\"button\" draggable=\"true\" class=\"tag tag-ai\" data-type=\"ai-tag\" aria-grabbed=\"false\" data-tag=\"machine-learning\">\u21b5                            machine-learning\u21b5   \u2026</span>\n",
-      "timestamp": 1758146316.472627
+      "duration": 10.013004064559937,
+      "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".tag-ai[data-tag]\") to be visible\n    11 \u00d7 locator resolved to 3 elements. Proceeding with the first one: <span draggable=\"true\" class=\"tag tag-ai\" data-type=\"ai-tag\" data-tag=\"machine-learning\">\u21b5                            machine-learning\u21b5   \u2026</span>\n",
+      "timestamp": 1758468750.4839501
     },
     {
       "test": "Populate union zone",
       "success": true,
-      "duration": 2.374845027923584,
+      "duration": 2.3349130153656006,
       "details": ".tag-user[data-tag]:nth-child(1) \u2192 .union-zone",
-      "timestamp": 1758146319.366257
+      "timestamp": 1758468753.3288162
     },
     {
       "test": "Populate intersection zone",
       "success": true,
-      "duration": 2.378662347793579,
+      "duration": 2.343186855316162,
       "details": ".tag-user[data-tag]:nth-child(2) \u2192 .intersection-zone",
-      "timestamp": 1758146322.058248
+      "timestamp": 1758468755.977463
     },
     {
       "test": "Populate row zone",
       "success": true,
-      "duration": 2.3843648433685303,
+      "duration": 2.336845874786377,
       "details": ".tag-user[data-tag]:nth-child(3) \u2192 .row-zone",
-      "timestamp": 1758146324.755532
+      "timestamp": 1758468758.620579
     },
     {
-      "test": "Union tag \u2192 Intersection zone",
+      "test": "Populate column zone",
       "success": true,
-      "duration": 2.381716012954712,
-      "details": ".union-zone .tag \u2192 .intersection-zone",
-      "timestamp": 1758146327.452723
-    },
-    {
-      "test": "Union tag \u2192 Row zone",
-      "success": true,
-      "duration": 2.3527870178222656,
-      "details": ".union-zone .tag \u2192 .row-zone",
-      "timestamp": 1758146330.315382
-    },
-    {
-      "test": "Union tag \u2192 Column zone",
-      "success": true,
-      "duration": 2.395266056060791,
-      "details": ".union-zone .tag \u2192 .column-zone",
-      "timestamp": 1758146333.2235851
-    },
-    {
-      "test": "Intersection tag \u2192 Union zone",
-      "success": true,
-      "duration": 2.3575987815856934,
-      "details": ".intersection-zone .tag \u2192 .union-zone",
-      "timestamp": 1758146336.0903192
-    },
-    {
-      "test": "Intersection tag \u2192 Row zone",
-      "success": true,
-      "duration": 2.4364750385284424,
-      "details": ".intersection-zone .tag \u2192 .row-zone",
-      "timestamp": 1758146339.0348969
-    },
-    {
-      "test": "Intersection tag \u2192 Column zone",
-      "success": true,
-      "duration": 2.363417148590088,
-      "details": ".intersection-zone .tag \u2192 .column-zone",
-      "timestamp": 1758146341.9078069
-    },
-    {
-      "test": "Union tag \u2192 User cloud",
-      "success": true,
-      "duration": 2.404513120651245,
-      "details": ".union-zone .tag \u2192 .cloud-user .tags-wrapper",
-      "timestamp": 1758146344.848557
-    },
-    {
-      "test": "Intersection tag \u2192 User cloud",
-      "success": true,
-      "duration": 2.3844501972198486,
-      "details": ".intersection-zone .tag \u2192 .cloud-user .tags-wrapper",
-      "timestamp": 1758146347.741598
+      "duration": 2.3662877082824707,
+      "details": ".tag-user[data-tag]:nth-child(4) \u2192 .column-zone",
+      "timestamp": 1758468761.292751
     },
     {
       "test": "Filter zone \u2192 Left area",
       "success": true,
-      "duration": 2.3781771659851074,
+      "duration": 2.3367011547088623,
       "details": ".filter-zone-container \u2192 .left-control .control-area-container",
-      "timestamp": 1758146350.649218
+      "timestamp": 1758468763.9708748
     },
     {
       "test": "Filter zone \u2192 Right area",
       "success": true,
-      "duration": 2.3726038932800293,
+      "duration": 2.4546542167663574,
       "details": ".filter-zone-container \u2192 .right-control .control-area-container",
-      "timestamp": 1758146354.0307
+      "timestamp": 1758468767.431299
     },
     {
       "test": "Filter zone \u2192 Bottom area",
       "success": true,
-      "duration": 2.356397867202759,
+      "duration": 2.447942018508911,
       "details": ".filter-zone-container \u2192 .bottom-control .control-area-container",
-      "timestamp": 1758146357.3970199
+      "timestamp": 1758468770.884523
     },
     {
       "test": "Row zone \u2192 Top area",
       "success": true,
-      "duration": 2.4163241386413574,
+      "duration": 2.3533718585968018,
       "details": ".row-zone \u2192 .top-control .control-area-container",
-      "timestamp": 1758146360.8250968
+      "timestamp": 1758468774.250015
     },
     {
       "test": "Row zone \u2192 Right area",
       "success": true,
-      "duration": 2.381240129470825,
+      "duration": 2.362025022506714,
       "details": ".row-zone \u2192 .right-control .control-area-container",
-      "timestamp": 1758146364.220427
+      "timestamp": 1758468777.616995
     },
     {
       "test": "Row zone \u2192 Bottom area",
       "success": true,
-      "duration": 2.375488042831421,
+      "duration": 2.4268338680267334,
       "details": ".row-zone \u2192 .bottom-control .control-area-container",
-      "timestamp": 1758146367.612941
+      "timestamp": 1758468781.0491881
     },
     {
       "test": "Column zone \u2192 Left area",
       "success": true,
-      "duration": 2.3851771354675293,
+      "duration": 2.3401870727539062,
       "details": ".column-zone \u2192 .left-control .control-area-container",
-      "timestamp": 1758146371.009841
+      "timestamp": 1758468784.3979242
     },
     {
       "test": "Column zone \u2192 Top area",
       "success": true,
-      "duration": 2.3958420753479004,
+      "duration": 2.3806211948394775,
       "details": ".column-zone \u2192 .top-control .control-area-container",
-      "timestamp": 1758146374.418016
+      "timestamp": 1758468787.7838662
     },
     {
       "test": "Column zone \u2192 Bottom area",
       "success": true,
-      "duration": 2.3866968154907227,
+      "duration": 2.346463918685913,
       "details": ".column-zone \u2192 .bottom-control .control-area-container",
-      "timestamp": 1758146377.8178701
+      "timestamp": 1758468791.135802
     },
     {
       "test": "Multi-selected tags \u2192 Union zone",
       "success": false,
-      "duration": 10.016237735748291,
+      "duration": 10.012000799179077,
       "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".tag-user.selected:first-child\") to be visible\n",
-      "timestamp": 1758146390.258637
+      "timestamp": 1758468803.536672
     },
     {
       "test": "Multi-selected zone tags \u2192 Different zone",
       "success": false,
-      "duration": 10.014869689941406,
+      "duration": 10.01133394241333,
       "details": "Page.wait_for_selector: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator(\".union-zone .tag.selected:first-child\") to be visible\n",
-      "timestamp": 1758146403.544207
+      "timestamp": 1758468818.5563881
     }
   ]
 }

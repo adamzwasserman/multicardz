@@ -1,4 +1,4 @@
-# MultiCardz™ Drag-Drop Testing Guide
+# multicardz™ Drag-Drop Testing Guide
 
 ## ✅ Automated Tests (PASSED)
 
@@ -21,7 +21,7 @@ uv run python test_drag_drop.py
 ### 1. Start the Server
 ```bash
 # Option A: Using test server
-python test_server.py
+uv run python test_server.py
 
 # Option B: Direct module run
 uv run python -m apps.user.main
@@ -34,7 +34,7 @@ Navigate to: `http://localhost:8011`
 
 #### Basic Functionality
 - [ ] Page loads without errors
-- [ ] Console shows "MultiCardz™ drag-drop system initialized"
+- [ ] Console shows "multicardz™ drag-drop system initialized"
 - [ ] No JavaScript errors in console
 
 #### Drag-Drop Interaction (Once Database Connected)

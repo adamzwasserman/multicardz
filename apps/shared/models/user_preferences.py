@@ -1,5 +1,5 @@
 """
-User Preferences model for MultiCardz™.
+User Preferences model for multicardz™.
 Handles all user UI/UX customization settings.
 """
 
@@ -28,6 +28,11 @@ class ViewSettings(BaseModel):
     show_tag_colors: bool = Field(
         default=True, description="Whether to show colors on tags and cards"
     )
+    color_palette: str = Field(
+        default="muji",
+        pattern="^(muji|vibrant|pastel|professional)$",
+        description="Tag color palette style",
+    )
     card_density: str = Field(
         default="comfortable",
         pattern="^(compact|comfortable|spacious)$",
@@ -49,7 +54,7 @@ class ThemeSettings(BaseModel):
 
     theme: str = Field(
         default="system",
-        pattern="^(light|dark|system)$",
+        pattern="^(light|dark|system|earth)$",
         description="Color theme preference",
     )
     font_family: str = Field(
@@ -125,6 +130,34 @@ class WorkspaceSettings(BaseModel):
         pattern="^(summary|detail|grid)$",
         description="Default view mode for new workspaces",
     )
+    zone_layout: dict[str, str] = Field(
+        default_factory=dict,
+        description="Zone positions mapping zone IDs to container IDs (e.g., {'union-zone': 'left-panel'})",
+    )
+    collapsed_sections: list[str] = Field(
+        default_factory=list,
+        description="List of collapsed section IDs (e.g., ['universal-control', 'ui-control'])",
+    )
+    collapsed_rows: list[int] = Field(
+        default_factory=list,
+        description="List of collapsed row numbers in dimensional grid",
+    )
+    collapsed_columns: list[int] = Field(
+        default_factory=list,
+        description="List of collapsed column numbers in dimensional grid",
+    )
+    left_control_width: int = Field(
+        default=120,
+        ge=100,
+        le=600,
+        description="Width of left control panel in pixels",
+    )
+    right_control_width: int = Field(
+        default=120,
+        ge=100,
+        le=600,
+        description="Width of right control panel in pixels",
+    )
 
     model_config = {
         "frozen": True,
@@ -184,6 +217,7 @@ class UserPreferences(BaseModel):
             "cards_expanded": self.view_settings.cards_start_expanded,
             "tag_layout": self.view_settings.tag_layout,
             "show_tag_colors": self.view_settings.show_tag_colors,
+            "color_palette": self.view_settings.color_palette,
             "card_density": self.view_settings.card_density,
             "theme_class": f"theme-{self.theme_settings.theme}",
             "font_class": f"font-{self.theme_settings.font_family.lower()}",

@@ -1,1 +1,1 @@
-"""API tests for MultiCardz™ drag-drop system."""
+"""API tests for multicardz™ drag-drop system."""

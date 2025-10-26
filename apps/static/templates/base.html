@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en"{% if theme == 'dark' %} style="color-scheme: dark"{% elif theme == 'light' %} style="color-scheme: light"{% endif %}>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="multicardz™ - Spatial tag manipulation system for intuitive data organization and filtering using drag-and-drop interactions">
+    {% if workspace_id %}
+    <meta name="workspace-id" content="{{ workspace_id }}">
+    {% endif %}
+    {% if user_id %}
+    <meta name="user-id" content="{{ user_id }}">
+    {% endif %}
+    <title>{% block title %}multicardz™{% if workspace_name %} - {{ workspace_name }}{% endif %}{% endblock %}</title>
+
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="/static/fonts/dongle-wordmark.woff2" as="font" type="font/woff2" crossorigin>
+    {% if font_preload_url %}
+    <link rel="preload" href="{{ font_preload_url }}" as="font" type="font/woff2" crossorigin>
+    {% endif %}
+
+    <!-- Base template styles -->
+    {% block head %}{% endblock %}
+
+    <!-- Inline self-hosted fonts and logo CSS for immediate rendering -->
+    <style>
+        /* Self-hosted fonts - no external dependencies */
+        @font-face {
+            font-family: 'Dongle';
+            font-style: normal;
+            font-weight: 400;
+            font-display: optional;
+            src: url('/static/fonts/dongle-wordmark.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Inconsolata';
+            font-style: normal;
+            font-weight: 200 400;
+            font-display: block;
+            src: url('/static/fonts/inconsolata-regular.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Mulish';
+            font-style: normal;
+            font-weight: 300 600;
+            font-display: block;
+            src: url('/static/fonts/mulish-regular.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Work Sans';
+            font-style: normal;
+            font-weight: 300 500;
+            font-display: block;
+            src: url('/static/fonts/worksans-regular.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Lato';
+            font-style: normal;
+            font-weight: 300 700;
+            font-display: block;
+            src: url('/static/fonts/lato-regular.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Libre Franklin';
+            font-style: normal;
+            font-weight: 300 600;
+            font-display: block;
+            src: url('/static/fonts/librefranklin-regular.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Merriweather Sans';
+            font-style: normal;
+            font-weight: 300 400;
+            font-display: block;
+            src: url('/static/fonts/merriweathersans-regular.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Roboto';
+            font-style: normal;
+            font-weight: 300 500;
+            font-display: block;
+            src: url('/static/fonts/roboto-regular.woff2') format('woff2');
+        }
+
+        .brand-link {
+            font-family: 'Dongle', sans-serif !important;
+            font-size: 56px;
+            font-weight: 400;
+            color: var(--color-text-primary, #333);
+            text-decoration: none;
+            letter-spacing: 0;
+            transition: opacity 0.2s ease;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        .brand-link:hover {
+            opacity: 0.8;
+            text-decoration: none;
+        }
+
+        .brand-link .brand-i {
+            position: relative;
+            color: var(--color-text-primary, #333);
+        }
+
+        .brand-link .brand-i::after {
+            content: '';
+            position: absolute;
+            top: 0.12em;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0.16em;
+            height: 0.16em;
+            background: #dc2626;
+            border-radius: 50%;
+        }
+
+        /* Critical card-display styles to prevent layout shift */
+        .card-display {
+            background: light-dark(#fefefe, #0f0f0f);
+            border: 1px solid light-dark(#f0f0f0, #1f1f1f);
+            border-radius: 4px;
+            padding: 2rem;
+            min-height: 300px;
+        }
+    </style>
+
+    <!-- Preload critical resources for parallel download -->
+    <link rel="preload" href="/static/css/user.css" as="style">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/user.css">
+    {% block extra_css %}{% endblock %}
+
+    <!-- Preload critical JavaScript for parallel download -->
+    <link rel="modulepreload" href="/static/js/drag-drop.js">
+    <link rel="modulepreload" href="/static/js/app.js">
+
+    <!-- Deferred JavaScript -->
+    <script defer src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.min.js"></script>
+    <script defer src="/static/js/drag-drop.js?v=2025102601"></script>
+    <script defer src="/static/js/app.js?v=2025102601"></script>
+</head>
+<body data-workspace="{{ workspace_id | default('default-workspace') }}" data-user="{{ user_id | default('anonymous-user') }}" class="{% if font_class %}{{ font_class }}{% endif %}{% if theme == 'dark' %} dark-mode{% elif theme == 'earth' %} earth-tones{% endif %}">
+    {% block body %}
+    <!-- Navigation Header -->
+    <nav class="main-navigation">
+        <div class="nav-container">
+            <div class="brand">
+                <a href="/" class="brand-link">mult<span class="brand-i">i</span>cardz</a>
+            </div>
+            <div class="nav-menu">
+                <ul class="nav-items">
+                    <li class="nav-item learning-mode-container">
+                        <div class="learning-mode-menu highlighted-menu">
+                            <label for="navLessonSelector" class="learning-mode-label">Learning Mode:</label>
+                            <input type="hidden" id="completedLessons" name="completed" data-completed-lessons value="[]">
+                            <select id="navLessonSelector" class="nav-lesson-selector"
+                                    hx-get="/api/lessons/options"
+                                    hx-trigger="load"
+                                    hx-swap="innerHTML"
+                                    hx-include="#completedLessons"
+                                    onchange="switchLesson(this.value)">
+                                <option value="1">Loading lessons...</option>
+                            </select>
+                            <div class="learning-mode-footer">
+                                <a href="#" class="hide-learning-mode" onclick="hideLearningMode()">hide this menu</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a href="/features">features</a></li>
+                    <li class="nav-item projects-menu-container">
+                        <div class="projects-menu">
+                            <a href="#" class="projects-link">projects</a>
+                        </div>
+                    </li>
+                    <li class="nav-item"><a href="/pricing">pricing</a></li>
+                    <li class="nav-item">
+                        <a href="/trial" class="cta-button">start free trial</a>
+                    </li>
+                    <li class="nav-item user-avatar-item">
+                        <div class="user-avatar"
+                             hx-on:click="document.getElementById('settingsDrawer').classList.add('open'); document.getElementById('drawerOverlay').style.display = 'block';">
+                            <svg class="avatar-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="12" cy="10" r="3" fill="currentColor"/>
+                                <path d="M6.5 18.5C6.5 16.5 8.5 15 12 15C15.5 15 17.5 16.5 17.5 18.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Settings Drawer -->
+    <div class="drawer-overlay" id="drawerOverlay" style="display: none;"
+         hx-on:click="document.getElementById('settingsDrawer').classList.remove('open'); this.style.display = 'none';"></div>
+    <div class="settings-drawer" id="settingsDrawer">
+        <div class="drawer-header">
+            <h3 class="drawer-title">settings</h3>
+            <button class="drawer-close"
+                    hx-on:click="document.getElementById('settingsDrawer').classList.remove('open'); document.getElementById('drawerOverlay').style.display = 'none';">×</button>
+        </div>
+        <div class="drawer-content">
+            <div class="settings-section">
+                <h4 class="settings-section-title">account</h4>
+                <div class="settings-item">
+                    <div class="settings-input" aria-label="User email address">user@example.com</div>
+                </div>
+                <div class="settings-item">
+                    <a href="/logout" class="settings-button settings-button-logout">logout</a>
+                </div>
+            </div>
+            <div class="settings-section">
+                <h4 class="settings-section-title">appearance</h4>
+                <div class="settings-item">
+                    <label>font</label>
+                    <select class="settings-select" id="fontSelector" aria-label="Font family selector"
+                            hx-on:change="
+                              const fontClass = this.value;
+                              document.body.className = document.body.className.replace(/font-\\w+/g, '');
+                              if (fontClass !== 'font-system') document.body.classList.add(fontClass);
+                              fetch('/api/user/preferences', {
+                                method: 'POST',
+                                headers: {'Content-Type': 'application/json'},
+                                body: JSON.stringify({fontSelector: fontClass})
+                              });
+                            ">
+                        <option value="font-system">system sans</option>
+                        <option value="font-inconsolata">inconsolata 200</option>
+                        <option value="font-optima">lato</option>
+                        <option value="font-helvetica">libre franklin</option>
+                        <option value="font-merriweather">merriweather sans light</option>
+                        <option value="font-avenir">mulish</option>
+                        <option value="font-sanfrancisco">roboto</option>
+                        <option value="font-akzidenz">work sans</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <label>theme</label>
+                    <div class="settings-theme-group">
+                        <div class="settings-theme-item">
+                            <input type="radio" id="theme-system" name="theme" value="system" {% if theme == 'system' %}checked{% endif %}
+                                   hx-on:click="
+                                     document.documentElement.style.colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                                     document.body.classList.remove('dark-mode', 'earth-tones');
+                                     fetch('/api/user/preferences', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({theme: 'system'})});
+                                   ">
+                            <label for="theme-system">system</label>
+                        </div>
+                        <div class="settings-theme-item">
+                            <input type="radio" id="theme-light" name="theme" value="light" {% if theme == 'light' %}checked{% endif %}
+                                   hx-on:click="
+                                     document.documentElement.style.colorScheme = 'light';
+                                     document.body.classList.remove('dark-mode', 'earth-tones');
+                                     fetch('/api/user/preferences', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({theme: 'light'})});
+                                   ">
+                            <label for="theme-light">light</label>
+                        </div>
+                        <div class="settings-theme-item">
+                            <input type="radio" id="theme-dark" name="theme" value="dark" {% if theme == 'dark' %}checked{% endif %}
+                                   hx-on:click="
+                                     document.documentElement.style.colorScheme = 'dark';
+                                     document.body.classList.add('dark-mode');
+                                     document.body.classList.remove('earth-tones');
+                                     fetch('/api/user/preferences', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({theme: 'dark'})});
+                                   ">
+                            <label for="theme-dark">dark</label>
+                        </div>
+                        <div class="settings-theme-item">
+                            <input type="radio" id="theme-earth" name="theme" value="earth" {% if theme == 'earth' %}checked{% endif %}
+                                   hx-on:click="
+                                     document.documentElement.style.colorScheme = 'light';
+                                     document.body.classList.add('earth-tones');
+                                     document.body.classList.remove('dark-mode');
+                                     fetch('/api/user/preferences', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({theme: 'earth'})});
+                                   ">
+                            <label for="theme-earth">earth tones</label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="settings-section">
+                <h4 class="settings-section-title">card options</h4>
+                <div class="settings-item">
+                    <div class="settings-checkbox">
+                        <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="if(typeof window.settingsManager !== 'undefined') window.settingsManager.savePreference('startWithAllCards', this.checked); if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
+                        <label for="startWithAllCards">show all cards when no tags selected</label>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-checkbox">
+                        <input type="checkbox" id="startWithCardsExpanded" data-affects-rendering="true" checked onchange="if(typeof window.settingsManager !== 'undefined') window.settingsManager.savePreference('startWithCardsExpanded', this.checked); if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
+                        <label for="startWithCardsExpanded">show tags on cards</label>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-checkbox">
+                        <input type="checkbox" id="advancedView" onchange="toggleAICloud(this.checked)">
+                        <label for="advancedView">separate user tags / AI tags</label>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <div class="settings-checkbox">
+                        <input type="checkbox" id="showColors" data-affects-rendering="true" onchange="if(typeof window.settingsManager !== 'undefined') window.settingsManager.savePreference('showColors', this.checked); if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
+                        <label for="showColors">show colors on tags/cards</label>
+                    </div>
+                </div>
+                <div class="settings-item">
+                    <label for="colorPalette">tag colors</label>
+                    <select id="colorPalette" data-affects-rendering="true" class="settings-select" onchange="if(typeof window.settingsManager !== 'undefined') window.settingsManager.savePreference('colorPalette', this.value); if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
+                        <option value="muji" selected>muji (earth tones)</option>
+                        <option value="vibrant">vibrant</option>
+                        <option value="pastel">pastel</option>
+                        <option value="professional">professional</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        {% block content %}{% endblock %}
+    </div>
+    {% endblock %}
+
+    <!-- Utility JavaScript functions -->
+    {% block scripts %}
+    <script>
+        // JavaScript functions for the drag-drop system
+        // dragDropSystem is initialized by drag-drop.js as window.dragDropSystem
+
+        function toggleMode() {
+            // Mode toggle is now handled through DOM controls
+            const modeControl = document.querySelector('[data-affects-rendering="true"][name*="mode"]');
+            if (modeControl) {
+                modeControl.checked = !modeControl.checked;
+                if (window.dragDropSystem) {
+                    window.dragDropSystem.updateStateAndRender();
+                }
+            }
+        }
+
+        function toggleTheme() {
+            // Theme toggle handled by CSS classes
+            document.body.classList.toggle('dark-theme');
+        }
+
+        function debugZones() {
+            if (window.dragDropSystem) {
+                const state = window.dragDropSystem.deriveStateFromDOM();
+                console.log('Zone state:', state);
+            }
+        }
+
+        function clearState() {
+            if (window.dragDropSystem) {
+                window.dragDropSystem.clearSelection();
+                // Clear all zones by moving tags back to cloud
+                const zones = document.querySelectorAll('.drop-zone');
+                zones.forEach(zone => {
+                    const tags = zone.querySelectorAll('.tag');
+                    tags.forEach(tag => {
+                        const cloud = document.querySelector('.tag-cloud .tags-wrapper');
+                        if (cloud) cloud.appendChild(tag);
+                    });
+                });
+                window.dragDropSystem.updateStateAndRender();
+                console.log('State cleared');
+            }
+        }
+
+        function debugSystem() {
+            console.log('Drag-Drop System:', window.dragDropSystem);
+            if (window.dragDropSystem) {
+                console.log('Current state:', window.dragDropSystem.deriveStateFromDOM());
+            }
+        }
+
+        function reloadSystem() {
+            location.reload();
+        }
+
+        function inspectState() {
+            if (window.dragDropSystem) {
+                const state = window.dragDropSystem.deriveStateFromDOM();
+                const totalTags = Object.values(state.zones || {}).reduce((sum, zone) => sum + zone.tags.length, 0);
+                console.log('Total tags in zones:', totalTags);
+                console.log('Selected tags:', window.dragDropSystem.selectedTags.size);
+                console.log('Full state:', state);
+            }
+        }
+
+        function togglePerformanceMonitor() {
+            console.log('Performance monitoring toggled');
+            // Could implement performance monitoring here
+        }
+
+        function hideLearningMode() {
+            const learningContainer = document.querySelector('.learning-mode-container');
+            if (learningContainer) {
+                learningContainer.style.display = 'none';
+                localStorage.setItem('learningModeHidden', 'true');
+                console.log('Learning mode hidden');
+            }
+        }
+
+        function toggleUserMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('userMenu');
+            if (menu) {
+                const isVisible = menu.style.display !== 'none';
+                menu.style.display = isVisible ? 'none' : 'block';
+            }
+        }
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('userMenu');
+            const avatar = document.querySelector('.user-avatar');
+            if (menu && avatar && !avatar.contains(event.target) && !menu.contains(event.target)) {
+                menu.style.display = 'none';
+            }
+        });
+
+        // Update card title on blur
+        async function updateCardTitle(element) {
+            const cardId = element.dataset.cardId;
+            const newTitle = element.textContent.trim();
+
+            console.log('updateCardTitle called:', {cardId, newTitle});
+
+            if (!newTitle) {
+                console.warn('Card title cannot be empty');
+                return;
+            }
+
+            try {
+                console.log('Sending update request to /api/cards/update-title');
+                const response = await fetch('/api/cards/update-title', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        card_id: cardId,
+                        title: newTitle,
+                        workspace_id: 'default-workspace'
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    console.error('Failed to update card title', await response.text());
+                } else {
+                    console.log('Card title updated successfully:', cardId, newTitle);
+                    // Update the element's text to ensure it displays correctly
+                    element.textContent = newTitle;
+                }
+            } catch (error) {
+                console.error('Error updating card title:', error);
+            }
+        }
+
+        // Update card content on blur
+        async function updateCardContent(element) {
+            const cardId = element.dataset.cardId;
+            const newContent = element.textContent.trim();
+
+            try {
+                const response = await fetch('/api/cards/update-content', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        card_id: cardId,
+                        content: newContent,
+                        workspace_id: 'default-workspace'
+                    })
+                });
+
+                if (!response.ok) {
+                    console.error('Failed to update card content');
+                }
+            } catch (error) {
+                console.error('Error updating card content:', error);
+            }
+        }
+
+        // Open settings drawer
+        function openSettingsDrawer(event) {
+            event.preventDefault();
+            const drawer = document.getElementById('settingsDrawer');
+            const userMenu = document.getElementById('userMenu');
+
+            if (drawer) {
+                drawer.classList.add('drawer-open');
+            }
+
+            // Close user menu
+            if (userMenu) {
+                userMenu.style.display = 'none';
+            }
+        }
+
+        // Close settings drawer
+        function closeSettingsDrawer() {
+            const drawer = document.getElementById('settingsDrawer');
+
+            if (drawer) {
+                drawer.classList.remove('drawer-open');
+            }
+        }
+
+        // Change font from select dropdown
+        function changeFontFromSelect(fontClass) {
+            document.body.className = document.body.className.replace(/font-\w+/g, '');
+            if (fontClass !== 'font-system') {
+                document.body.classList.add(fontClass);
+            }
+            // Save preference
+            fetch('/api/user/preferences', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fontSelector: fontClass })
+            }).catch(err => console.error('Failed to save font preference:', err));
+        }
+
+        // Check if learning mode should be hidden on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const isHidden = localStorage.getItem('learningModeHidden');
+            if (isHidden === 'true') {
+                const learningContainer = document.querySelector('.learning-mode-container');
+                if (learningContainer) {
+                    learningContainer.style.display = 'none';
+                }
+            }
+        });
+    </script>
+    {% endblock %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

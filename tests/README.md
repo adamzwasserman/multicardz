@@ -1,4 +1,4 @@
-# MultiCardz™ Test Suite
+# multicardz™ Test Suite
 
 ## Test Organization
 

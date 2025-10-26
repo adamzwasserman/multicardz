@@ -1,5 +1,5 @@
 """
-MultiCardz" models package.
+multicardz" models package.
 
 All models are immutable Pydantic models with no business logic.
 """

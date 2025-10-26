@@ -1,5 +1,5 @@
 """
-BDD tests for MultiCardz™ two-tier card model system.
+BDD tests for multicardz™ two-tier card model system.
 """
 
 from datetime import datetime

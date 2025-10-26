@@ -1,10 +1,10 @@
 #!/bin/bash
-# MultiCardz™ Pre-commit Hook
+# multicardz™ Pre-commit Hook
 # Runs smart test selection for maximum speed while ensuring quality
 
 set -e
 
-echo "🔍 MultiCardz™ Pre-commit Hook - Running Smart Tests"
+echo "🔍 multicardz™ Pre-commit Hook - Running Smart Tests"
 echo "=================================================="
 
 # Check if test_runner.py exists

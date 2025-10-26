@@ -1,4 +1,4 @@
-"""FastAPI WebApp Auth0 integration for MultiCardz User Site"""
+"""FastAPI WebApp Auth0 integration for multicardz User Site"""
 
 import json
 import os
@@ -223,7 +223,7 @@ async def lifespan(app: FastAPI):
         yield
 
 
-app = FastAPI(title="MultiCardz User Site", lifespan=lifespan)
+app = FastAPI(title="multicardz User Site", lifespan=lifespan)
 app.add_middleware(SessionMiddleware, secret_key=APP_SECRET_KEY)
 
 app.include_router(tag_search_router)

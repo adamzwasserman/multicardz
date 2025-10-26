@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}multicardz - Drag. Drop. Discover.{% endblock %}</title>
+
+    <!-- Preload critical Dongle font for wordmark - prevents layout shift -->
+    <link rel="preload" href="/static/fonts/dongle-wordmark.woff2" as="font" type="font/woff2" crossorigin>
+
+    <!-- Google Fonts for Work Sans only -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Load Dongle from local woff2 for immediate rendering without CLS */
+        @font-face {
+            font-family: 'Dongle';
+            font-style: normal;
+            font-weight: 400;
+            font-display: block;
+            src: url('/static/fonts/dongle-wordmark.woff2') format('woff2');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Muji color palette */
+            --color-bg: #fafaf9;
+            --color-surface: #ffffff;
+            --color-text-primary: #2d2d2d;
+            --color-text-secondary: #6b6b6b;
+            --color-text-tertiary: #a8a8a7;
+            --color-border: #e8e8e7;
+
+            /* Brand colors */
+            --color-red: #dc2626;
+            --color-blue: #0d6efd;
+
+            /* Muji earth tones for tags */
+            --color-tag-1: #d4c5b9;
+            --color-tag-2: #c9b8a8;
+            --color-tag-3: #b8a694;
+            --color-tag-4: #a89580;
+        }
+
+        body {
+            font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif !important;
+            background: var(--color-bg);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .main-navigation {
+            background: var(--color-surface);
+            border-bottom: 1px solid var(--color-border);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1366px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .brand-link {
+            font-family: 'Dongle', sans-serif !important;
+            font-size: 56px;
+            font-weight: 400;
+            color: var(--color-text-primary);
+            text-decoration: none;
+            letter-spacing: 0;
+            transition: opacity 0.2s ease;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        .brand-link:hover {
+            opacity: 0.8;
+        }
+
+        .brand-link .brand-i {
+            position: relative;
+            color: var(--color-text-primary);
+        }
+
+        .brand-link .brand-i::after {
+            content: '';
+            position: absolute;
+            top: 21px;
+            left: 51%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: var(--color-red);
+            border-radius: 50%;
+        }
+
+        .nav-menu ul {
+            list-style: none;
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .nav-menu a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.2s ease;
+        }
+
+        .nav-menu a:hover {
+            color: var(--color-text-primary);
+        }
+
+        .cta-button {
+            color: var(--color-blue) !important;
+            border: 1px solid var(--color-blue);
+            padding: 8px 20px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background: var(--color-blue);
+            color: white !important;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .user-avatar:hover {
+            border-color: var(--color-text-secondary);
+        }
+
+        .avatar-icon {
+            width: 20px;
+            height: 20px;
+            color: var(--color-text-secondary);
+        }
+
+        {% block extra_styles %}{% endblock %}
+    </style>
+
+    <!-- Shared CSS from user site (preloaded for better performance) -->
+    <link rel="preload" href="/static/css/user.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/static/css/user.css"></noscript>
+</head>
+<body>
+    <!-- Shared Header Component -->
+    {% set show_learning_mode = false %}
+    {% set show_projects = false %}
+    {% set show_settings = false %}
+    {% include 'components/header.html' %}
+
+    {% block content %}{% endblock %}
+
+    {% block scripts %}{% endblock %}
+
+    <!-- Analytics JavaScript (loads first to initialize tracking) -->
+    <script src="/public/static/js/analytics.js"></script>
+
+    <!-- Drag-Drop JavaScript (deferred for better performance) -->
+    <script src="/static/js/drag-drop.js" defer></script>
+
+    <!-- Analytics-dependent JavaScript (deferred - non-blocking) -->
+    <script src="/public/static/js/mouse-tracking.js" defer></script>
+    <script src="/public/static/js/conversion-tracking.js" defer></script>
+</body>
+</html>

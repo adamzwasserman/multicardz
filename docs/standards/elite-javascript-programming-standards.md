@@ -3,13 +3,13 @@
 **Document Version**: 1.0
 **Date**: 2025-09-16
 **Status**: MANDATORY FOR ALL JAVASCRIPT DEVELOPMENT
-**Scope**: MultiCardz JavaScript Implementation
+**Scope**: multicardz JavaScript Implementation
 
 ---
 
 ## Philosophy: Excellence Over Expediency
 
-This document establishes the non-negotiable standards for JavaScript development in the MultiCardz project. We reject mediocre code patterns in favor of implementations that demonstrate mastery of JavaScript engines, computer science fundamentals, and elegant software design.
+This document establishes the non-negotiable standards for JavaScript development in the multicardz project. We reject mediocre code patterns in favor of implementations that demonstrate mastery of JavaScript engines, computer science fundamentals, and elegant software design.
 
 **Core Principle**: Every line of JavaScript code must represent the pinnacle of engineering excellence, demonstrating deep understanding of language internals, performance characteristics, and maintainable architecture patterns.
 
@@ -630,7 +630,7 @@ const createTagMoveCommand = (tag, sourceZone, targetZone) => Object.freeze({
 **MANDATORY PATTERNS**:
 ```javascript
 // Elite pattern - Comprehensive error hierarchy
-class MultiCardzError extends Error {
+class multicardzError extends Error {
   constructor(message, code, context = {}) {
     super(message);
     this.name = this.constructor.name;
@@ -653,7 +653,7 @@ class MultiCardzError extends Error {
   }
 }
 
-class TagValidationError extends MultiCardzError {
+class TagValidationError extends multicardzError {
   constructor(tag, validationFailures) {
     super(
       `Tag validation failed: ${validationFailures.map(f => f.message).join(', ')}`,
@@ -663,7 +663,7 @@ class TagValidationError extends MultiCardzError {
   }
 }
 
-class PerformanceThresholdExceededError extends MultiCardzError {
+class PerformanceThresholdExceededError extends multicardzError {
   constructor(operation, actualDuration, threshold) {
     super(
       `Operation "${operation}" exceeded performance threshold: ${actualDuration}ms > ${threshold}ms`,
@@ -826,7 +826,7 @@ getData(function(a) {
 
 ## 8. Conclusion
 
-These standards represent the minimum acceptable quality bar for JavaScript development in the MultiCardz project. They ensure that our codebase will be:
+These standards represent the minimum acceptable quality bar for JavaScript development in the multicardz project. They ensure that our codebase will be:
 
 - **Maintainable**: Clear, predictable patterns that any elite developer can understand
 - **Performant**: Optimized for JavaScript engines with measurable benchmarks

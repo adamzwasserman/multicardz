@@ -1,5 +1,5 @@
 """
-Workspace model for MultiCardz™.
+Workspace model for multicardz™.
 Pure data model with no business logic.
 """
 

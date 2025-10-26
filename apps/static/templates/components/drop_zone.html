@@ -2,7 +2,14 @@
 <div class="zone {{ zone_type }}-zone"
      data-zone="{{ zone_name }}"
      data-zone-type="{{ zone_type }}"
-     {% if zone_config %}data-zone-config="{{ zone_config | tojson }}"{% endif %}>
+     {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
+     {% if zone_config %}data-zone-config="{{ zone_config | tojson }}"{% endif %}
+     {% if htmx_enabled %}
+     hx-post="/api/render/cards"
+     hx-trigger="tags-changed"
+     hx-target="#card-grid"
+     hx-headers='{"X-Workspace-Id": "{{ workspace_id }}"}'
+     {% endif %}>
     <div class="zone-header">
         {{ zone_display_name | default(zone_name | title) }}
         {% if show_count and zone_count is defined %}
@@ -11,7 +18,7 @@
     </div>
     <div class="zone-content">
         {% if zone_content %}
-            {{ zone_content | safe }}
+            {{ zone_content }}
         {% endif %}
         {% if show_drop_hint %}
         <div class="drop-hint">{{ drop_hint_text | default('Drop items here') }}</div>

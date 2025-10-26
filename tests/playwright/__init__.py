@@ -1,1 +1,1 @@
-"""Playwright browser tests for MultiCardz™ drag-drop system."""
+"""Playwright browser tests for multicardz™ drag-drop system."""

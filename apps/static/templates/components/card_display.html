@@ -1,32 +1,56 @@
 <!-- Card Display Component Template -->
-<div class="card-display-container">
-    <div class="card-grid" data-layout="{{ layout_type | default('grid') }}">
+<div class="card-display-container"
+     {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
+     {% if user_id %}data-user="{{ user_id }}"{% endif %}>
+    <!-- Lesson completion banner (will be shown/hidden by JavaScript) -->
+    <div id="lessonCompletionBanner" class="lesson-completion-banner" style="display: none;">
+        <div class="completion-content">
+            <div class="completion-icon">🎉</div>
+            <div class="completion-message">
+                <h3>Lesson 1 Complete!</h3>
+                <p>Great job! Click the purple "🎓 Learning Mode" dropdown above and select <strong>"Lesson 2: Card Revelation"</strong> to continue your journey!</p>
+            </div>
+            <button class="completion-dismiss" onclick="dismissLessonCompletion(this)">✕</button>
+        </div>
+    </div>
+    <div class="card-grid {% if show_expanded %}cards-expanded{% endif %}"
+         data-layout="{{ layout_type | default('grid') }}"
+         {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
+         {% if htmx_enabled %}
+         hx-get="/api/cards"
+         hx-trigger="workspace-changed from:body"
+         hx-headers='{"X-Workspace-Id": "{{ workspace_id }}"}'
+         {% endif %}>
         {% for card in cards %}
         <div class="card-item"
              data-card-id="{{ card.id }}"
+             {% if workspace_id %}data-workspace="{{ workspace_id }}"{% endif %}
              {% if card.draggable %}draggable="true"{% endif %}>
             <div class="card-content">
+                <button class="card-delete" onclick="deleteCard('{{ card.id }}', this)" title="Delete card">×</button>
                 <div class="card-header">
-                    <h4 class="card-title">{{ card.title }}</h4>
+                    <h4 class="card-title" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardTitle(this)">{{ card.title }}</h4>
                     {% if card.subtitle %}
                     <div class="card-subtitle">{{ card.subtitle }}</div>
                     {% endif %}
                 </div>
                 {% if card.content %}
                 <div class="card-body">
-                    <p class="card-description">{{ card.content }}</p>
+                    {% if card.content.startswith('<div') %}
+                        {{ card.content | safe }}
+                    {% else %}
+                        <p class="card-description" contenteditable="true" data-card-id="{{ card.id }}" onblur="updateCardContent(this)">{{ card.content }}</p>
+                    {% endif %}
                 </div>
                 {% endif %}
                 <div class="card-footer">
-                    <div class="card-tags-accordion">
-                        <input type="checkbox" id="tags-{{ card.id }}" class="card-tags-toggle">
-                        <label for="tags-{{ card.id }}" class="card-tags-label">
-                            tags ({{ card.tags|length }})
-                            <span class="card-tags-arrow">▼</span>
-                        </label>
+                    <div class="card-tags-section">
+                        <div class="card-tags-header">
+                            <span class="card-tags-label">tags ({{ card.tags|length }})</span>
+                        </div>
                         <div class="card-tags">
                             {% for tag in card.tags %}
-                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }}</span>
+                            <span class="card-tag" data-tag="{{ tag }}">{{ tag }} <span class="tag-remove" onclick="removeTagFromCard('{{ card.id }}', '{{ tag }}', this)">×</span></span>
                             {% endfor %}
                         </div>
                     </div>
@@ -48,3 +72,73 @@
     </div>
     {% endif %}
 </div>
+
+<script>
+// Hide instructional text when cards are present and show lesson completion if applicable
+(function() {
+    const cardItems = document.querySelectorAll('.card-item');
+    const instructionalText = document.getElementById('instructionalText');
+    const emptyStateMessage = document.getElementById('emptyStateMessage');
+    const completionBanner = document.getElementById('lessonCompletionBanner');
+
+    console.log('Card display script - found', cardItems.length, 'cards');
+
+    if (cardItems.length > 0) {
+        // Cards are present - hide instructional text and empty state
+        if (instructionalText) {
+            instructionalText.style.display = 'none';
+            console.log('Hiding instructional text');
+        }
+        if (emptyStateMessage) {
+            emptyStateMessage.style.display = 'none';
+            console.log('Hiding empty state message');
+        }
+
+        // Check if lesson 1 is complete (drag me to first box tag in union zone)
+        const isLesson1Complete = checkLesson1Completion();
+        if (isLesson1Complete && completionBanner) {
+            // Show completion banner if not already dismissed
+            const dismissed = localStorage.getItem('lesson1CompletionDismissed');
+            if (!dismissed) {
+                completionBanner.style.display = 'block';
+                console.log('Showing lesson 1 completion banner');
+            }
+        }
+    } else {
+        // No cards - show instructional text and empty state
+        if (instructionalText) {
+            instructionalText.style.display = 'block';
+            console.log('Showing instructional text');
+        }
+        if (emptyStateMessage) {
+            emptyStateMessage.style.display = 'block';
+            console.log('Showing empty state message');
+        }
+        // Hide completion banner when no cards
+        if (completionBanner) {
+            completionBanner.style.display = 'none';
+        }
+    }
+
+    function checkLesson1Completion() {
+        // Check if "drag me to first box" tag is in union zone
+        const unionZone = document.querySelector('[data-zone-type="union"]');
+        if (unionZone) {
+            const tags = unionZone.querySelectorAll('.tag');
+            for (let tag of tags) {
+                if (tag.textContent.includes('drag me to first box')) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Make dismiss function globally available
+    window.dismissLessonCompletion = function(button) {
+        localStorage.setItem('lesson1CompletionDismissed', 'true');
+        button.parentElement.parentElement.style.display = 'none';
+        console.log('Lesson 1 completion banner dismissed');
+    };
+})();
+</script>

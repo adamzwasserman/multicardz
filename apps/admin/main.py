@@ -1,5 +1,5 @@
 """
-MultiCardz™ Admin Application.
+multicardz™ Admin Application.
 Administrative interface and management.
 """
 
@@ -13,7 +13,7 @@ def create_app():
 def main():
     """Run admin application."""
     # Will be implemented in Phase 9: Deployment
-    print("MultiCardz Admin App - Phase 0 foundation complete")
+    print("multicardz Admin App - Phase 0 foundation complete")
 
 
 if __name__ == "__main__":

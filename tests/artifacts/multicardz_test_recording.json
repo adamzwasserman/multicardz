@@ -1,63 +1,63 @@
 [
   {
     "action": "navigate",
-    "timestamp": 1758144810.921818,
+    "timestamp": 1758501993.994421,
     "url": "http://localhost:8011"
   },
   {
     "action": "drag_drop",
-    "timestamp": 1758144813.969731,
+    "timestamp": 1758501997.399056,
     "source": ".tag[data-tag='javascript']",
     "target": ".union-zone",
     "source_pos": [
-      338.2890625,
-      89.5
+      344.28125,
+      167.5
     ],
     "target_pos": [
-      468.453125,
-      481.0
+      462.9609375,
+      558.0
     ]
   },
   {
     "action": "click",
-    "timestamp": 1758144817.379699,
+    "timestamp": 1758502000.860777,
     "selector": ".tag[data-tag='python']",
     "pos": [
-      332.1875,
-      89.5
+      337.125,
+      167.5
     ]
   },
   {
     "action": "click",
-    "timestamp": 1758144818.39839,
+    "timestamp": 1758502001.879783,
     "selector": ".tag[data-tag='react']",
     "pos": [
-      382.15625,
-      89.5
+      392.734375,
+      167.5
     ],
     "modifier": "Meta"
   },
   {
     "action": "click",
-    "timestamp": 1758144818.5055842,
+    "timestamp": 1758502001.990238,
     "selector": "#startWithAllCards",
     "pos": [
-      39.5,
-      515.0
+      47.5,
+      594.5
     ]
   },
   {
     "action": "drag_drop",
-    "timestamp": 1758144818.918999,
+    "timestamp": 1758502002.4095721,
     "source": ".union-zone .tag[data-tag='javascript']",
     "target": ".intersection-zone",
     "source_pos": [
-      468.453125,
-      492.5
+      462.953125,
+      569.5
     ],
     "target_pos": [
-      791.546875,
-      481.0
+      770.8828125,
+      558.0
     ]
   }
 ]

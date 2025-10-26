@@ -1,12 +1,12 @@
+from typing import Any
+
 import pytest
-from typing import FrozenSet, Dict, Any, List
+
 from packages.shared.src.backend.models.card_models import CardSummary
-import time
-import random
 
 
 @pytest.fixture
-def performance_test_datasets() -> Dict[str, FrozenSet[CardSummary]]:
+def performance_test_datasets() -> dict[str, frozenset[CardSummary]]:
     """Create datasets of various sizes for performance testing."""
     datasets = {}
 
@@ -32,7 +32,7 @@ def performance_test_datasets() -> Dict[str, FrozenSet[CardSummary]]:
 
 
 @pytest.fixture
-def complex_set_operation_scenarios() -> List[Dict[str, Any]]:
+def complex_set_operation_scenarios() -> list[dict[str, Any]]:
     """Create scenarios for complex set operations testing."""
     return [
         {
@@ -62,7 +62,7 @@ def complex_set_operation_scenarios() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
-def cache_performance_context() -> Dict[str, Any]:
+def cache_performance_context() -> dict[str, Any]:
     """Create context for cache performance testing."""
     return {
         "cache_size": 1000,
@@ -73,7 +73,7 @@ def cache_performance_context() -> Dict[str, Any]:
 
 
 @pytest.fixture
-def mathematical_validation_cases() -> List[Dict[str, Any]]:
+def mathematical_validation_cases() -> list[dict[str, Any]]:
     """Create test cases for mathematical property validation."""
     return [
         {

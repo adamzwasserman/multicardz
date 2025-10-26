@@ -3,20 +3,15 @@ BDD tests for Set Theory Operations with Performance Optimization.
 Tests the foundation set operations scenarios defined in the feature file.
 """
 
-import pytest
 import time
-import statistics
-from typing import FrozenSet, Dict, Any
-from packages.shared.src.backend.models.card_models import CardSummary
+
 from packages.shared.src.backend.domain.set_operations import (
-    filter_cards_by_intersection, combine_cards_by_union,
-    get_cache_statistics, clear_operation_cache,
-    validate_mathematical_properties, execute_complex_set_operation
+    clear_operation_cache,
+    combine_cards_by_union,
+    filter_cards_by_intersection,
+    get_cache_statistics,
 )
-from tests.fixtures.foundation_fixtures.set_operations_fixtures import (
-    performance_test_datasets, complex_set_operation_scenarios,
-    cache_performance_context, mathematical_validation_cases
-)
+from packages.shared.src.backend.models.card_models import CardSummary
 
 
 class TestIntersectionFilteringWithMathematicalPrecision:

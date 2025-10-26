@@ -65,6 +65,7 @@ markers = [
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
     "performance: marks tests as performance tests",
+    "stress: marks tests as stress tests",
 ]
 
 [tool.coverage.run]
@@ -95,10 +96,13 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "email-validator>=2.3.0",
     "httpx>=0.28.1",
     "hypothesis>=6.139.1",
     "playwright>=1.55.0",
     "pre-commit>=4.3.0",
+    "psutil>=7.1.1",
+    "pydantic>=2.11.9",
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
     "pytest-bdd>=8.1.0",

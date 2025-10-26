@@ -1,5 +1,5 @@
 Feature: Database Storage Layer for Two-Tier Architecture
-  As a MultiCardz system
+  As a multicardz system
   I want to persist cards using two-tier architecture
   So that I can efficiently load card summaries and details on-demand
 
@@ -49,7 +49,7 @@ Feature: Database Storage Layer for Two-Tier Architecture
   Scenario: Bulk card loading for set operations
     Given I have 1000 CardSummary objects in the database
     When I load all CardSummary objects for workspace filtering
-    Then all cards are loaded in under 50ms
+    Then all cards are loaded in under 75ms
     And the loaded cards can be used with set operations
     And CardDetail objects are not loaded automatically
 

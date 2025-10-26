@@ -45,3 +45,36 @@ htmlcov/
 # Environment variables
 .env
 .env.local
+
+# Node/JavaScript
+node_modules/
+apps/static/dist/
+package-lock.json
+
+# Database files
+data/multicardz_dev.db-shm
+data/multicardz_dev.db-wal
+
+# Timestamp tracking logs (implementation artifacts)
+task_*_time.log
+*_time.log
+
+# Root-level test files (tests should be in tests/ directory)
+/test_*.py
+
+# Debug artifacts and screenshots
+*.png
+*.jpg
+*.jpeg
+*.gif
+error_state.*
+debug_*.log
+
+# Console/application logs with wrong extensions
+*.log.py
+
+# Old/temporary virtualenvs
+venv_*/
+ENV_*/
+data/multicardz_dev.db
+.claude/settings.local.json
