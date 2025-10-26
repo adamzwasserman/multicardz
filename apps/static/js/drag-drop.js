@@ -1155,13 +1155,19 @@ class SpatialDragDrop {
   // Handle tag click for selection
   handleTagClick(event) {
     const tag = event.target.matches('[data-tag]') ? event.target : event.target.closest('[data-tag]');
-    if (!tag) return;
+    console.log('handleTagClick called', { tag: tag?.dataset?.tag, metaKey: event.metaKey, ctrlKey: event.ctrlKey, shiftKey: event.shiftKey });
+    if (!tag) {
+      console.log('No tag found, returning');
+      return;
+    }
 
     if (event.metaKey || event.ctrlKey || event.shiftKey) {
+      console.log('Modifier key detected, calling handleSelectionClick');
       event.preventDefault();
       this.handleSelectionClick(event, tag);
     } else {
       // Regular click: clear all and select only this tag
+      console.log('Regular click, clearing and selecting single tag');
       event.preventDefault();
       this.clearSelection();
       this.addToSelection(tag);
@@ -1231,9 +1237,6 @@ class SpatialDragDrop {
     this.renderDebounceTimer = setTimeout(async () => {
       const tagsInPlay = this.deriveStateFromDOM();
 
-      // DEBUG: Log zone state
-      console.log('[DEBUG] Zones state:', JSON.stringify(tagsInPlay.zones, null, 2));
-
       // Update display
       const tagsField = document.getElementById('tagsInPlay');
       if (tagsField) {
@@ -1243,15 +1246,12 @@ class SpatialDragDrop {
       // Send to backend
       await this.renderCards(tagsInPlay);
 
-      // Update lesson hint with current zone state
       await this.updateLessonHint(tagsInPlay);
     }, this.DEBOUNCE_DELAY);
   }
 
-  // Update lesson hint based on current zone state
   async updateLessonHint(tagsInPlay) {
     try {
-      // Build query parameters from zone state
       const params = new URLSearchParams();
 
       if (tagsInPlay.zones) {
