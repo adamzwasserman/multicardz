@@ -87,6 +87,36 @@ class DropHandler {
   }
 
   /**
+   * Validate batch operation before execution
+   * Returns { valid: boolean, errors: string[] }
+   */
+  validateBatch(draggedElements, dropElement) {
+    const errors = [];
+
+    // Check basic drop validity
+    if (!dropElement.hasAttribute('data-droppable') &&
+        !dropElement.classList.contains('cloud') &&
+        !dropElement.classList.contains('card-tags') &&
+        !dropElement.dataset.zoneType) {
+      errors.push('Invalid drop target');
+      return { valid: false, errors };
+    }
+
+    // Validate each element individually
+    for (const element of draggedElements) {
+      if (!this.validate(element, dropElement)) {
+        const tagName = element.dataset.tag || 'unknown';
+        errors.push(`Cannot drop ${tagName} here`);
+      }
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors
+    };
+  }
+
+  /**
    * Handle dragover event for visual feedback
    */
   handleDragOver(event, dropElement, draggedElements) {
@@ -109,6 +139,56 @@ class DropHandler {
    */
   async handleDrop(event, dropElement, draggedElements) {
     throw new Error('Must implement handleDrop() in subclass');
+  }
+
+  /**
+   * Declare if handler supports optimized batch operations
+   */
+  supportsBatch() {
+    return false;
+  }
+
+  /**
+   * Handle batch drop operation (optional optimization)
+   * Override in subclasses that can process batches more efficiently
+   */
+  async handleBatchDrop(event, dropElement, draggedElements) {
+    // Default: process sequentially
+    return await this.processBatchSequentially(event, dropElement, draggedElements);
+  }
+
+  /**
+   * Process batch sequentially with error collection
+   */
+  async processBatchSequentially(event, dropElement, draggedElements) {
+    const total = draggedElements.length;
+    let completed = 0;
+    const errors = [];
+    const successful = [];
+
+    for (const element of draggedElements) {
+      try {
+        if (this.validate(element, dropElement)) {
+          await this.handleDrop(event, dropElement, [element]);
+          completed++;
+          successful.push(element);
+        } else {
+          const tagName = element.dataset.tag || 'unknown';
+          errors.push(`Cannot drop ${tagName} here`);
+        }
+      } catch (error) {
+        const tagName = element.dataset.tag || 'unknown';
+        errors.push(`Failed to process ${tagName}: ${error.message}`);
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      completed,
+      total,
+      errors,
+      successful
+    };
   }
 
   /**
@@ -297,6 +377,48 @@ class TagToZoneHandler extends DropHandler {
     return true;
   }
 
+  validateBatch(draggedElements, dropElement) {
+    const errors = [];
+    const tagCollection = dropElement.querySelector('.tag-collection');
+
+    if (!tagCollection) {
+      errors.push('Invalid zone - no tag collection found');
+      return { valid: false, errors };
+    }
+
+    // Check zone capacity for batch
+    const maxTags = this.system.parseMaxTags(dropElement.dataset.maxTags);
+    const currentCount = tagCollection.children.length;
+    const newCount = draggedElements.length;
+
+    if (maxTags && (currentCount + newCount) > maxTags) {
+      const available = maxTags - currentCount;
+      errors.push(`Zone can only accept ${available} more tag${available !== 1 ? 's' : ''}`);
+    }
+
+    // Check for duplicates
+    const existingTags = new Set();
+    tagCollection.querySelectorAll('[data-tag]').forEach(tag => {
+      existingTags.add(tag.dataset.tag);
+    });
+
+    for (const element of draggedElements) {
+      const tagName = element.dataset.tag;
+      if (existingTags.has(tagName)) {
+        errors.push(`${tagName} is already in this zone`);
+      }
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors
+    };
+  }
+
+  supportsBatch() {
+    return true; // Optimized batch processing available
+  }
+
   async handleDrop(event, dropElement, draggedElements) {
     event.preventDefault();
     dropElement.classList.remove('drag-over');
@@ -312,6 +434,44 @@ class TagToZoneHandler extends DropHandler {
       tagElement.classList.remove('tag-cloud');
       tagElement.classList.add('tag-active');
     }
+  }
+
+  async handleBatchDrop(event, dropElement, draggedElements) {
+    event.preventDefault();
+    dropElement.classList.remove('drag-over');
+
+    const tagCollection = dropElement.querySelector('.tag-collection');
+    if (!tagCollection) {
+      return {
+        success: false,
+        errors: ['No tag collection found in zone'],
+        completed: 0,
+        total: draggedElements.length
+      };
+    }
+
+    // Use document fragment for batch DOM manipulation
+    const fragment = document.createDocumentFragment();
+    const successful = [];
+
+    for (const tagElement of draggedElements) {
+      // Move tag to fragment
+      tagElement.classList.remove('tag-cloud', 'tag-selected');
+      tagElement.classList.add('tag-active');
+      fragment.appendChild(tagElement);
+      successful.push(tagElement);
+    }
+
+    // Single DOM reflow for all tags
+    tagCollection.appendChild(fragment);
+
+    return {
+      success: true,
+      completed: successful.length,
+      total: draggedElements.length,
+      errors: [],
+      successful
+    };
   }
 
   mutatesTagsInPlay() {
@@ -577,6 +737,27 @@ class SpatialDragDrop {
         selectionSequence: [] // Order of selection for undo
       }
     };
+
+    // Ghost image configuration
+    this.ghostImageConfig = {
+      maxVisibleTags: 5, // Show first N tags in ghost
+      thumbnailSize: { width: 200, height: 100 },
+      opacity: 0.7,
+      offset: { x: 10, y: 10 }, // Cursor offset
+      canvas: {
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        borderRadius: 8,
+        padding: 10,
+        tagSpacing: 5,
+        font: '14px Inter, system-ui, sans-serif',
+        textColor: '#2c3e50',
+        badgeColor: '#3498db'
+      }
+    };
+
+    // Ghost image state
+    this.currentGhostCanvas = null;
+    this.currentGhostImage = null;
   }
 
   // ============================================================
@@ -699,7 +880,11 @@ class SpatialDragDrop {
     if (event.shiftKey) {
       // Shift+click: Range selection
       // Special case: if clicking the same tag twice in a row, toggle it off
-      if (this.selectionState.lastShiftClickedTag === tag && this.selectionState.selectedTags.has(tag)) {
+      const lastTag = this.selectionState.lastShiftClickedTag;
+      const isConsecutiveClick = lastTag && lastTag.dataset.tag === tag.dataset.tag;
+      const isSelected = this.selectionState.selectedTags.has(tag);
+
+      if (isConsecutiveClick && isSelected) {
         this.toggleTagSelection(tag);
       } else {
         const anchor = this.selectionState.anchorTag || tag;
@@ -777,7 +962,7 @@ class SpatialDragDrop {
 
   /**
    * Initialize accessibility support for multi-selection
-   * Sets up ARIA states and live region for screen reader announcements
+   * Sets up ARIA states, live region, and keyboard navigation
    */
   initializeAccessibility() {
     // Set container as multi-selectable
@@ -787,11 +972,14 @@ class SpatialDragDrop {
       container.setAttribute('role', 'listbox');
     });
 
-    // Initialize all tags with ARIA states
+    // Initialize all tags with ARIA states and keyboard handlers
     document.querySelectorAll('[data-tag]').forEach(tag => {
       tag.setAttribute('role', 'option');
       tag.setAttribute('aria-selected', 'false');
       tag.setAttribute('tabindex', '0');
+
+      // Add keyboard navigation handler
+      tag.addEventListener('keydown', (event) => this.handleTagKeyboard(event));
     });
 
     // Create live region for announcements if it doesn't exist
@@ -803,6 +991,169 @@ class SpatialDragDrop {
       liveRegion.setAttribute('aria-atomic', 'true');
       liveRegion.className = 'sr-only';
       document.body.appendChild(liveRegion);
+    }
+
+    // Set up global keyboard shortcuts
+    document.addEventListener('keydown', (event) => this.handleGlobalKeyboard(event));
+  }
+
+  /**
+   * Handle keyboard navigation for tag selection
+   * Implements arrow keys, space/enter selection, and modifiers
+   */
+  handleTagKeyboard(event) {
+    const tag = event.target;
+    const allTags = Array.from(document.querySelectorAll('[data-tag]'));
+    const currentIndex = allTags.indexOf(tag);
+
+    if (currentIndex === -1) return;
+
+    let handled = true;
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        event.preventDefault();
+        const nextIndex = Math.min(currentIndex + 1, allTags.length - 1);
+        const nextTag = allTags[nextIndex];
+
+        if (nextTag) {
+          nextTag.focus();
+          this.ensureFocusVisible(nextTag);
+
+          if (event.shiftKey) {
+            this.addToSelection(nextTag);
+            this.updateARIAStates();
+          }
+        }
+        break;
+
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        event.preventDefault();
+        const prevIndex = Math.max(currentIndex - 1, 0);
+        const prevTag = allTags[prevIndex];
+
+        if (prevTag) {
+          prevTag.focus();
+          this.ensureFocusVisible(prevTag);
+
+          if (event.shiftKey) {
+            this.addToSelection(prevTag);
+            this.updateARIAStates();
+          }
+        }
+        break;
+
+      case ' ':
+      case 'Enter':
+        event.preventDefault();
+
+        if (event.ctrlKey || event.metaKey) {
+          // Ctrl/Cmd+Space/Enter: Toggle selection
+          this.toggleTagSelection(tag);
+          const action = this.selectionState.selectedTags.has(tag) ? 'added' : 'removed';
+          this.announceSelectionChange(action, tag);
+        } else if (event.shiftKey) {
+          // Shift+Space/Enter: Range selection
+          const anchor = this.selectionState.anchorTag || tag;
+          this.selectRange(anchor, tag);
+        } else {
+          // Regular Space/Enter: Clear and select
+          this.clearSelection();
+          this.addToSelection(tag);
+          this.selectionState.anchorTag = tag;
+          this.announceSelectionChange('selected', tag);
+        }
+
+        this.updateARIAStates();
+        break;
+
+      case 'Escape':
+        this.clearSelection();
+        this.updateARIAStates();
+        this.announceSelection('Selection cleared');
+        break;
+
+      default:
+        handled = false;
+    }
+
+    if (handled) {
+      event.stopPropagation();
+    }
+  }
+
+  /**
+   * Handle global keyboard shortcuts
+   * Implements Ctrl/Cmd+A for select all
+   */
+  handleGlobalKeyboard(event) {
+    // Select all: Ctrl/Cmd+A
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a') {
+      const target = event.target;
+
+      // Only handle if focus is in tag area
+      if (target.closest('.cloud') || target.closest('.tag-collection') || target.hasAttribute('data-tag')) {
+        event.preventDefault();
+        this.selectAllTags();
+      }
+    }
+  }
+
+  /**
+   * Select all visible tags in the current container
+   */
+  selectAllTags() {
+    const allTags = document.querySelectorAll('[data-tag]:not([hidden])');
+
+    this.clearSelection();
+    allTags.forEach(tag => {
+      this.addToSelection(tag);
+    });
+
+    this.updateARIAStates();
+    this.announceSelection(`All ${allTags.length} tags selected`);
+  }
+
+  /**
+   * Announce individual selection change with specific action
+   */
+  announceSelectionChange(action, tag) {
+    const tagName = tag.dataset.tag;
+
+    const messages = {
+      'added': `${tagName} added to selection`,
+      'removed': `${tagName} removed from selection`,
+      'selected': `${tagName} selected`
+    };
+
+    const message = messages[action] || `${tagName} ${action}`;
+    this.announceSelection(message);
+  }
+
+  /**
+   * Ensure focused element is visible in viewport
+   * Scrolls element into view if needed
+   */
+  ensureFocusVisible(element) {
+    const rect = element.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+
+    const isVisible = (
+      rect.top >= 0 &&
+      rect.left >= 0 &&
+      rect.bottom <= viewportHeight &&
+      rect.right <= viewportWidth
+    );
+
+    if (!isVisible) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      });
     }
   }
 
@@ -973,21 +1324,37 @@ class SpatialDragDrop {
         return;
       }
 
+      // Use batch dispatch for multi-element operations
+      let result;
+      if (this.draggedElements.length > 1) {
+        result = await this.dispatchBatchOperation(this.draggedElements, dropTarget, e);
+      } else {
+        // Single element - use direct handler
+        const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
+
+        if (handler && handler.validate(this.draggedElements[0], dropTarget)) {
+          await handler.handleDrop(e, dropTarget, this.draggedElements);
+          result = { success: true };
+        } else {
+          result = { success: false };
+        }
+      }
+
+      // Cleanup dragged elements
+      this.draggedElements.forEach(el => {
+        el.classList.remove('dragging');
+        el.setAttribute('aria-grabbed', 'false');
+      });
+
       const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
+      this.draggedElements = [];
 
-      if (handler && handler.validate(this.draggedElements[0], dropTarget)) {
-        await handler.handleDrop(e, dropTarget, this.draggedElements);
-
-        // Cleanup dragged elements
-        this.draggedElements.forEach(el => {
-          el.classList.remove('dragging');
-          el.setAttribute('aria-grabbed', 'false');
-        });
-        this.draggedElements = [];
+      // Clear selection after successful drop
+      if (result.success) {
         this.clearSelection();
 
         // Update state if handler mutates tagsInPlay
-        if (handler.mutatesTagsInPlay() || handler.requiresRerender()) {
+        if (handler && (handler.mutatesTagsInPlay() || handler.requiresRerender())) {
           this.invalidateCache();
           this.updateStateAndRender();
         }
@@ -1093,6 +1460,602 @@ class SpatialDragDrop {
     });
   }
 
+  // ============================================================
+  // GHOST IMAGE GENERATION
+  // Canvas-based composite ghost image for multi-tag drag operations
+  // ============================================================
+
+  /**
+   * Generate composite ghost image for selected tags
+   * Creates canvas rendering with tag preview and count badge
+   * Target: <16ms for 60 FPS performance
+   */
+  generateGhostImage(selectedTags) {
+    const startTime = performance.now();
+
+    // Check if canvas is supported
+    if (!this.canUseCanvas()) {
+      return this.createFallbackGhostImage(selectedTags);
+    }
+
+    const config = this.ghostImageConfig;
+    const tagCount = selectedTags.size;
+    const visibleTags = Array.from(selectedTags).slice(0, config.maxVisibleTags);
+
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      return this.createFallbackGhostImage(selectedTags);
+    }
+
+    // Set canvas dimensions
+    canvas.width = config.thumbnailSize.width;
+    canvas.height = config.thumbnailSize.height;
+
+    // Draw background with rounded corners
+    ctx.fillStyle = config.canvas.backgroundColor;
+    ctx.beginPath();
+    this.roundRect(ctx, 0, 0, canvas.width, canvas.height, config.canvas.borderRadius);
+    ctx.fill();
+
+    // Draw tag previews
+    ctx.font = config.canvas.font;
+    let yOffset = config.canvas.padding;
+    const tagHeight = 24;
+
+    visibleTags.forEach((tag, index) => {
+      const tagText = tag.dataset.tag || 'unknown';
+      const tagType = tag.dataset.type || 'user-tag';
+
+      // Draw tag background
+      const tagColor = this.getTagColor(tagType);
+      ctx.fillStyle = tagColor;
+      ctx.beginPath();
+      this.roundRect(
+        ctx,
+        config.canvas.padding,
+        yOffset,
+        canvas.width - 2 * config.canvas.padding,
+        tagHeight,
+        4
+      );
+      ctx.fill();
+
+      // Draw tag text
+      ctx.fillStyle = '#ffffff';
+      ctx.textBaseline = 'middle';
+      const truncatedText = this.truncateText(
+        ctx,
+        tagText,
+        canvas.width - 2 * config.canvas.padding - 16
+      );
+      ctx.fillText(
+        truncatedText,
+        config.canvas.padding + 8,
+        yOffset + tagHeight / 2
+      );
+
+      yOffset += tagHeight + config.canvas.tagSpacing;
+    });
+
+    // Draw count badge if more tags than visible
+    if (tagCount > config.maxVisibleTags) {
+      const badgeX = canvas.width - 30;
+      const badgeY = canvas.height - 30;
+      const overflowCount = tagCount - config.maxVisibleTags;
+
+      // Draw circle
+      ctx.fillStyle = config.canvas.badgeColor;
+      ctx.beginPath();
+      ctx.arc(badgeX, badgeY, 20, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw count text
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '12px Inter, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`+${overflowCount}`, badgeX, badgeY);
+    }
+
+    // Set canvas opacity
+    canvas.style.opacity = config.opacity.toString();
+
+    // Performance monitoring
+    const duration = performance.now() - startTime;
+    if (duration > 16) {
+      console.warn(`Ghost image generation took ${duration.toFixed(2)}ms (target: <16ms)`);
+    }
+
+    return canvas;
+  }
+
+  /**
+   * Helper to draw rounded rectangle (for browsers without roundRect)
+   */
+  roundRect(ctx, x, y, width, height, radius) {
+    if (typeof ctx.roundRect === 'function') {
+      ctx.roundRect(x, y, width, height, radius);
+    } else {
+      // Manual rounded rectangle
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+  }
+
+  /**
+   * Get color for tag type
+   */
+  getTagColor(tagType) {
+    const colors = {
+      'user-tag': '#3498db',
+      'ai-tag': '#9b59b6',
+      'system-tag': '#e74c3c',
+      'group-tag': '#2ecc71'
+    };
+    return colors[tagType] || '#95a5a6';
+  }
+
+  /**
+   * Truncate text to fit within width
+   */
+  truncateText(ctx, text, maxWidth) {
+    const metrics = ctx.measureText(text);
+    if (metrics.width <= maxWidth) {
+      return text;
+    }
+
+    const ellipsis = '...';
+    for (let i = text.length; i > 0; i--) {
+      const truncated = text.substring(0, i) + ellipsis;
+      if (ctx.measureText(truncated).width <= maxWidth) {
+        return truncated;
+      }
+    }
+
+    return ellipsis;
+  }
+
+  /**
+   * Check if browser supports canvas
+   */
+  canUseCanvas() {
+    try {
+      const canvas = document.createElement('canvas');
+      return !!(canvas.getContext && canvas.getContext('2d'));
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /**
+   * Create DOM-based fallback ghost for browsers without canvas support
+   */
+  createFallbackGhostImage(selectedTags) {
+    const ghost = document.createElement('div');
+    ghost.className = 'ghost-image-fallback';
+    ghost.style.cssText = `
+      position: fixed;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #3498db;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 10000;
+      font-family: Inter, system-ui, sans-serif;
+    `;
+
+    // Add count
+    const count = document.createElement('div');
+    const tagCount = selectedTags.size;
+    count.textContent = `${tagCount} tag${tagCount > 1 ? 's' : ''} selected`;
+    count.style.fontWeight = 'bold';
+    ghost.appendChild(count);
+
+    // Show first few tag names
+    const previewTags = Array.from(selectedTags).slice(0, 3);
+    if (previewTags.length > 0) {
+      const preview = document.createElement('div');
+      preview.style.fontSize = '0.9em';
+      preview.style.marginTop = '5px';
+
+      const names = previewTags.map(t => t.dataset.tag).join(', ');
+      preview.textContent = names;
+
+      if (selectedTags.size > 3) {
+        preview.textContent += ` and ${selectedTags.size - 3} more`;
+      }
+
+      ghost.appendChild(preview);
+    }
+
+    document.body.appendChild(ghost);
+    return ghost;
+  }
+
+  /**
+   * Attach ghost image to drag event
+   * Manages canvas lifecycle and memory cleanup
+   */
+  attachGhostImage(event, selectedTags) {
+    // Clean up any existing ghost
+    this.cleanupGhostImage();
+
+    // Generate ghost canvas
+    this.currentGhostCanvas = this.generateGhostImage(selectedTags);
+
+    // Convert canvas to image for drag image
+    const ghostImage = new Image();
+
+    if (this.currentGhostCanvas instanceof HTMLCanvasElement) {
+      ghostImage.src = this.currentGhostCanvas.toDataURL();
+    } else {
+      // Fallback DOM element - can't use as drag image directly
+      // Browser will use default drag image
+      return;
+    }
+
+    this.currentGhostImage = ghostImage;
+
+    // Set drag image once loaded
+    ghostImage.onload = () => {
+      if (event.dataTransfer && event.dataTransfer.setDragImage) {
+        event.dataTransfer.setDragImage(
+          ghostImage,
+          this.ghostImageConfig.offset.x,
+          this.ghostImageConfig.offset.y
+        );
+      }
+    };
+  }
+
+  /**
+   * Clean up ghost image resources
+   */
+  cleanupGhostImage() {
+    if (this.currentGhostCanvas) {
+      if (this.currentGhostCanvas instanceof HTMLCanvasElement) {
+        // Clear canvas context to free memory
+        const ctx = this.currentGhostCanvas.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, this.currentGhostCanvas.width, this.currentGhostCanvas.height);
+        }
+      } else if (this.currentGhostCanvas.parentElement) {
+        // Remove DOM fallback element
+        this.currentGhostCanvas.remove();
+      }
+      this.currentGhostCanvas = null;
+    }
+
+    if (this.currentGhostImage) {
+      this.currentGhostImage.src = '';
+      this.currentGhostImage = null;
+    }
+  }
+
+  // ============================================================
+  // BATCH OPERATIONS
+  // Batch polymorphic dispatch with atomicity and rollback
+  // ============================================================
+
+  /**
+   * Dispatch batch drag-drop operation with atomicity
+   * Maintains individual tag semantics while processing as batch
+   */
+  async dispatchBatchOperation(draggedElements, dropTarget, event) {
+    // Start performance tracking
+    const startTime = performance.now();
+
+    // Find appropriate handler
+    const handler = this.registry.findHandler(draggedElements[0], dropTarget);
+    if (!handler) {
+      this.showBatchError(['No handler found for drop target']);
+      return { success: false, errors: ['No handler found'] };
+    }
+
+    // Validate batch operation
+    const validation = handler.validateBatch(draggedElements, dropTarget);
+    if (!validation.valid) {
+      this.showBatchError(validation.errors);
+      return { success: false, errors: validation.errors };
+    }
+
+    // Show progress for large batches
+    let progress = null;
+    if (draggedElements.length > 10) {
+      progress = this.showBatchProgress(draggedElements.length);
+    }
+
+    try {
+      // Create batch operation payload for rollback
+      const batchOp = this.prepareBatchOperation(draggedElements, dropTarget);
+
+      // Execute batch operation
+      let result;
+      if (handler.supportsBatch()) {
+        // Use optimized batch handler
+        result = await handler.handleBatchDrop(event, dropTarget, draggedElements);
+      } else {
+        // Fall back to sequential processing
+        result = await this.processBatchWithProgress(
+          handler,
+          event,
+          dropTarget,
+          draggedElements,
+          progress
+        );
+      }
+
+      // Check performance
+      const duration = performance.now() - startTime;
+      if (draggedElements.length >= 50 && duration > 500) {
+        console.warn(`Large batch operation took ${duration.toFixed(2)}ms (target: <500ms for 50 tags)`);
+      }
+
+      // Show errors if any
+      if (result.errors && result.errors.length > 0) {
+        this.showBatchError(result.errors);
+      }
+
+      return result;
+
+    } catch (error) {
+      console.error('Batch operation failed:', error);
+
+      // Rollback changes
+      await this.rollbackBatchOperation(batchOp);
+
+      this.showBatchError(['Operation failed. Changes have been rolled back.']);
+      return { success: false, errors: [error.message] };
+
+    } finally {
+      if (progress) {
+        progress.close();
+      }
+    }
+  }
+
+  /**
+   * Prepare batch operation payload for rollback
+   */
+  prepareBatchOperation(draggedElements, dropTarget) {
+    return {
+      operationId: `batch-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+      timestamp: Date.now(),
+      tags: draggedElements.map(element => ({
+        element: element,
+        tagId: element.dataset.tagId,
+        tagName: element.dataset.tag,
+        tagType: element.dataset.type,
+        sourceZone: element.closest('[data-zone-type]')?.dataset.zoneType ||
+                   element.closest('.cloud')?.dataset.cloudType ||
+                   'unknown',
+        sourceParent: element.parentElement
+      })),
+      targetZone: dropTarget.dataset.zoneType ||
+                  dropTarget.dataset.cloudType ||
+                  dropTarget.classList.contains('card-tags') ? 'card-tags' : 'unknown'
+    };
+  }
+
+  /**
+   * Process batch with progress updates
+   */
+  async processBatchWithProgress(handler, event, dropTarget, draggedElements, progress) {
+    const total = draggedElements.length;
+    let completed = 0;
+    const errors = [];
+    const successful = [];
+
+    for (const element of draggedElements) {
+      try {
+        if (handler.validate(element, dropTarget)) {
+          await handler.handleDrop(event, dropTarget, [element]);
+          completed++;
+          successful.push(element);
+
+          // Update progress
+          if (progress) {
+            progress.update(completed, total);
+          }
+        } else {
+          const tagName = element.dataset.tag || 'unknown';
+          errors.push(`Cannot drop ${tagName} here`);
+        }
+      } catch (error) {
+        const tagName = element.dataset.tag || 'unknown';
+        errors.push(`Failed to process ${tagName}: ${error.message}`);
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      completed,
+      total,
+      errors,
+      successful
+    };
+  }
+
+  /**
+   * Rollback failed batch operation
+   */
+  async rollbackBatchOperation(batchOp) {
+    console.log(`Rolling back batch operation ${batchOp.operationId}`);
+
+    // Restore each tag to original position
+    for (const tagInfo of batchOp.tags) {
+      if (tagInfo.sourceParent && tagInfo.element) {
+        try {
+          // Move tag back to source
+          tagInfo.sourceParent.appendChild(tagInfo.element);
+
+          // Restore original classes
+          tagInfo.element.classList.remove('tag-active', 'dragging', 'tag-selected');
+
+          if (tagInfo.sourceZone === 'unknown' || tagInfo.sourceZone.includes('cloud')) {
+            tagInfo.element.classList.add('tag-cloud');
+          } else {
+            tagInfo.element.classList.add('tag-active');
+          }
+        } catch (error) {
+          console.error(`Failed to rollback tag ${tagInfo.tagName}:`, error);
+        }
+      }
+    }
+  }
+
+  /**
+   * Show progress indicator for batch operations
+   */
+  showBatchProgress(total) {
+    const progressContainer = document.createElement('div');
+    progressContainer.className = 'batch-progress';
+    progressContainer.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      border: 2px solid #3498db;
+      border-radius: 8px;
+      padding: 20px;
+      z-index: 10000;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      min-width: 300px;
+    `;
+
+    const message = document.createElement('div');
+    message.textContent = `Processing ${total} tags...`;
+    message.style.cssText = `
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-family: Inter, system-ui, sans-serif;
+    `;
+
+    const progressBar = document.createElement('div');
+    progressBar.style.cssText = `
+      width: 100%;
+      height: 20px;
+      background: #ecf0f1;
+      border-radius: 10px;
+      overflow: hidden;
+    `;
+
+    const progressFill = document.createElement('div');
+    progressFill.style.cssText = `
+      width: 0%;
+      height: 100%;
+      background: #3498db;
+      transition: width 0.3s ease;
+    `;
+
+    const progressText = document.createElement('div');
+    progressText.textContent = '0 / ' + total;
+    progressText.style.cssText = `
+      margin-top: 10px;
+      text-align: center;
+      font-family: Inter, system-ui, sans-serif;
+      color: #666;
+    `;
+
+    progressBar.appendChild(progressFill);
+    progressContainer.appendChild(message);
+    progressContainer.appendChild(progressBar);
+    progressContainer.appendChild(progressText);
+    document.body.appendChild(progressContainer);
+
+    return {
+      update: (current, total) => {
+        const percentage = (current / total) * 100;
+        progressFill.style.width = `${percentage}%`;
+        progressText.textContent = `${current} / ${total}`;
+      },
+      close: () => {
+        progressContainer.remove();
+      }
+    };
+  }
+
+  /**
+   * Display batch operation errors to user
+   */
+  showBatchError(errors) {
+    // Create error notification
+    const errorContainer = document.createElement('div');
+    errorContainer.className = 'batch-error';
+    errorContainer.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #e74c3c;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 10000;
+      max-width: 400px;
+      font-family: Inter, system-ui, sans-serif;
+    `;
+
+    const title = document.createElement('div');
+    title.textContent = 'Batch Operation Failed';
+    title.style.cssText = `
+      font-weight: bold;
+      margin-bottom: 10px;
+    `;
+
+    const errorList = document.createElement('div');
+    errorList.style.cssText = `
+      font-size: 0.9em;
+      max-height: 200px;
+      overflow-y: auto;
+    `;
+
+    // Show first 5 errors
+    const displayErrors = errors.slice(0, 5);
+    displayErrors.forEach(error => {
+      const errorItem = document.createElement('div');
+      errorItem.textContent = `• ${error}`;
+      errorItem.style.marginBottom = '5px';
+      errorList.appendChild(errorItem);
+    });
+
+    // Show "and X more" if needed
+    if (errors.length > 5) {
+      const moreItem = document.createElement('div');
+      moreItem.textContent = `... and ${errors.length - 5} more errors`;
+      moreItem.style.cssText = `
+        margin-top: 5px;
+        font-style: italic;
+        opacity: 0.8;
+      `;
+      errorList.appendChild(moreItem);
+    }
+
+    errorContainer.appendChild(title);
+    errorContainer.appendChild(errorList);
+    document.body.appendChild(errorContainer);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      errorContainer.remove();
+    }, 5000);
+
+    // Announce to screen readers
+    this.announceSelection(`Batch operation failed: ${errors[0]}`);
+  }
+
   // Handle tag drag start
   handleTagDragStart(event) {
     const draggedTag = event.target;
@@ -1124,6 +2087,12 @@ class SpatialDragDrop {
       el.setAttribute('aria-grabbed', 'true');
     });
 
+    // Generate and attach ghost image for multi-tag selections
+    if (this.draggedElements.length > 1) {
+      const draggedSet = new Set(this.draggedElements);
+      this.attachGhostImage(event, draggedSet);
+    }
+
     // Set transfer data
     event.dataTransfer.effectAllowed = 'move';
     event.dataTransfer.setData('text/plain', this.draggedElements.length.toString());
@@ -1136,6 +2105,9 @@ class SpatialDragDrop {
       el.setAttribute('aria-grabbed', 'false');
     });
     this.draggedElements = [];
+
+    // Clean up ghost image
+    this.cleanupGhostImage();
 
     // Unlock selection after drag
     this.selectionState.isDragging = false;
@@ -1165,48 +2137,21 @@ class SpatialDragDrop {
   // Handle tag click for selection
   handleTagClick(event) {
     const tag = event.target.matches('[data-tag]') ? event.target : event.target.closest('[data-tag]');
-    console.log('[v3.0-shift-consecutive-toggle] handleTagClick called', { tag: tag?.dataset?.tag, metaKey: event.metaKey, ctrlKey: event.ctrlKey, shiftKey: event.shiftKey });
     if (!tag) {
-      console.log('No tag found, returning');
       return;
     }
 
     if (event.metaKey || event.ctrlKey || event.shiftKey) {
-      console.log('Modifier key detected, calling handleSelectionClick');
       event.preventDefault();
       this.handleSelectionClick(event, tag);
     } else {
       // Regular click: clear all and select only this tag
-      console.log('Regular click, clearing and selecting single tag');
       event.preventDefault();
       this.clearSelection();
       this.addToSelection(tag);
     }
   }
 
-  // Toggle tag selection
-  toggleTagSelection(tagElement) {
-    if (!tagElement) return;
-
-    if (this.selectedTags.has(tagElement)) {
-      this.selectedTags.delete(tagElement);
-      tagElement.classList.remove('selected');
-      tagElement.setAttribute('aria-selected', 'false');
-    } else {
-      this.selectedTags.add(tagElement);
-      tagElement.classList.add('selected');
-      tagElement.setAttribute('aria-selected', 'true');
-    }
-  }
-
-  // Clear selection properly
-  clearSelection() {
-    this.selectedTags.forEach(tag => {
-      tag.classList.remove('selected');
-      tag.setAttribute('aria-selected', 'false');
-    });
-    this.selectedTags.clear();
-  }
 
   // Legacy method kept for backwards compatibility (now uses polymorphic handlers)
   moveTags(tagElements, targetZone) {
