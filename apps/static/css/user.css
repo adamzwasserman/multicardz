@@ -3270,6 +3270,89 @@ body.font-berkeley-mono {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* ============================================================
+   MULTI-SELECTION VISUAL STATES
+   Provides visual feedback for tag selection with modifiers
+   ============================================================ */
+
+/* Tag in selectable state */
+.tag {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+/* Tag selected state - primary visual feedback */
+.tag-selected,
+.tag.selected {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    background-color: rgba(30, 64, 175, 0.1) !important;
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(30, 64, 175, 0.2);
+    z-index: 10;
+}
+
+/* Selection during drag operation */
+.tag-selected.dragging,
+.tag.selected.dragging {
+    opacity: 0.7;
+    transform: scale(0.95);
+}
+
+/* Focus state for keyboard navigation */
+.tag:focus {
+    outline: 3px solid var(--color-text-primary);
+    outline-offset: 4px;
+    z-index: 11;
+}
+
+/* Combined focus and selection state */
+.tag-selected:focus,
+.tag.selected:focus {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 4px;
+}
+
+/* Selection preview during hover with modifier keys */
+.tag:hover.selecting-preview {
+    outline: 1px dashed var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Screen reader only class for accessibility announcements */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ARIA multiselectable containers */
+[aria-multiselectable="true"] {
+    position: relative;
+}
+
+/* Tag with aria-selected state */
+[data-tag][aria-selected="true"] {
+    /* Visual state handled by .tag-selected class */
+}
+
+[data-tag][aria-selected="false"] {
+    /* Default state */
+}
+
+/* Keyboard navigation focus ring */
+[data-tag][tabindex="0"]:focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 4px;
+}
+
 /* Group tag indicators */
 .tag-group {
     position: relative;

@@ -560,6 +560,240 @@ class SpatialDragDrop {
     this.renderDebounceTimer = null;
     this.DEBOUNCE_DELAY = 100;
     this.registry = new DropTargetRegistry(this); // Polymorphic handler registry
+
+    // Multi-selection state management
+    this.selectionState = {
+      selectedTags: new Set(), // Set of tag element references for O(1) operations
+      selectionMode: 'single', // 'single' | 'range' | 'toggle'
+      anchorTag: null, // For shift-selection range operations
+      lastSelectedTag: null, // For range operations
+      selectionBounds: null, // For lasso selection (future)
+      isDragging: false, // Selection lock during drag operations
+      selectionMetadata: {
+        selectionStartTime: null,
+        selectionMethod: 'click', // 'click' | 'keyboard' | 'lasso'
+        selectionCount: 0,
+        selectionSequence: [] // Order of selection for undo
+      }
+    };
+  }
+
+  // ============================================================
+  // MULTI-SELECTION STATE MANAGEMENT
+  // Set-based O(1) operations for selection management
+  // ============================================================
+
+  /**
+   * Add tag to current selection with O(1) performance
+   * Updates visual state and maintains selection metadata
+   */
+  addToSelection(tag) {
+    if (!tag || !tag.dataset || !tag.dataset.tag) {
+      return;
+    }
+
+    this.selectionState.selectedTags.add(tag);
+    tag.classList.add('tag-selected');
+    tag.setAttribute('aria-selected', 'true');
+
+    // Update metadata
+    this.selectionState.selectionMetadata.selectionCount++;
+    this.selectionState.selectionMetadata.selectionSequence.push(tag);
+    this.selectionState.lastSelectedTag = tag;
+
+    // Announce to screen readers
+    this.announceSelection(`Added ${tag.dataset.tag} to selection`);
+  }
+
+  /**
+   * Remove tag from selection with O(1) performance
+   */
+  removeFromSelection(tag) {
+    if (!tag || !this.selectionState.selectedTags.has(tag)) {
+      return;
+    }
+
+    this.selectionState.selectedTags.delete(tag);
+    tag.classList.remove('tag-selected');
+    tag.setAttribute('aria-selected', 'false');
+
+    // Update metadata
+    this.selectionState.selectionMetadata.selectionCount--;
+    const sequenceIndex = this.selectionState.selectionMetadata.selectionSequence.indexOf(tag);
+    if (sequenceIndex > -1) {
+      this.selectionState.selectionMetadata.selectionSequence.splice(sequenceIndex, 1);
+    }
+
+    // Announce to screen readers
+    this.announceSelection(`Removed ${tag.dataset.tag} from selection`);
+  }
+
+  /**
+   * Clear entire selection and reset state
+   */
+  clearSelection() {
+    this.selectionState.selectedTags.forEach(tag => {
+      tag.classList.remove('tag-selected');
+      tag.setAttribute('aria-selected', 'false');
+    });
+
+    this.selectionState.selectedTags.clear();
+    this.selectionState.selectionMetadata.selectionCount = 0;
+    this.selectionState.selectionMetadata.selectionSequence = [];
+    this.selectionState.lastSelectedTag = null;
+    this.selectionState.anchorTag = null;
+
+    // Legacy compatibility - also clear old selectedTags set
+    this.selectedTags.clear();
+  }
+
+  /**
+   * Toggle tag selection state (XOR operation)
+   */
+  toggleTagSelection(tag) {
+    if (!tag) return;
+
+    if (this.selectionState.selectedTags.has(tag)) {
+      this.removeFromSelection(tag);
+    } else {
+      this.addToSelection(tag);
+    }
+  }
+
+  /**
+   * Select range of tags between anchor and target
+   * Uses DOM order for determining range boundaries
+   */
+  selectRange(anchor, target) {
+    if (!anchor || !target) return;
+
+    const allTags = Array.from(document.querySelectorAll('[data-tag]'));
+    const anchorIndex = allTags.indexOf(anchor);
+    const targetIndex = allTags.indexOf(target);
+
+    if (anchorIndex === -1 || targetIndex === -1) return;
+
+    const start = Math.min(anchorIndex, targetIndex);
+    const end = Math.max(anchorIndex, targetIndex);
+
+    this.clearSelection();
+    for (let i = start; i <= end; i++) {
+      this.addToSelection(allTags[i]);
+    }
+
+    const count = end - start + 1;
+    this.announceSelection(`${count} tags selected`);
+  }
+
+  /**
+   * Handle tag selection based on click modifiers
+   * Implements single, range (Shift), and toggle (Ctrl/Cmd) selection
+   */
+  handleSelectionClick(event, tag) {
+    if (!tag) return;
+
+    // Record performance
+    const startTime = performance.now();
+
+    if (event.shiftKey) {
+      // Shift+click: Range selection
+      this.selectRange(this.selectionState.anchorTag || tag, tag);
+    } else if (event.ctrlKey || event.metaKey) {
+      // Ctrl/Cmd+click: Toggle selection
+      this.toggleTagSelection(tag);
+      if (!this.selectionState.anchorTag) {
+        this.selectionState.anchorTag = tag;
+      }
+    } else {
+      // Regular click: Clear and select single
+      this.clearSelection();
+      this.addToSelection(tag);
+      this.selectionState.anchorTag = tag;
+    }
+
+    // Update ARIA states for all tags
+    this.updateARIAStates();
+
+    // Performance monitoring
+    const duration = performance.now() - startTime;
+    if (duration > 5) {
+      console.warn(`Selection operation took ${duration.toFixed(2)}ms (target: <5ms)`);
+    }
+  }
+
+  /**
+   * Update ARIA attributes for all tags based on selection
+   * Maintains proper ARIA attributes for accessibility tools
+   */
+  updateARIAStates() {
+    document.querySelectorAll('[data-tag]').forEach(tag => {
+      const isSelected = this.selectionState.selectedTags.has(tag);
+      tag.setAttribute('aria-selected', isSelected.toString());
+
+      if (isSelected) {
+        tag.classList.add('tag-selected');
+      } else {
+        tag.classList.remove('tag-selected');
+      }
+    });
+
+    // Announce selection summary
+    const count = this.selectionState.selectedTags.size;
+    if (count > 0) {
+      this.announceSelection(`${count} tag${count > 1 ? 's' : ''} selected`);
+    }
+  }
+
+  /**
+   * Announce message to screen readers via live region
+   */
+  announceSelection(message) {
+    const announcer = document.getElementById('selection-announcer');
+    if (announcer) {
+      // Clear and set for proper announcement
+      announcer.textContent = '';
+
+      // Use setTimeout to ensure change is detected
+      setTimeout(() => {
+        announcer.textContent = message;
+      }, 10);
+
+      // Clear after announcement
+      setTimeout(() => {
+        announcer.textContent = '';
+      }, 1000);
+    }
+  }
+
+  /**
+   * Initialize accessibility support for multi-selection
+   * Sets up ARIA states and live region for screen reader announcements
+   */
+  initializeAccessibility() {
+    // Set container as multi-selectable
+    const tagContainers = document.querySelectorAll('.cloud, .tag-collection');
+    tagContainers.forEach(container => {
+      container.setAttribute('aria-multiselectable', 'true');
+      container.setAttribute('role', 'listbox');
+    });
+
+    // Initialize all tags with ARIA states
+    document.querySelectorAll('[data-tag]').forEach(tag => {
+      tag.setAttribute('role', 'option');
+      tag.setAttribute('aria-selected', 'false');
+      tag.setAttribute('tabindex', '0');
+    });
+
+    // Create live region for announcements if it doesn't exist
+    let liveRegion = document.getElementById('selection-announcer');
+    if (!liveRegion) {
+      liveRegion = document.createElement('div');
+      liveRegion.id = 'selection-announcer';
+      liveRegion.setAttribute('aria-live', 'polite');
+      liveRegion.setAttribute('aria-atomic', 'true');
+      liveRegion.className = 'sr-only';
+      document.body.appendChild(liveRegion);
+    }
   }
 
   // Initialize the entire system
@@ -570,6 +804,7 @@ class SpatialDragDrop {
     this.setupCardTagEventDelegation();
     this.startTagCountPolling();
     this.observeZoneChanges();
+    this.initializeAccessibility(); // NEW: Initialize accessibility for multi-selection
 
     // Initial render
     this.updateStateAndRender();
@@ -858,12 +1093,17 @@ class SpatialDragDrop {
     // Stop event from bubbling to zone's dragstart handler
     event.stopPropagation();
 
+    // Lock selection during drag
+    this.selectionState.isDragging = true;
+
     // Determine what's being dragged
     if (draggedTag.dataset.type === 'group-tag') {
       this.draggedElements = this.expandGroupTag(draggedTag);
-    } else if (this.selectedTags.has(draggedTag)) {
-      this.draggedElements = Array.from(this.selectedTags);
+    } else if (this.selectionState.selectedTags.has(draggedTag)) {
+      // If dragged tag is part of selection, drag all selected tags
+      this.draggedElements = Array.from(this.selectionState.selectedTags);
     } else {
+      // If dragged tag not selected, drag only it and clear selection
       this.draggedElements = [draggedTag];
       this.clearSelection();
     }
@@ -886,6 +1126,9 @@ class SpatialDragDrop {
       el.setAttribute('aria-grabbed', 'false');
     });
     this.draggedElements = [];
+
+    // Unlock selection after drag
+    this.selectionState.isDragging = false;
   }
 
   // Handle card drag start
@@ -913,10 +1156,12 @@ class SpatialDragDrop {
   handleTagClick(event) {
     const tag = event.currentTarget;
 
-    if (event.metaKey || event.ctrlKey) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey) {
       event.preventDefault();
-      this.toggleTagSelection(tag);
+      this.handleSelectionClick(event, tag);
     } else {
+      // Regular click without modifiers - don't prevent default
+      // Just clear selection to allow normal drag behavior
       this.clearSelection();
     }
   }
