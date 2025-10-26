@@ -1161,9 +1161,10 @@ class SpatialDragDrop {
       event.preventDefault();
       this.handleSelectionClick(event, tag);
     } else {
-      // Regular click without modifiers - don't prevent default
-      // Just clear selection to allow normal drag behavior
+      // Regular click: clear all and select only this tag
+      event.preventDefault();
       this.clearSelection();
+      this.addToSelection(tag);
     }
   }
 
