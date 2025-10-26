@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"{% if theme == 'dark' %} style="color-scheme: dark"{% elif theme == 'light' %} style="color-scheme: light"{% endif %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -152,7 +152,7 @@
     <script defer src="/static/js/drag-drop.js?v=2025102601"></script>
     <script defer src="/static/js/app.js?v=2025102601"></script>
 </head>
-<body data-workspace="{{ workspace_id | default('default-workspace') }}" data-user="{{ user_id | default('anonymous-user') }}" {% if font_class %}class="{{ font_class }}"{% endif %}>
+<body data-workspace="{{ workspace_id | default('default-workspace') }}" data-user="{{ user_id | default('anonymous-user') }}" class="{% if font_class %}{{ font_class }}{% endif %}{% if theme == 'dark' %} dark-mode{% elif theme == 'earth' %} earth-tones{% endif %}">
     {% block body %}
     <!-- Navigation Header -->
     <nav class="main-navigation">
@@ -217,7 +217,7 @@
             <div class="settings-section">
                 <h4 class="settings-section-title">account</h4>
                 <div class="settings-item">
-                    <input type="email" value="user@example.com" readonly class="settings-input">
+                    <div class="settings-input" aria-label="User email address">user@example.com</div>
                 </div>
                 <div class="settings-item">
                     <a href="/logout" class="settings-button settings-button-logout">logout</a>
@@ -227,7 +227,7 @@
                 <h4 class="settings-section-title">appearance</h4>
                 <div class="settings-item">
                     <label>font</label>
-                    <select class="settings-select" id="fontSelector"
+                    <select class="settings-select" id="fontSelector" aria-label="Font family selector"
                             hx-on:change="
                               const fontClass = this.value;
                               document.body.className = document.body.className.replace(/font-\\w+/g, '');
@@ -252,7 +252,7 @@
                     <label>theme</label>
                     <div class="settings-theme-group">
                         <div class="settings-theme-item">
-                            <input type="radio" id="theme-system" name="theme" value="system" checked
+                            <input type="radio" id="theme-system" name="theme" value="system" {% if theme == 'system' %}checked{% endif %}
                                    hx-on:click="
                                      document.documentElement.style.colorScheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                                      document.body.classList.remove('dark-mode', 'earth-tones');
@@ -261,7 +261,7 @@
                             <label for="theme-system">system</label>
                         </div>
                         <div class="settings-theme-item">
-                            <input type="radio" id="theme-light" name="theme" value="light"
+                            <input type="radio" id="theme-light" name="theme" value="light" {% if theme == 'light' %}checked{% endif %}
                                    hx-on:click="
                                      document.documentElement.style.colorScheme = 'light';
                                      document.body.classList.remove('dark-mode', 'earth-tones');
@@ -270,7 +270,7 @@
                             <label for="theme-light">light</label>
                         </div>
                         <div class="settings-theme-item">
-                            <input type="radio" id="theme-dark" name="theme" value="dark"
+                            <input type="radio" id="theme-dark" name="theme" value="dark" {% if theme == 'dark' %}checked{% endif %}
                                    hx-on:click="
                                      document.documentElement.style.colorScheme = 'dark';
                                      document.body.classList.add('dark-mode');
@@ -280,7 +280,7 @@
                             <label for="theme-dark">dark</label>
                         </div>
                         <div class="settings-theme-item">
-                            <input type="radio" id="theme-earth" name="theme" value="earth"
+                            <input type="radio" id="theme-earth" name="theme" value="earth" {% if theme == 'earth' %}checked{% endif %}
                                    hx-on:click="
                                      document.documentElement.style.colorScheme = 'light';
                                      document.body.classList.add('earth-tones');
