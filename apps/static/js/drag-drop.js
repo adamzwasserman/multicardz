@@ -567,6 +567,7 @@ class SpatialDragDrop {
       selectionMode: 'single', // 'single' | 'range' | 'toggle'
       anchorTag: null, // For shift-selection range operations
       lastSelectedTag: null, // For range operations
+      lastShiftClickedTag: null, // Track last Shift+clicked tag for toggle detection
       selectionBounds: null, // For lasso selection (future)
       isDragging: false, // Selection lock during drag operations
       selectionMetadata: {
@@ -697,24 +698,27 @@ class SpatialDragDrop {
 
     if (event.shiftKey) {
       // Shift+click: Range selection
-      // Special case: if clicking the same tag again and it's already selected, toggle it off
-      const anchor = this.selectionState.anchorTag || tag;
-      if (anchor === tag && this.selectionState.selectedTags.has(tag)) {
+      // Special case: if clicking the same tag twice in a row, toggle it off
+      if (this.selectionState.lastShiftClickedTag === tag && this.selectionState.selectedTags.has(tag)) {
         this.toggleTagSelection(tag);
       } else {
+        const anchor = this.selectionState.anchorTag || tag;
         this.selectRange(anchor, tag);
       }
+      this.selectionState.lastShiftClickedTag = tag;
     } else if (event.ctrlKey || event.metaKey) {
       // Ctrl/Cmd+click: Toggle selection
       this.toggleTagSelection(tag);
       if (!this.selectionState.anchorTag) {
         this.selectionState.anchorTag = tag;
       }
+      this.selectionState.lastShiftClickedTag = null; // Clear on non-Shift click
     } else {
       // Regular click: Clear and select single
       this.clearSelection();
       this.addToSelection(tag);
       this.selectionState.anchorTag = tag;
+      this.selectionState.lastShiftClickedTag = null; // Clear on non-Shift click
     }
 
     // Update ARIA states for all tags
@@ -1161,7 +1165,7 @@ class SpatialDragDrop {
   // Handle tag click for selection
   handleTagClick(event) {
     const tag = event.target.matches('[data-tag]') ? event.target : event.target.closest('[data-tag]');
-    console.log('handleTagClick called', { tag: tag?.dataset?.tag, metaKey: event.metaKey, ctrlKey: event.ctrlKey, shiftKey: event.shiftKey });
+    console.log('[v3.0-shift-consecutive-toggle] handleTagClick called', { tag: tag?.dataset?.tag, metaKey: event.metaKey, ctrlKey: event.ctrlKey, shiftKey: event.shiftKey });
     if (!tag) {
       console.log('No tag found, returning');
       return;
