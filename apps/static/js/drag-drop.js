@@ -697,7 +697,13 @@ class SpatialDragDrop {
 
     if (event.shiftKey) {
       // Shift+click: Range selection
-      this.selectRange(this.selectionState.anchorTag || tag, tag);
+      // Special case: if clicking the same tag again and it's already selected, toggle it off
+      const anchor = this.selectionState.anchorTag || tag;
+      if (anchor === tag && this.selectionState.selectedTags.has(tag)) {
+        this.toggleTagSelection(tag);
+      } else {
+        this.selectRange(anchor, tag);
+      }
     } else if (event.ctrlKey || event.metaKey) {
       // Ctrl/Cmd+click: Toggle selection
       this.toggleTagSelection(tag);
