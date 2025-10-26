@@ -1154,7 +1154,8 @@ class SpatialDragDrop {
 
   // Handle tag click for selection
   handleTagClick(event) {
-    const tag = event.currentTarget;
+    const tag = event.target.matches('[data-tag]') ? event.target : event.target.closest('[data-tag]');
+    if (!tag) return;
 
     if (event.metaKey || event.ctrlKey || event.shiftKey) {
       event.preventDefault();
