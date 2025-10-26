@@ -284,3 +284,144 @@
         display: none;
     }
 }
+
+/* ============ UI Integration Components ============ */
+
+/* Group creation button */
+.create-group-button {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 4px 0;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    background: rgba(240, 240, 240, 0.95);
+    color: rgba(0, 0, 0, 0.8);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.create-group-button:hover {
+    background: rgba(230, 230, 230, 0.98);
+    border-color: rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.create-group-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Expansion preview */
+.expansion-preview {
+    position: absolute;
+    bottom: -30px;
+    left: 0;
+    right: 0;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.6);
+    z-index: 100;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Notification toasts */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 10000;
+    max-width: 400px;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification-success {
+    border-left: 4px solid rgba(0, 128, 0, 0.6);
+}
+
+.notification-error {
+    border-left: 4px solid rgba(255, 0, 0, 0.6);
+}
+
+.notification-warning {
+    border-left: 4px solid rgba(255, 165, 0, 0.6);
+}
+
+.notification-info {
+    border-left: 4px solid rgba(0, 123, 255, 0.6);
+}
+
+/* Group hover feedback */
+.tag.group-tag.group-hover {
+    border-style: solid;
+    border-width: 2px;
+    border-color: rgba(0, 0, 0, 0.4);
+    background: rgba(245, 245, 245, 0.98);
+}
+
+/* Selection indicator */
+.tag.selected::before {
+    content: '✓';
+    display: inline-block;
+    margin-right: 4px;
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+/* Zone active state when group is being dragged */
+.zone-active.group-drop-target {
+    border-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.03);
+    border-style: dashed;
+}
+
+@media (prefers-color-scheme: dark) {
+    .create-group-button {
+        background: rgba(60, 60, 60, 0.95);
+        color: rgba(255, 255, 255, 0.9);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .create-group-button:hover {
+        background: rgba(70, 70, 70, 0.98);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .expansion-preview {
+        background: rgba(40, 40, 40, 0.95);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .notification {
+        background: rgba(40, 40, 40, 0.95);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    .tag.group-tag.group-hover {
+        background: rgba(70, 70, 70, 0.98);
+    }
+}

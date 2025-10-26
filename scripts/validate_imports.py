@@ -72,6 +72,7 @@ class ImportVisitor(ast.NodeVisitor):
             "base64",
             "urllib",
             "http",
+            "logging",
             # Core dependencies
             "pydantic",
             "fastapi",
