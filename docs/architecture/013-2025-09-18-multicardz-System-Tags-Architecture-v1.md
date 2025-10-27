@@ -1,6 +1,6 @@
 # multicardz System Tags Architecture
 
-**Document ID**: 013-2025-09-18-multicardz-System-Tags-Architecture-v1
+**Document ID**: 013-2025-09-18-MultiCardz-System-Tags-Architecture-v1
 **Created**: September 18, 2025
 **Author**: System Architect
 **Status**: Active Architecture Specification

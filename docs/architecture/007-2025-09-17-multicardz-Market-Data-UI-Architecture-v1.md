@@ -1,13 +1,13 @@
-# multicardz Market Data and UI Architecture Specification
+# MultiCardz Market Data and UI Architecture Specification
 
 **Document Version**: 1.0
 **Date**: 2025-09-17
 **Status**: ARCHITECTURE SPECIFICATION
-**Next Document**: 008-2025-09-17-multicardz-Market-Data-UI-Implementation-Plan-v1.md
+**Next Document**: 008-2025-09-17-MultiCardz-Market-Data-UI-Implementation-Plan-v1.md
 
 ## Executive Summary
 
-This architecture specification defines the comprehensive implementation of market segment data models and complete UI specification for the multicardz spatial manipulation system. Based on analysis of the sales document and patent specifications, this architecture establishes the foundational data structures for market scenarios and the complete UI framework supporting spatial manipulation paradigms.
+This architecture specification defines the comprehensive implementation of market segment data models and complete UI specification for the MultiCardz spatial manipulation system. Based on analysis of the sales document and patent specifications, this architecture establishes the foundational data structures for market scenarios and the complete UI framework supporting spatial manipulation paradigms.
 
 The solution implements patent-compliant spatial manipulation zones with set theory operations, comprehensive market data models supporting all identified segments, and a complete UI framework using HTMX for interactivity while maintaining pure functional architecture principles. Performance targets include sub-millisecond spatial operations and seamless scaling to 500,000+ cards without degradation.
 
@@ -396,7 +396,7 @@ Complete card display with spatial interaction support:
 HTMX-based drag and drop with spatial awareness:
 
 ```javascript
-// Minimal JavaScript for drag/drop (spatial manipulation)
+// Minimal JavaScript for drag/drop (WASM bridge)
 class SpatialDragDrop {
     static initializeDragHandlers() {
         // Use native HTML5 drag/drop with HTMX integration
@@ -642,14 +642,14 @@ def calculate_performance_metrics(
 ```
 
 ### 4.3 JavaScript Restrictions
-Minimal JavaScript limited to spatial manipulation and DOM property access:
+Minimal JavaScript limited to WASM bridge and DOM property access:
 
 ```javascript
 // ONLY approved JavaScript patterns
 class SpatialInterface {
-    // JavaScript module loading (approved)
-    static async loadSpatialModule() {
-        this.spatialModule = await import('./spatial_operations.js');
+    // WASM module loading (approved)
+    static async loadSpatialWasm() {
+        this.wasmModule = await import('./spatial_operations.wasm');
     }
 
     // DOM property access (approved)

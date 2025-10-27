@@ -8,14 +8,14 @@ echo "🔍 multicardz™ Pre-commit Hook - Running Smart Tests"
 echo "=================================================="
 
 # Check if test_runner.py exists
-if [ ! -f "test_runner.py" ]; then
-    echo "❌ test_runner.py not found"
+if [ ! -f "scripts/test_runner.py" ]; then
+    echo "❌ test_runner.py not found at scripts/test_runner.py"
     exit 1
 fi
 
 # Run smart tests with all optimizations
 echo "🧠 Running smart test selection..."
-uv run python test_runner.py all --smart --time --parallel --no-cache
+uv run python scripts/test_runner.py all --smart --time --parallel --no-cache
 
 # Check exit code
 if [ $? -eq 0 ]; then

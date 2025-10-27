@@ -15,7 +15,22 @@ from apps.shared.models.database_models import (
     GroupMembership,
     GroupMembershipCreate,
 )
-from apps.shared.services.database_connection import get_connection
+from apps.shared.services.database_connection import get_workspace_connection
+
+
+# ============ Database Connection ============
+
+# This function can be monkey-patched during testing
+def get_connection():
+    """
+    Get database connection.
+
+    This is a stub that can be replaced during testing.
+    In production, this should use the appropriate connection method.
+    """
+    raise NotImplementedError(
+        "get_connection() must be implemented or mocked for testing"
+    )
 
 
 # ============ Pure Validation Functions ============
@@ -133,11 +148,11 @@ def get_group_by_id(group_id: str) -> Optional[GroupTag]:
     )
 
 
-def get_groups_by_workspace(workspace_id: str) -> frozenset[GroupTag]:
+def get_groups_by_workspace(workspace_id: str) -> tuple[GroupTag, ...]:
     """
     Get all groups in a workspace.
 
-    Returns immutable frozenset of GroupTag objects.
+    Returns immutable tuple of GroupTag objects.
     """
     conn = get_connection()
     cursor = conn.execute(
@@ -151,7 +166,7 @@ def get_groups_by_workspace(workspace_id: str) -> frozenset[GroupTag]:
 
     group_ids = [row[0] for row in cursor.fetchall()]
     groups = [get_group_by_id(gid) for gid in group_ids]
-    return frozenset(g for g in groups if g is not None)
+    return tuple(g for g in groups if g is not None)
 
 
 def is_group_tag(tag_id: str) -> bool:

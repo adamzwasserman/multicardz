@@ -70,7 +70,7 @@ def setup_test_data():
 # ============================================================================
 
 
-def test_create_group_basic(client, _setup_test_data):
+def test_create_group_basic(client, setup_test_data):
     """Test basic group creation."""
     print("🧪 Testing basic group creation...")
 
@@ -94,7 +94,7 @@ def test_create_group_basic(client, _setup_test_data):
     print(f"✅ Group created: {data['group_id']}")
 
 
-def test_create_group_with_members(client, _setup_test_data):
+def test_create_group_with_members(client, setup_test_data):
     """Test group creation with initial members."""
     print("🧪 Testing group creation with members...")
 
@@ -123,7 +123,7 @@ def test_create_group_with_members(client, _setup_test_data):
     print(f"✅ Group created with {info_data['member_count']} members")
 
 
-def test_create_group_duplicate_name(client, _setup_test_data):
+def test_create_group_duplicate_name(client, setup_test_data):
     """Test that duplicate group names are rejected."""
     print("🧪 Testing duplicate group name validation...")
 
@@ -161,7 +161,7 @@ def test_create_group_duplicate_name(client, _setup_test_data):
 # ============================================================================
 
 
-def test_add_member_to_group(client, _setup_test_data):
+def test_add_member_to_group(client, setup_test_data):
     """Test adding a member to an existing group."""
     print("🧪 Testing add member to group...")
 
@@ -200,7 +200,7 @@ def test_add_member_to_group(client, _setup_test_data):
     print("✅ Member added successfully")
 
 
-def test_add_multiple_members(client, _setup_test_data):
+def test_add_multiple_members(client, setup_test_data):
     """Test batch adding members to group."""
     print("🧪 Testing batch add members...")
 
@@ -239,7 +239,7 @@ def test_add_multiple_members(client, _setup_test_data):
     print(f"✅ Batch added {data['members_added']} members")
 
 
-def test_remove_member_from_group(client, _setup_test_data):
+def test_remove_member_from_group(client, setup_test_data):
     """Test removing a member from group."""
     print("🧪 Testing remove member from group...")
 
@@ -283,7 +283,7 @@ def test_remove_member_from_group(client, _setup_test_data):
 # ============================================================================
 
 
-def test_expand_simple_group(client, _setup_test_data):
+def test_expand_simple_group(client, setup_test_data):
     """Test expanding a simple group with direct members."""
     print("🧪 Testing simple group expansion...")
 
@@ -314,7 +314,7 @@ def test_expand_simple_group(client, _setup_test_data):
     print(f"✅ Expanded to {len(data['expanded_tag_ids'])} tags")
 
 
-def test_expand_nested_group(client, _setup_test_data):
+def test_expand_nested_group(client, setup_test_data):
     """Test expanding nested groups."""
     print("🧪 Testing nested group expansion...")
 
@@ -356,7 +356,7 @@ def test_expand_nested_group(client, _setup_test_data):
     print(f"✅ Nested expansion: {len(data['expanded_tag_ids'])} leaf tags")
 
 
-def test_expansion_caching(client, _setup_test_data):
+def test_expansion_caching(client, setup_test_data):
     """Test that expansion caching works."""
     print("🧪 Testing expansion caching...")
 
@@ -403,7 +403,7 @@ def test_expansion_caching(client, _setup_test_data):
 # ============================================================================
 
 
-def test_get_group_info(client, _setup_test_data):
+def test_get_group_info(client, setup_test_data):
     """Test getting group information."""
     print("🧪 Testing get group info...")
 
@@ -432,7 +432,7 @@ def test_get_group_info(client, _setup_test_data):
     print("✅ Group info retrieved")
 
 
-def test_get_workspace_groups(client, _setup_test_data):
+def test_get_workspace_groups(client, setup_test_data):
     """Test getting all groups for a workspace."""
     print("🧪 Testing get workspace groups...")
 
@@ -460,7 +460,7 @@ def test_get_workspace_groups(client, _setup_test_data):
     print(f"✅ Retrieved {data['total_count']} workspace groups")
 
 
-def test_get_nonexistent_group(client, _setup_test_data):
+def test_get_nonexistent_group(client, setup_test_data):
     """Test getting info for nonexistent group."""
     print("🧪 Testing nonexistent group...")
 
@@ -475,7 +475,7 @@ def test_get_nonexistent_group(client, _setup_test_data):
 # ============================================================================
 
 
-def test_delete_group(client, _setup_test_data):
+def test_delete_group(client, setup_test_data):
     """Test deleting a group."""
     print("🧪 Testing group deletion...")
 
@@ -509,7 +509,7 @@ def test_delete_group(client, _setup_test_data):
 # ============================================================================
 
 
-def test_invalidate_cache(client, _setup_test_data):
+def test_invalidate_cache(client, setup_test_data):
     """Test manual cache invalidation."""
     print("🧪 Testing cache invalidation...")
 
@@ -537,7 +537,7 @@ def test_invalidate_cache(client, _setup_test_data):
     print("✅ Cache invalidated")
 
 
-def test_clear_cache(client, _setup_test_data):
+def test_clear_cache(client, setup_test_data):
     """Test clearing entire cache."""
     print("🧪 Testing cache clear...")
 

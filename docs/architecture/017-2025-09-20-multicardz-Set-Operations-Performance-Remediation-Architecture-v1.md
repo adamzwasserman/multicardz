@@ -1,6 +1,6 @@
-# multicardz™ Set Operations Performance Remediation Architecture v1
+# MultiCardz™ Set Operations Performance Remediation Architecture v1
 
-**Document ID**: 017-2025-09-20-multicardz-Set-Operations-Performance-Remediation-Architecture-v1
+**Document ID**: 017-2025-09-20-MultiCardz-Set-Operations-Performance-Remediation-Architecture-v1
 **Created**: September 20, 2025
 **Status**: CRITICAL PERFORMANCE REMEDIATION
 **Patent Compliance**: docs/patents/cardz-complete-patent.md

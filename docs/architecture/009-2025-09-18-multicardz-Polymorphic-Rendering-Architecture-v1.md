@@ -1,6 +1,6 @@
 # multicardz Polymorphic Rendering Architecture
 
-**Document ID**: 009-2025-09-18-multicardz-Polymorphic-Rendering-Architecture-v1
+**Document ID**: 009-2025-09-18-MultiCardz-Polymorphic-Rendering-Architecture-v1
 **Created**: September 18, 2025
 **Author**: System Architect
 **Status**: Active Architecture Specification
@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This document specifies a revolutionary 4-layer polymorphic rendering architecture for multicardz that implements complete separation of concerns while enabling maximum functionality with minimal code. The architecture transforms the current monolithic `/api/render/cards` function into a composable system that supports cards, charts, n-dimensional views, and future visualizations through the same architectural pattern.
+This document specifies a revolutionary 4-layer polymorphic rendering architecture for MultiCardz that implements complete separation of concerns while enabling maximum functionality with minimal code. The architecture transforms the current monolithic `/api/render/cards` function into a composable system that supports cards, charts, n-dimensional views, and future visualizations through the same architectural pattern.
 
 **Core Innovation**: Protocol-based polymorphism where the same spatial manipulation logic drives card grids, pie charts, sankey diagrams, 3D spatial arrangements, and any future visualization type. This approach eliminates code duplication while preserving the mathematical rigor of our patent-compliant set theory operations.
 
@@ -650,8 +650,7 @@ async def compute_card_sets(
 
     Phase 1 (Intersection): U' = {c ∈ U : I ⊆ c.tags} where I = intersection_tags
     Phase 2 (Union): R = {c ∈ U' : (O ∩ c.tags) ≠ ∅} where O = union_tags
-    Phase 3 (Exclusion): E = {c ∈ U' : (E ∩ c.tags) = ∅} where E = exclusion_tags
-    Phase 4 (Difference): R' = R \ {c ∈ R : (D ∩ c.tags) ≠ ∅} where D = difference_tags
+    Phase 3 (Difference): R' = R \ {c ∈ R : (D ∩ c.tags) ≠ ∅} where D = difference_tags
 
     PROPERTIES GUARANTEED:
     - Associative: (A ∩ B) ∩ C = A ∩ (B ∩ C)
@@ -668,7 +667,6 @@ async def compute_card_sets(
     # Extract zone operations maintaining mathematical purity
     intersection_tags = extract_intersection_tags(tags_in_play)
     union_tags = extract_union_tags(tags_in_play)
-    exclusion_tags = extract_exclusion_tags(tags_in_play)
     difference_tags = extract_difference_tags(tags_in_play)
 
     # Phase 1: Intersection filtering (universe restriction)
@@ -693,26 +691,15 @@ async def compute_card_sets(
         union_result = filtered_cards
         operations.append("identity(no union)")
 
-    # Phase 3: Exclusion filtering (complement of union)
-    if exclusion_tags:
-        exclusion_result = frozenset(
-            card for card in union_result
-            if not (exclusion_tags & card.tags)
-        )
-        operations.append(f"exclusion({len(exclusion_tags)} tags)")
-    else:
-        exclusion_result = union_result
-        operations.append("identity(no exclusion)")
-
-    # Phase 4: Difference exclusion (subtract from result)
+    # Phase 3: Difference exclusion
     if difference_tags:
         final_result = frozenset(
-            card for card in exclusion_result
+            card for card in union_result
             if not (difference_tags & card.tags)
         )
         operations.append(f"difference({len(difference_tags)} tags)")
     else:
-        final_result = exclusion_result
+        final_result = union_result
         operations.append("identity(no difference)")
 
     processing_time = time.perf_counter() - start_time
@@ -1334,8 +1321,8 @@ async def render_cards_polymorphic(request: Request):
 
 **Story-Driven Visualization for Enterprise Sales**:
 ```python
-# "We use multicardz to run multicardz" demonstration
-class multicardzOperationsRenderer(HTMLCardRenderer):
+# "We use MultiCardz to run MultiCardz" demonstration
+class MultiCardzOperationsRenderer(HTMLCardRenderer):
     async def render_operations_story(self, operational_cards: frozenset[Card]) -> str:
         """Render compelling operational intelligence story."""
         template = self.templates.get_template('operations/multicardz_story.html')
@@ -1346,7 +1333,7 @@ class multicardzOperationsRenderer(HTMLCardRenderer):
         correlation_discoveries = extract_correlation_patterns(operational_cards)
 
         return template.render(
-            story_title="How multicardz Operations Team Uses Spatial Correlation",
+            story_title="How MultiCardz Operations Team Uses Spatial Correlation",
             deployment_rate=deployment_success_rate,
             mttr_improvement="75% reduction in mean time to resolution",
             key_discoveries=correlation_discoveries,
