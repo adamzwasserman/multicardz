@@ -99,10 +99,14 @@
 
 /* ============ Interaction States ============ */
 
-/* Hover state - higher specificity to override user.css:3235 */
+/* Hover state - higher specificity to override user.css:1743 and user.css:3235 */
 .tag.tag-group.group-tag:hover,
 .cloud .tag.tag-group:hover,
 .tags-wrapper .tag.tag-group:hover {
+    /* Keep background and text visible on hover */
+    background: rgba(245, 245, 245, 0.98);
+    color: #1f2937;
+
     border-style: solid;
     border-width: 1px;
     border-color: rgba(0, 0, 0, 0.5);
