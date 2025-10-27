@@ -124,7 +124,7 @@ function createGroupElement(group) {
     const icon = document.createElement('span');
     icon.className = 'group-icon';
     icon.innerHTML = `
-        <svg viewBox="0 0 12 12" fill="none" stroke="currentColor">
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor">
             <path d="M3 5 L6 8 L9 5" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
     `;

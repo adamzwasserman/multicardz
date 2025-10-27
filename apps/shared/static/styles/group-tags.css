@@ -129,19 +129,30 @@
 
 /* ============ Group Icon ============ */
 
-.group-tag .group-icon {
+/* Higher specificity to ensure icon sizing */
+.tag.group-tag .group-icon,
+.cloud .tag-group .group-icon,
+span.group-tag .group-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 10px;
     height: 10px;
+    max-width: 10px;
+    max-height: 10px;
     flex-shrink: 0;
     transition: transform 0.2s ease;
+    overflow: hidden;
 }
 
-.group-tag .group-icon svg {
+.tag.group-tag .group-icon svg,
+.cloud .tag-group .group-icon svg,
+span.group-tag .group-icon svg {
     width: 10px;
     height: 10px;
+    max-width: 10px;
+    max-height: 10px;
+    display: block;
     stroke: currentColor;
     stroke-width: 1.5;
 }
