@@ -315,7 +315,7 @@ class TagToCloudHandler extends DropHandler {
     const cloudType = dropElement.dataset.cloudType;
 
     // User and AI tags can both go to user cloud if preference is set
-    if (cloudType === 'user') return tagType === 'user-tag' || tagType === 'ai-tag';
+    if (cloudType === 'user') return tagType === 'user-tag' || tagType === 'ai-tag' || tagType === 'tag';
     if (cloudType === 'ai') return tagType === 'ai-tag';
     if (cloudType === 'system') return tagType === 'system-tag';
     if (cloudType === 'group') return tagType === 'group-tag';
@@ -324,19 +324,24 @@ class TagToCloudHandler extends DropHandler {
   }
 
   async handleDrop(event, dropElement, draggedElements) {
+    console.log('[TagToCloudHandler.handleDrop] Called with', draggedElements.length, 'tags');
     event.preventDefault();
     dropElement.classList.remove('drag-over');
 
     const cloudWrapper = dropElement.querySelector('.tags-wrapper');
+    console.log('[TagToCloudHandler.handleDrop] Cloud wrapper found:', cloudWrapper);
     if (!cloudWrapper) return;
 
     for (const tagElement of draggedElements) {
-      if (!this.validate(tagElement, dropElement)) continue;
+      const isValid = this.validate(tagElement, dropElement);
+      console.log('[TagToCloudHandler.handleDrop] Tag', tagElement.dataset.tag, 'valid:', isValid);
+      if (!isValid) continue;
 
       // MOVE tag to cloud (DOM manipulation, not recreation)
       cloudWrapper.appendChild(tagElement);
       tagElement.classList.remove('tag-active', 'selected');
       tagElement.classList.add('tag-cloud');
+      console.log('[TagToCloudHandler.handleDrop] Moved tag to cloud:', tagElement.dataset.tag);
     }
   }
 
@@ -1331,15 +1336,19 @@ class SpatialDragDrop {
 
     // Drop handler with debouncing to prevent rapid repeated drops
     const handleDrop = debounce(async (e) => {
+      console.log('[handleDrop] Drop event fired on:', e.target);
       e.preventDefault();
       e.stopPropagation();
 
       if (!this.draggedElements || this.draggedElements.length === 0) {
+        console.log('[handleDrop] No dragged elements, returning');
         return;
       }
 
       const dropTarget = this.findDropTarget(e.target);
+      console.log('[handleDrop] Drop target found:', dropTarget);
       if (!dropTarget) {
+        console.log('[handleDrop] No drop target found, returning');
         return;
       }
 
@@ -1392,13 +1401,16 @@ class SpatialDragDrop {
 
       const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
 
-      if (handler && handler.validate(this.draggedElements[0], dropTarget)) {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.dataTransfer) {
-          e.dataTransfer.dropEffect = 'move';
+      if (handler) {
+        const isValid = handler.validate(this.draggedElements[0], dropTarget);
+        if (isValid) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.dataTransfer) {
+            e.dataTransfer.dropEffect = 'move';
+          }
+          dropTarget.classList.add('drag-over');
         }
-        dropTarget.classList.add('drag-over');
       }
     });
 
@@ -1438,21 +1450,21 @@ class SpatialDragDrop {
 
     // Drag start - use capture phase to run before zone's inline handler
     tagContainer.addEventListener('dragstart', (e) => {
-      if (e.target.matches('[data-tag]')) {
+      if (e.target.matches('[data-tag], [data-type="group-tag"]')) {
         this.handleTagDragStart(e);
       }
     }, true); // Capture phase
 
     // Drag end
     tagContainer.addEventListener('dragend', (e) => {
-      if (e.target.matches('[data-tag]')) {
+      if (e.target.matches('[data-tag], [data-type="group-tag"]')) {
         this.handleTagDragEnd(e);
       }
     });
 
     // Click for selection
     tagContainer.addEventListener('click', (e) => {
-      if (e.target.matches('[data-tag]')) {
+      if (e.target.matches('[data-tag], [data-type="group-tag"]')) {
         this.handleTagClick(e);
       }
     });
@@ -1497,9 +1509,8 @@ class SpatialDragDrop {
       return this.createFallbackGhostImage(selectedTags);
     }
 
-    const config = this.ghostImageConfig;
-    const tagCount = selectedTags.size;
-    const visibleTags = Array.from(selectedTags).slice(0, config.maxVisibleTags);
+    const tagArray = Array.from(selectedTags);
+    const tagCount = tagArray.length;
 
     // Create canvas
     const canvas = document.createElement('canvas');
@@ -1509,78 +1520,69 @@ class SpatialDragDrop {
       return this.createFallbackGhostImage(selectedTags);
     }
 
-    // Set canvas dimensions
-    canvas.width = config.thumbnailSize.width;
-    canvas.height = config.thumbnailSize.height;
+    // Tag styling (matching CSS)
+    const tagStyle = {
+      fontSize: 13,
+      fontFamily: 'Inter, system-ui, sans-serif',
+      padding: { x: 8, y: 4 },
+      margin: 3,
+      borderRadius: 3,
+      borderWidth: 1,
+      backgroundColor: '#ffffff',
+      borderColor: '#d1d5db',
+      textColor: '#374151'
+    };
 
-    // Draw background with rounded corners
-    ctx.fillStyle = config.canvas.backgroundColor;
-    ctx.beginPath();
-    this.roundRect(ctx, 0, 0, canvas.width, canvas.height, config.canvas.borderRadius);
-    ctx.fill();
-
-    // Draw tag previews
-    ctx.font = config.canvas.font;
-    let yOffset = config.canvas.padding;
-    const tagHeight = 24;
-
-    visibleTags.forEach((tag, index) => {
-      const tagText = tag.dataset.tag || 'unknown';
-      const tagType = tag.dataset.type || 'user-tag';
-
-      // Draw tag background
-      const tagColor = this.getTagColor(tagType);
-      ctx.fillStyle = tagColor;
-      ctx.beginPath();
-      this.roundRect(
-        ctx,
-        config.canvas.padding,
-        yOffset,
-        canvas.width - 2 * config.canvas.padding,
-        tagHeight,
-        4
-      );
-      ctx.fill();
-
-      // Draw tag text
-      ctx.fillStyle = '#ffffff';
-      ctx.textBaseline = 'middle';
-      const truncatedText = this.truncateText(
-        ctx,
-        tagText,
-        canvas.width - 2 * config.canvas.padding - 16
-      );
-      ctx.fillText(
-        truncatedText,
-        config.canvas.padding + 8,
-        yOffset + tagHeight / 2
-      );
-
-      yOffset += tagHeight + config.canvas.tagSpacing;
+    // Measure all tags to calculate canvas dimensions
+    ctx.font = `${tagStyle.fontSize}px ${tagStyle.fontFamily}`;
+    const tagMetrics = tagArray.map(tag => {
+      const text = tag.textContent.trim() || tag.dataset.tag || 'unknown';
+      const textWidth = ctx.measureText(text).width;
+      const tagWidth = textWidth + (tagStyle.padding.x * 2) + (tagStyle.borderWidth * 2);
+      const tagHeight = tagStyle.fontSize + (tagStyle.padding.y * 2) + (tagStyle.borderWidth * 2);
+      return { text, width: tagWidth, height: tagHeight };
     });
 
-    // Draw count badge if more tags than visible
-    if (tagCount > config.maxVisibleTags) {
-      const badgeX = canvas.width - 30;
-      const badgeY = canvas.height - 30;
-      const overflowCount = tagCount - config.maxVisibleTags;
+    // Calculate canvas dimensions for horizontal layout
+    const totalWidth = tagMetrics.reduce((sum, m) => sum + m.width + tagStyle.margin, 0);
+    const maxHeight = Math.max(...tagMetrics.map(m => m.height));
 
-      // Draw circle
-      ctx.fillStyle = config.canvas.badgeColor;
+    canvas.width = totalWidth + tagStyle.margin;
+    canvas.height = maxHeight + (tagStyle.margin * 2);
+
+    // Clear background (transparent)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw tags horizontally
+    let xOffset = tagStyle.margin;
+    const yOffset = tagStyle.margin;
+
+    tagMetrics.forEach((metrics, index) => {
+      const { text, width, height } = metrics;
+
+      // Draw tag background
+      ctx.fillStyle = tagStyle.backgroundColor;
+      ctx.strokeStyle = tagStyle.borderColor;
+      ctx.lineWidth = tagStyle.borderWidth;
+
       ctx.beginPath();
-      ctx.arc(badgeX, badgeY, 20, 0, Math.PI * 2);
+      this.roundRect(ctx, xOffset, yOffset, width, height, tagStyle.borderRadius);
       ctx.fill();
+      ctx.stroke();
 
-      // Draw count text
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '12px Inter, system-ui, sans-serif';
-      ctx.textAlign = 'center';
+      // Draw tag text
+      ctx.fillStyle = tagStyle.textColor;
+      ctx.font = `${tagStyle.fontSize}px ${tagStyle.fontFamily}`;
       ctx.textBaseline = 'middle';
-      ctx.fillText(`+${overflowCount}`, badgeX, badgeY);
-    }
+      ctx.textAlign = 'left';
+      ctx.fillText(
+        text,
+        xOffset + tagStyle.padding.x + tagStyle.borderWidth,
+        yOffset + height / 2
+      );
 
-    // Set canvas opacity
-    canvas.style.opacity = config.opacity.toString();
+      xOffset += width + tagStyle.margin;
+    });
 
     // Performance monitoring
     const duration = performance.now() - startTime;
@@ -1707,35 +1709,39 @@ class SpatialDragDrop {
    * Manages canvas lifecycle and memory cleanup
    */
   attachGhostImage(event, selectedTags) {
+    console.log('[attachGhostImage] Called with', selectedTags.size, 'tags');
+
     // Clean up any existing ghost
     this.cleanupGhostImage();
 
     // Generate ghost canvas
     this.currentGhostCanvas = this.generateGhostImage(selectedTags);
+    console.log('[attachGhostImage] Generated canvas:', this.currentGhostCanvas);
 
-    // Convert canvas to image for drag image
-    const ghostImage = new Image();
-
-    if (this.currentGhostCanvas instanceof HTMLCanvasElement) {
-      ghostImage.src = this.currentGhostCanvas.toDataURL();
-    } else {
-      // Fallback DOM element - can't use as drag image directly
-      // Browser will use default drag image
+    if (!(this.currentGhostCanvas instanceof HTMLCanvasElement)) {
+      console.warn('[attachGhostImage] Not a canvas element, using default drag image');
       return;
     }
 
-    this.currentGhostImage = ghostImage;
+    // Append canvas to document temporarily (required for setDragImage in some browsers)
+    this.currentGhostCanvas.style.position = 'absolute';
+    this.currentGhostCanvas.style.top = '-9999px';
+    this.currentGhostCanvas.style.left = '-9999px';
+    document.body.appendChild(this.currentGhostCanvas);
+    console.log('[attachGhostImage] Canvas appended to document');
 
-    // Set drag image once loaded
-    ghostImage.onload = () => {
-      if (event.dataTransfer && event.dataTransfer.setDragImage) {
-        event.dataTransfer.setDragImage(
-          ghostImage,
-          this.ghostImageConfig.offset.x,
-          this.ghostImageConfig.offset.y
-        );
-      }
-    };
+    // Set drag image synchronously with the canvas element
+    if (event.dataTransfer && event.dataTransfer.setDragImage) {
+      console.log('[attachGhostImage] Setting drag image with canvas directly');
+      event.dataTransfer.setDragImage(
+        this.currentGhostCanvas,
+        this.ghostImageConfig.offset.x,
+        this.ghostImageConfig.offset.y
+      );
+      console.log('[attachGhostImage] Drag image set successfully');
+    } else {
+      console.warn('[attachGhostImage] dataTransfer.setDragImage not available');
+    }
   }
 
   /**
@@ -1744,6 +1750,10 @@ class SpatialDragDrop {
   cleanupGhostImage() {
     if (this.currentGhostCanvas) {
       if (this.currentGhostCanvas instanceof HTMLCanvasElement) {
+        // Remove from DOM if appended
+        if (this.currentGhostCanvas.parentElement) {
+          this.currentGhostCanvas.remove();
+        }
         // Clear canvas context to free memory
         const ctx = this.currentGhostCanvas.getContext('2d');
         if (ctx) {
@@ -1772,18 +1782,24 @@ class SpatialDragDrop {
    * Maintains individual tag semantics while processing as batch
    */
   async dispatchBatchOperation(draggedElements, dropTarget, event) {
+    console.log('[dispatchBatchOperation] Called with', draggedElements.length, 'elements');
+    console.log('[dispatchBatchOperation] Drop target:', dropTarget);
+
     // Start performance tracking
     const startTime = performance.now();
 
     // Find appropriate handler
     const handler = this.registry.findHandler(draggedElements[0], dropTarget);
+    console.log('[dispatchBatchOperation] Handler found:', handler);
     if (!handler) {
       this.showBatchError(['No handler found for drop target']);
       return { success: false, errors: ['No handler found'] };
     }
 
     // Validate batch operation
+    console.log('[dispatchBatchOperation] Calling validateBatch');
     const validation = handler.validateBatch(draggedElements, dropTarget);
+    console.log('[dispatchBatchOperation] Validation result:', validation);
     if (!validation.valid) {
       this.showBatchError(validation.errors);
       return { success: false, errors: validation.errors };
@@ -2090,7 +2106,9 @@ class SpatialDragDrop {
 
     // Determine what's being dragged
     if (draggedTag.dataset.type === 'group-tag') {
+      console.log('[handleTagDragStart] Dragging group tag');
       this.draggedElements = this.expandGroupTag(draggedTag);
+      console.log('[handleTagDragStart] After expandGroupTag, draggedElements.length:', this.draggedElements.length);
     } else if (this.selectionState.selectedTags.has(draggedTag)) {
       // If dragged tag is part of selection, drag all selected tags
       this.draggedElements = Array.from(this.selectionState.selectedTags);
@@ -2107,9 +2125,13 @@ class SpatialDragDrop {
     });
 
     // Generate and attach ghost image for multi-tag selections
+    console.log('[handleTagDragStart] Checking ghost image condition: draggedElements.length =', this.draggedElements.length);
     if (this.draggedElements.length > 1) {
+      console.log('[handleTagDragStart] Generating ghost image for', this.draggedElements.length, 'tags');
       const draggedSet = new Set(this.draggedElements);
       this.attachGhostImage(event, draggedSet);
+    } else {
+      console.log('[handleTagDragStart] NOT generating ghost image - only', this.draggedElements.length, 'tag(s)');
     }
 
     // Set transfer data
@@ -2181,15 +2203,24 @@ class SpatialDragDrop {
   // Expand group tag to individual tags
   expandGroupTag(groupTagElement) {
     const groupId = groupTagElement.dataset.group;
-    const memberTags = groupTagElement.dataset.members?.split(',') || [];
+    const memberTagIds = groupTagElement.dataset.members?.split(',') || [];
+
+    console.log('[expandGroupTag] Group ID:', groupId);
+    console.log('[expandGroupTag] dataset.members raw:', groupTagElement.dataset.members);
+    console.log('[expandGroupTag] Member IDs:', memberTagIds);
 
     const tagElements = [];
-    memberTags.forEach(tagName => {
-      const tagElement = document.querySelector(`[data-tag="${tagName}"]`);
+    memberTagIds.forEach(tagId => {
+      console.log('[expandGroupTag] Searching for tag ID:', tagId);
+      const tagElement = document.querySelector(`[data-tag-id="${tagId}"]`);
+      console.log('[expandGroupTag] Found element:', tagElement);
       if (tagElement) {
         tagElements.push(tagElement);
       }
     });
+
+    console.log('[expandGroupTag] Total elements found:', tagElements.length);
+    console.log('[expandGroupTag] Elements:', tagElements);
 
     return tagElements;
   }

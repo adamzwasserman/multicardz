@@ -192,18 +192,7 @@ function setupGroupElementListeners(element, group) {
         }
     });
 
-    // Drag start
-    element.addEventListener('dragstart', (e) => {
-        e.dataTransfer.setData('text/group-id', group.group_id);
-        e.dataTransfer.setData('text/type', 'group-tag');
-        element.classList.add('dragging');
-        console.log(`🔵 Dragging group: ${group.name}`);
-    });
-
-    // Drag end
-    element.addEventListener('dragend', (e) => {
-        element.classList.remove('dragging');
-    });
+    // Drag handlers are managed by the main drag-drop.js system
 
     // Drop handler (for adding tags to group)
     element.addEventListener('dragover', (e) => {
