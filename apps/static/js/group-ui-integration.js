@@ -23,6 +23,13 @@ const GroupUIState = {
 function initializeGroupUI() {
     console.log('🏷️ Initializing Group Tags UI...');
 
+    // Get workspace and user from body element
+    const body = document.body;
+    GroupUIState.currentWorkspace = body.dataset.workspace || 'default-workspace';
+    GroupUIState.currentUser = body.dataset.user || 'default-user';
+
+    console.log(`📍 Workspace: ${GroupUIState.currentWorkspace}, User: ${GroupUIState.currentUser}`);
+
     // Load groups from server
     loadWorkspaceGroups();
 
@@ -230,6 +237,15 @@ async function createGroupFromSelection(groupName) {
     try {
         GroupUIState.isCreatingGroup = true;
 
+        const memberTagIds = Array.from(GroupUIState.selectedTags);
+        console.log('Creating group:', {
+            name: groupName,
+            workspace: GroupUIState.currentWorkspace,
+            user: GroupUIState.currentUser,
+            memberCount: memberTagIds.length,
+            memberIds: memberTagIds
+        });
+
         const response = await fetch('/api/groups/create', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -237,12 +253,13 @@ async function createGroupFromSelection(groupName) {
                 name: groupName.trim(),
                 workspace_id: GroupUIState.currentWorkspace,
                 user_id: GroupUIState.currentUser,
-                member_tag_ids: Array.from(GroupUIState.selectedTags),
+                member_tag_ids: memberTagIds,
                 visual_style: {}
             })
         });
 
         const data = await response.json();
+        console.log('API response:', data);
 
         if (data.success) {
             showNotification(`Group "${groupName}" created with ${GroupUIState.selectedTags.size} members`, 'success');
@@ -253,11 +270,12 @@ async function createGroupFromSelection(groupName) {
             // Clear selection
             clearTagSelection();
         } else {
+            console.error('API error:', data);
             showNotification(data.message || 'Failed to create group', 'error');
         }
     } catch (error) {
         console.error('Failed to create group:', error);
-        showNotification('Failed to create group', 'error');
+        showNotification(`Failed to create group: ${error.message}`, 'error');
     } finally {
         GroupUIState.isCreatingGroup = false;
     }
