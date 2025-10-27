@@ -503,8 +503,8 @@ function clearTagSelection() {
     GroupUIState.selectedTags.clear();
     updateSelectionUI();
 
-    // Dispatch event
-    document.dispatchEvent(new CustomEvent('selection-cleared'));
+    // Don't dispatch event here - it's dispatched from drag-drop.js
+    // to prevent infinite recursion
 }
 
 // ============================================================================
