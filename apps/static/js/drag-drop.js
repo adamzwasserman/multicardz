@@ -2079,8 +2079,8 @@ class SpatialDragDrop {
   handleTagDragStart(event) {
     const draggedTag = event.target;
 
-    // Validate it's actually a tag
-    if (!draggedTag.dataset.tag) return;
+    // Validate it's actually a tag (regular tag or group tag)
+    if (!draggedTag.dataset.tag && draggedTag.dataset.type !== 'group-tag') return;
 
     // Stop event from bubbling to zone's dragstart handler
     event.stopPropagation();
