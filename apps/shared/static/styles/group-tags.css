@@ -26,6 +26,11 @@
     /* Subtle depth through opacity */
     opacity: 0.95;
 
+    /* Stacked appearance - subtle layers on bottom-right */
+    box-shadow:
+        1px 1px 0 rgba(0, 0, 0, 0.08),
+        2px 2px 0 rgba(0, 0, 0, 0.05);
+
     /* Smooth transitions for interactions */
     transition: all 0.2s ease;
 
@@ -96,7 +101,11 @@
     border-width: 1px;
     opacity: 1.0;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* Enhanced stacked shadow on hover */
+    box-shadow:
+        1px 1px 0 rgba(0, 0, 0, 0.12),
+        2px 2px 0 rgba(0, 0, 0, 0.08),
+        0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Focus state for accessibility */
