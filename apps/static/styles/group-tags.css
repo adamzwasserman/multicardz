@@ -19,6 +19,9 @@
     border: 1px dashed rgba(0, 0, 0, 0.4);
     background: rgba(255, 255, 255, 0.95);
 
+    /* Ensure text is visible - dark gray on white background */
+    color: #374151;
+
     /* Minimal texture pattern - barely visible dots */
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><circle cx="1" cy="1" r="0.5" fill="rgba(0,0,0,0.03)"/></svg>');
     background-size: 4px 4px;
