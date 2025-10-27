@@ -1702,8 +1702,8 @@ body {
 }
 
 .cloud-group {
-    background-color: transparent;
-    border: 1px dashed light-dark(#9ca3af, var(--color-neutral-400));
+    background-color: light-dark(#fefefe, var(--color-neutral-100));
+    border: 1px solid light-dark(#e5e7eb, var(--color-neutral-300));
 }
 
 .cloud-system {
