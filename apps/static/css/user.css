@@ -369,10 +369,7 @@ body {
   border-color: #d4cfc6;
 }
 
-.earth-tones .cloud-group {
-  background-color: #faf8f5;
-  border-color: #e0dcd4;
-}
+/* .cloud-group styling handled by group-tags.css */
 
 .earth-tones .cloud-system {
   background-color: #faf8f5;
@@ -395,9 +392,7 @@ body {
   color: #6b645c;
 }
 
-.earth-tones .cloud-title-group {
-  color: #6b645c;
-}
+/* .cloud-title-group styling handled by group-tags.css */
 
 .earth-tones .cloud-title-system {
   color: #3a352f;
@@ -420,10 +415,7 @@ body {
   color: #6b7280;
 }
 
-.earth-tones .tag-group {
-  border-color: #a8a29e;
-  color: #78716c;
-}
+/* .tag-group styling handled by group-tags.css */
 
 .earth-tones .tag-system {
   background-color: #e7e5e4;
