@@ -1795,12 +1795,7 @@ body {
     font-weight: 500;
 }
 
-.tag-group {
-    background-color: transparent;
-    border: 1px dashed light-dark(#9ca3af, var(--color-neutral-400));
-    color: light-dark(#6b7280, var(--color-text-secondary));
-    border-radius: 4px;
-}
+/* Group tag styling moved to group-tags.css for Muji design */
 
 .tag-system {
     background-color: light-dark(#e5e7eb, var(--color-neutral-300));
@@ -3353,17 +3348,7 @@ body.font-berkeley-mono {
     outline-offset: 4px;
 }
 
-/* Group tag indicators */
-.tag-group {
-    position: relative;
-    background: linear-gradient(135deg, var(--color-success-light), var(--color-success));
-}
-
-.tag-group::before {
-    content: '⊕';
-    margin-right: 4px;
-    font-weight: bold;
-}
+/* Group tag indicators - moved to group-tags.css for Muji design */
 
 /* Zone visual enhancements */
 .zone-label {

@@ -139,6 +139,15 @@ function createGroupElement(group) {
     count.className = 'member-count';
     count.textContent = `(${group.member_count})`;
 
+    // Member tags preview (collapsed)
+    const membersPreview = document.createElement('span');
+    membersPreview.className = 'members-preview';
+    if (group.member_tag_ids && group.member_tag_ids.length > 0) {
+        const preview = group.member_tag_ids.slice(0, 3).join(', ');
+        const more = group.member_tag_ids.length > 3 ? ` +${group.member_tag_ids.length - 3}` : '';
+        membersPreview.textContent = ` [${preview}${more}]`;
+    }
+
     // Delete button
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'tag-delete';
@@ -153,6 +162,7 @@ function createGroupElement(group) {
     span.appendChild(icon);
     span.appendChild(name);
     span.appendChild(count);
+    span.appendChild(membersPreview);
     span.appendChild(deleteBtn);
 
     // Add event listeners
