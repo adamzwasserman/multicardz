@@ -783,6 +783,14 @@ class SpatialDragDrop {
     this.selectionState.selectionMetadata.selectionSequence.push(tag);
     this.selectionState.lastSelectedTag = tag;
 
+    // Dispatch event for group UI integration
+    document.dispatchEvent(new CustomEvent('tag-selected', {
+      detail: {
+        tagId: tag.dataset.tagId || tag.dataset.tag,
+        tagElement: tag
+      }
+    }));
+
     // Announce to screen readers
     this.announceSelection(`Added ${tag.dataset.tag} to selection`);
   }
@@ -806,6 +814,14 @@ class SpatialDragDrop {
       this.selectionState.selectionMetadata.selectionSequence.splice(sequenceIndex, 1);
     }
 
+    // Dispatch event for group UI integration
+    document.dispatchEvent(new CustomEvent('tag-deselected', {
+      detail: {
+        tagId: tag.dataset.tagId || tag.dataset.tag,
+        tagElement: tag
+      }
+    }));
+
     // Announce to screen readers
     this.announceSelection(`Removed ${tag.dataset.tag} from selection`);
   }
@@ -827,6 +843,9 @@ class SpatialDragDrop {
 
     // Legacy compatibility - also clear old selectedTags set
     this.selectedTags.clear();
+
+    // Dispatch event for group UI integration
+    document.dispatchEvent(new CustomEvent('selection-cleared'));
   }
 
   /**
