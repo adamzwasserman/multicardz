@@ -26,10 +26,11 @@
     /* Subtle depth through opacity */
     opacity: 0.95;
 
-    /* Stacked appearance - subtle layers on bottom-right */
+    /* Stacked appearance - layers on bottom-right */
     box-shadow:
-        1px 1px 0 rgba(0, 0, 0, 0.08),
-        2px 2px 0 rgba(0, 0, 0, 0.05);
+        1px 1px 0 rgba(0, 0, 0, 0.15),
+        2px 2px 0 rgba(0, 0, 0, 0.10),
+        3px 3px 0 rgba(0, 0, 0, 0.05);
 
     /* Smooth transitions for interactions */
     transition: all 0.2s ease;
@@ -103,9 +104,10 @@
     transform: translateY(-1px);
     /* Enhanced stacked shadow on hover */
     box-shadow:
-        1px 1px 0 rgba(0, 0, 0, 0.12),
-        2px 2px 0 rgba(0, 0, 0, 0.08),
-        0 3px 6px rgba(0, 0, 0, 0.1);
+        1px 1px 0 rgba(0, 0, 0, 0.20),
+        2px 2px 0 rgba(0, 0, 0, 0.15),
+        3px 3px 0 rgba(0, 0, 0, 0.10),
+        0 4px 8px rgba(0, 0, 0, 0.12);
 }
 
 /* Focus state for accessibility */
