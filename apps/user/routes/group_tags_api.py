@@ -549,7 +549,7 @@ async def get_workspace_groups(workspace_id: str) -> WorkspaceGroupsResponse:
     logger.info(f"Fetching groups for workspace {workspace_id}")
 
     try:
-        groups = get_groups_by_workspace(workspace_id, DATABASE_PATH)
+        groups = get_groups_by_workspace(workspace_id)
 
         group_infos = tuple(
             GroupInfoResponse(

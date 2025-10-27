@@ -20,17 +20,65 @@ from apps.shared.services.database_connection import get_workspace_connection
 
 # ============ Database Connection ============
 
+import sqlite3
+
+# Global connection cache for the default database
+_default_connection = None
+
 # This function can be monkey-patched during testing
 def get_connection():
     """
     Get database connection.
 
-    This is a stub that can be replaced during testing.
-    In production, this should use the appropriate connection method.
+    Returns a connection to the default database path.
+    For testing, this function is monkey-patched with a test database.
     """
-    raise NotImplementedError(
-        "get_connection() must be implemented or mocked for testing"
-    )
+    global _default_connection
+
+    if _default_connection is None:
+        from apps.shared.config.database import DATABASE_PATH
+        _default_connection = sqlite3.connect(str(DATABASE_PATH), check_same_thread=False)
+        _default_connection.execute("PRAGMA foreign_keys = ON")
+
+        # Initialize schema if needed
+        _initialize_schema(_default_connection)
+
+    return _default_connection
+
+
+def _initialize_schema(conn: sqlite3.Connection) -> None:
+    """Initialize group tags schema if tables don't exist."""
+    conn.executescript("""
+        -- Group tags table
+        CREATE TABLE IF NOT EXISTS group_tags (
+            id TEXT PRIMARY KEY,
+            workspace_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            created_by TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            visual_style TEXT DEFAULT '{}',
+            max_nesting_depth INTEGER DEFAULT 10,
+            UNIQUE(workspace_id, name)
+        );
+
+        -- Group memberships
+        CREATE TABLE IF NOT EXISTS group_memberships (
+            group_id TEXT NOT NULL,
+            member_tag_id TEXT NOT NULL,
+            member_type TEXT NOT NULL CHECK (member_type IN ('tag', 'group')),
+            added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            added_by TEXT NOT NULL,
+            PRIMARY KEY (group_id, member_tag_id),
+            FOREIGN KEY (group_id) REFERENCES group_tags(id) ON DELETE CASCADE,
+            CHECK (group_id != member_tag_id)
+        );
+
+        -- Indexes
+        CREATE INDEX IF NOT EXISTS idx_group_tags_workspace ON group_tags(workspace_id);
+        CREATE INDEX IF NOT EXISTS idx_group_memberships_group ON group_memberships(group_id);
+        CREATE INDEX IF NOT EXISTS idx_group_memberships_member ON group_memberships(member_tag_id);
+    """)
+    conn.commit()
 
 
 # ============ Pure Validation Functions ============

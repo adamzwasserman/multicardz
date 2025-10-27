@@ -107,9 +107,11 @@ function createGroupElement(group) {
     const span = document.createElement('span');
     span.className = 'tag tag-group group-tag';
     span.dataset.groupId = group.group_id;
+    span.dataset.group = group.group_id;  // For drag-drop system compatibility
     span.dataset.type = 'group-tag';
     span.dataset.nestingLevel = '0';
     span.dataset.expanded = 'false';
+    span.dataset.members = group.member_tag_ids ? group.member_tag_ids.join(',') : '';
     span.draggable = true;
 
     // Add ARIA attributes
