@@ -419,10 +419,18 @@ function initializeApp() {
   document.querySelectorAll('.tag-input').forEach(input => {
     input.addEventListener('keypress', async function(e) {
       if (e.key === 'Enter' && this.value.trim()) {
-        const tagName = this.value.trim();
-        const cloudType = this.closest('.cloud-user') ? 'user' :
-                         this.closest('.cloud-ai') ? 'ai' : 'user';
-        await createTag(tagName, cloudType);
+        const inputValue = this.value.trim();
+
+        // Check if this is the group input
+        if (this.classList.contains('group-input')) {
+          // Create a group from currently selected tags
+          await createGroupFromInput(inputValue);
+        } else {
+          // Regular tag creation
+          const cloudType = this.closest('.cloud-user') ? 'user' :
+                           this.closest('.cloud-ai') ? 'ai' : 'user';
+          await createTag(inputValue, cloudType);
+        }
         this.value = '';
       }
     });
@@ -774,6 +782,46 @@ function saveCardOptions() {
   }
 }
 
+// ============================================================================
+// Group Tags Integration
+// ============================================================================
+
+/**
+ * Create a group from input field using currently selected tags
+ */
+async function createGroupFromInput(groupName) {
+  // Check if createGroupFromSelection exists (from group-ui-integration.js)
+  if (typeof createGroupFromSelection === 'function') {
+    await createGroupFromSelection(groupName);
+  } else {
+    console.warn('Group creation function not available');
+  }
+}
+
+/**
+ * Setup global keyboard shortcuts
+ */
+function setupGlobalKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    // Ignore if user is typing in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+      return;
+    }
+
+    // Press 'g' to create group from selected tags
+    if (e.key === 'g' || e.key === 'G') {
+      e.preventDefault();
+
+      // Check if showGroupCreationDialog exists (from group-ui-integration.js)
+      if (typeof showGroupCreationDialog === 'function') {
+        showGroupCreationDialog();
+      } else {
+        console.warn('Group creation dialog not available');
+      }
+    }
+  });
+}
+
 // Run when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
@@ -781,10 +829,12 @@ if (document.readyState === 'loading') {
     initializeColumnResize();
     loadCollapsedRows();
     loadZoneLayout();
+    setupGlobalKeyboardShortcuts();
   });
 } else {
   initializeApp();
   initializeColumnResize();
   loadCollapsedRows();
   loadZoneLayout();
+  setupGlobalKeyboardShortcuts();
 }
