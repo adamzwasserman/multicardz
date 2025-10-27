@@ -12,42 +12,48 @@
 /* ============ Base Group Tag Styling ============ */
 
 .tag.group-tag {
-    /* Subtle border instead of color */
-    border: 1px dashed rgba(0, 0, 0, 0.2);
-    background: rgba(255, 255, 255, 0.95);
+    /* Subtle border instead of color - !important to override conflicts */
+    border: 1px dashed rgba(0, 0, 0, 0.2) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
 
     /* Minimal texture pattern - barely visible dots */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><circle cx="1" cy="1" r="0.5" fill="rgba(0,0,0,0.03)"/></svg>');
-    background-size: 4px 4px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><circle cx="1" cy="1" r="0.5" fill="rgba(0,0,0,0.03)"/></svg>') !important;
+    background-size: 4px 4px !important;
 
     /* Subtle depth through opacity */
-    opacity: 0.95;
+    opacity: 0.95 !important;
 
     /* Smooth transitions for interactions */
-    transition: all 0.2s ease;
+    transition: all 0.2s ease !important;
 
     /* Prevent text selection during drag */
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
 
     /* Cursor indicates draggable */
-    cursor: move;
+    cursor: move !important;
 
-    /* Spacing and layout */
-    padding: 6px 12px;
-    margin: 4px;
-    border-radius: 4px;
+    /* Spacing and layout - compact like regular tags */
+    padding: 4px 8px !important;
+    margin: 2px !important;
+    border-radius: 3px !important;
 
     /* Flexbox for icon + text layout */
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
 
-    /* Typography */
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.4;
+    /* Typography - match regular tag size */
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    line-height: 1.4 !important;
+
+    /* Prevent expansion to full width */
+    width: auto !important;
+    max-width: fit-content !important;
+    height: auto !important;
+    min-height: 0 !important;
 }
 
 /* ============ Nesting Depth Variations ============ */
@@ -121,20 +127,20 @@
 /* ============ Group Icon ============ */
 
 .group-tag .group-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 12px;
-    height: 12px;
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 10px !important;
+    height: 10px !important;
+    flex-shrink: 0 !important;
+    transition: transform 0.2s ease !important;
 }
 
 .group-tag .group-icon svg {
-    width: 100%;
-    height: 100%;
-    stroke: currentColor;
-    stroke-width: 1.5;
+    width: 10px !important;
+    height: 10px !important;
+    stroke: currentColor !important;
+    stroke-width: 1.5 !important;
 }
 
 /* Rotate icon when expanded */

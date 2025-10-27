@@ -874,22 +874,7 @@ body {
     letter-spacing: 0.5px;
 }
 
-.tag-groups {
-    background: #f3e8ff;
-    border: 1px solid #c4b5fd;
-    border-radius: 6px;
-    padding: 1rem;
-    min-height: 80px;
-}
-
-.tag-groups h3 {
-    margin: 0 0 0.75rem 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: #7c3aed;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
+/* Legacy .tag-groups class - removed to avoid conflicts with Muji group-tags design */
 
 /* Tag Styling */
 .tag-item {
