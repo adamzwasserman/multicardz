@@ -15,8 +15,8 @@
 .tag.tag-group.group-tag,
 .cloud .tag.tag-group,
 .tags-wrapper .tag.tag-group {
-    /* Subtle border instead of color */
-    border: 1px dashed rgba(0, 0, 0, 0.2);
+    /* Visible border - increased from 0.2 to 0.4 for visibility */
+    border: 1px dashed rgba(0, 0, 0, 0.4);
     background: rgba(255, 255, 255, 0.95);
 
     /* Minimal texture pattern - barely visible dots */
@@ -26,11 +26,11 @@
     /* Subtle depth through opacity */
     opacity: 0.95;
 
-    /* Stacked appearance - layers on bottom-right */
+    /* Stacked appearance - layers on bottom-right - increased opacity for visibility */
     box-shadow:
-        1px 1px 0 rgba(0, 0, 0, 0.15),
-        2px 2px 0 rgba(0, 0, 0, 0.10),
-        3px 3px 0 rgba(0, 0, 0, 0.05);
+        1px 1px 0 rgba(0, 0, 0, 0.35),
+        2px 2px 0 rgba(0, 0, 0, 0.25),
+        3px 3px 0 rgba(0, 0, 0, 0.15);
 
     /* Smooth transitions for interactions */
     transition: all 0.2s ease;
@@ -96,18 +96,21 @@
 
 /* ============ Interaction States ============ */
 
-/* Hover state - no color change, just border and subtle lift */
-.tag.group-tag:hover {
+/* Hover state - higher specificity to override user.css:3235 */
+.tag.tag-group.group-tag:hover,
+.cloud .tag.tag-group:hover,
+.tags-wrapper .tag.tag-group:hover {
     border-style: solid;
     border-width: 1px;
+    border-color: rgba(0, 0, 0, 0.5);
     opacity: 1.0;
     transform: translateY(-1px);
-    /* Enhanced stacked shadow on hover */
+    /* Enhanced stacked shadow on hover - increased opacity */
     box-shadow:
-        1px 1px 0 rgba(0, 0, 0, 0.20),
-        2px 2px 0 rgba(0, 0, 0, 0.15),
-        3px 3px 0 rgba(0, 0, 0, 0.10),
-        0 4px 8px rgba(0, 0, 0, 0.12);
+        1px 1px 0 rgba(0, 0, 0, 0.45),
+        2px 2px 0 rgba(0, 0, 0, 0.35),
+        3px 3px 0 rgba(0, 0, 0, 0.25),
+        0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Focus state for accessibility */
