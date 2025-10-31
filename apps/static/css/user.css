@@ -3398,11 +3398,15 @@ body.font-berkeley-mono {
     color: var(--color-text-secondary);
 }
 
-/* Smooth transitions for all interactive elements */
+/* Smooth transitions for interactive elements (not clouds to prevent layout shift) */
 .drop-zone,
-.tag,
-.cloud {
+.tag {
     transition: all 0.2s ease;
+}
+
+/* Clouds do not transition to prevent layout shift on page load */
+.cloud {
+    /* No transition - prevents layout shift during initial render */
 }
 
 /* High contrast mode support */
