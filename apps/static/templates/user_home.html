@@ -92,19 +92,38 @@
                     </div>
                     <div class="tags-wrapper">
                         {% for group in groups %}
-                        <span class="tag tag-group"
+                        <span class="tag tag-group group-tag"
+                              data-group-id="{{ group.id }}"
                               data-group="{{ group.id }}"
                               data-type="group-tag"
+                              data-nesting-level="0"
+                              data-expanded="false"
+                              data-members="{{ group.member_tag_ids|join(',') }}"
                               draggable="true"
->
-                            {{ group.name }}
+                              role="button"
+                              tabindex="0"
+                              aria-label="Group: {{ group.name }} with {{ group.member_count }} members"
+                              aria-expanded="false">
+                            <span class="group-icon">
+                                <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor">
+                                    <path d="M3 5 L6 8 L9 5" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </span>
+                            <span class="tag-name">{{ group.name }}</span>
+                            <span class="member-count">({{ group.member_count }})</span>
+                            <span class="members-preview">
+                                {%- if group.member_tag_ids|length > 0 -%}
+                                    [{{ group.member_tag_ids[:3]|join(', ') }}{% if group.member_tag_ids|length > 3 %} +{{ group.member_tag_ids|length - 3 }}{% endif %}]
+                                {%- endif -%}
+                            </span>
+                            <button class="tag-delete" onclick="deleteGroup('{{ group.id }}')" title="Delete group">×</button>
                         </span>
                         {% endfor %}
                     </div>
-                    <div class="input-wrapper">
+                    <!-- <div class="input-wrapper">
                         <input type="text" class="tag-input group-input" placeholder="Add group..." aria-label="Add group"
 >
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- System Tags Cloud -->
@@ -242,8 +261,9 @@
     </div>
 
     <div class="card-display">
-        <div class="card-container" id="cardContainer">
-            <!-- Cards will be populated by JavaScript - starts empty to avoid layout shift -->
+        <div class="card-container" id="cardContainer" style="min-height: 400px;">
+            <!-- Cards will be populated by JavaScript -->
+            <!-- Min-height prevents layout shift during load -->
         </div>
     </div>
 

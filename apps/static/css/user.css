@@ -5,13 +5,34 @@
     box-sizing: border-box;
 }
 
-/* Font Face Declarations - Self-hosted fonts */
+/* Font Face Declarations - Self-hosted fonts with fallback metrics */
+
+/* Inconsolata with Courier New fallback (monospace) */
+@font-face {
+    font-family: 'Inconsolata Fallback';
+    src: local('Courier New');
+    size-adjust: 95.2%;
+    ascent-override: 92%;
+    descent-override: 24%;
+    line-gap-override: 0%;
+}
+
 @font-face {
     font-family: 'Inconsolata';
     src: url('/static/fonts/inconsolata-regular.woff2') format('woff2');
     font-weight: 200;
     font-style: normal;
-    font-display: block;
+    font-display: swap;
+}
+
+/* Lato with Arial fallback */
+@font-face {
+    font-family: 'Lato Fallback';
+    src: local('Arial');
+    size-adjust: 102.8%;
+    ascent-override: 95%;
+    descent-override: 20%;
+    line-gap-override: 0%;
 }
 
 @font-face {
@@ -19,7 +40,17 @@
     src: url('/static/fonts/lato-regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
-    font-display: block;
+    font-display: swap;
+}
+
+/* Libre Franklin with Arial fallback */
+@font-face {
+    font-family: 'Libre Franklin Fallback';
+    src: local('Arial');
+    size-adjust: 98.5%;
+    ascent-override: 92%;
+    descent-override: 22%;
+    line-gap-override: 0%;
 }
 
 @font-face {
@@ -27,7 +58,17 @@
     src: url('/static/fonts/librefranklin-regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
-    font-display: block;
+    font-display: swap;
+}
+
+/* Merriweather Sans with Arial fallback */
+@font-face {
+    font-family: 'Merriweather Sans Fallback';
+    src: local('Arial');
+    size-adjust: 104.2%;
+    ascent-override: 90%;
+    descent-override: 24%;
+    line-gap-override: 0%;
 }
 
 @font-face {
@@ -35,7 +76,17 @@
     src: url('/static/fonts/merriweathersans-regular.woff2') format('woff2');
     font-weight: 300;
     font-style: normal;
-    font-display: block;
+    font-display: swap;
+}
+
+/* Mulish (Avenir substitute) with Arial fallback */
+@font-face {
+    font-family: 'Mulish Fallback';
+    src: local('Arial');
+    size-adjust: 107.4%;
+    ascent-override: 90%;
+    descent-override: 22%;
+    line-gap-override: 0%;
 }
 
 @font-face {
@@ -43,7 +94,17 @@
     src: url('/static/fonts/mulish-regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
-    font-display: block;
+    font-display: swap;
+}
+
+/* Roboto with Arial fallback */
+@font-face {
+    font-family: 'Roboto Fallback';
+    src: local('Arial');
+    size-adjust: 100.3%;
+    ascent-override: 92%;
+    descent-override: 24%;
+    line-gap-override: 0%;
 }
 
 @font-face {
@@ -51,7 +112,17 @@
     src: url('/static/fonts/roboto-regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
-    font-display: block;
+    font-display: swap;
+}
+
+/* Work Sans with Arial fallback */
+@font-face {
+    font-family: 'Work Sans Fallback';
+    src: local('Arial');
+    size-adjust: 101.5%;
+    ascent-override: 93%;
+    descent-override: 21%;
+    line-gap-override: 0%;
 }
 
 @font-face {
@@ -59,7 +130,7 @@
     src: url('/static/fonts/worksans-regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
-    font-display: block;
+    font-display: swap;
 }
 
 /* Base body styling */
@@ -2503,7 +2574,7 @@ body.font-helvetica {
 
 .font-libre-franklin,
 body.font-libre-franklin {
-    font-family: 'Libre Franklin', 'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-family: 'Libre Franklin', 'Libre Franklin Fallback', Arial, sans-serif !important;
 }
 
 .font-source-sans,
@@ -2513,43 +2584,43 @@ body.font-source-sans {
 
 .font-avenir,
 body.font-avenir {
-    font-family: 'Mulish' !important;
+    font-family: 'Mulish', 'Mulish Fallback', Arial, sans-serif !important;
 }
 
 .font-akzidenz,
 body.font-akzidenz {
-    font-family: 'Work Sans' !important;
+    font-family: 'Work Sans', 'Work Sans Fallback', Arial, sans-serif !important;
 }
 
 .font-sanfrancisco,
 body.font-sanfrancisco {
-    font-family: 'Roboto' !important;
+    font-family: 'Roboto', 'Roboto Fallback', Arial, sans-serif !important;
 }
 
 .font-roboto,
 body.font-roboto {
-    font-family: 'Roboto' !important;
+    font-family: 'Roboto', 'Roboto Fallback', Arial, sans-serif !important;
 }
 
 .font-optima,
 body.font-optima {
-    font-family: 'Lato' !important;
+    font-family: 'Lato', 'Lato Fallback', Arial, sans-serif !important;
 }
 
 .font-lato,
 body.font-lato {
-    font-family: 'Lato' !important;
+    font-family: 'Lato', 'Lato Fallback', Arial, sans-serif !important;
 }
 
 .font-merriweather,
 body.font-merriweather {
-    font-family: 'Merriweather Sans' !important;
+    font-family: 'Merriweather Sans', 'Merriweather Sans Fallback', Arial, sans-serif !important;
     font-weight: 300 !important;
 }
 
 .font-inconsolata,
 body.font-inconsolata {
-    font-family: 'Inconsolata' !important;
+    font-family: 'Inconsolata', 'Inconsolata Fallback', 'Courier New', monospace !important;
     font-weight: 200 !important;
 }
 

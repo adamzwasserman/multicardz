@@ -131,6 +131,27 @@ def create_app():
             # Fallback to basic tags if lesson system fails
             available_tags = [{"name": "drag me to first box", "count": 0}]
 
+        # Load group tags from database
+        from apps.shared.services.group_storage import get_groups_by_workspace
+
+        try:
+            workspace_id = "default-workspace"
+            groups_tuple = get_groups_by_workspace(workspace_id)
+            # Convert GroupTag objects to dicts for template
+            groups = [
+                {
+                    "id": g.id,
+                    "name": g.name,
+                    "member_tag_ids": list(g.member_tag_ids),
+                    "member_count": len(g.member_tag_ids),
+                }
+                for g in groups_tuple
+            ]
+            logger.info(f"Loaded {len(groups)} group tags for server-side rendering")
+        except Exception as e:
+            logger.warning(f"Could not load group tags: {e}. Using empty list.")
+            groups = []
+
         # Load user preferences (zone layout, font, theme, and column widths)
         import json
 
@@ -199,7 +220,7 @@ def create_app():
             {
                 "request": request,
                 "available_tags": available_tags,
-                "groups": [],
+                "groups": groups,
                 "zone_layout": zone_layout,
                 "font_class": font_class,
                 "font_preload_url": font_preload_url,

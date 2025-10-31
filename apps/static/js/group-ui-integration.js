@@ -66,10 +66,10 @@ async function loadWorkspaceGroups() {
                 GroupUIState.groups.set(group.group_id, group);
             });
 
-            // Update UI
-            renderGroupsCloud();
+            // Hydrate server-rendered elements instead of re-rendering
+            hydrateGroupElements();
 
-            console.log(`✅ Loaded ${data.groups.length} groups`);
+            console.log(`✅ Loaded ${data.groups.length} groups (hydrated existing elements)`);
         }
     } catch (error) {
         console.error('Failed to load groups:', error);
@@ -78,7 +78,37 @@ async function loadWorkspaceGroups() {
 }
 
 /**
- * Render groups in the tag cloud
+ * Hydrate server-rendered group elements with event listeners
+ * This preserves server-rendered HTML and only adds JavaScript functionality
+ */
+function hydrateGroupElements() {
+    const groupsWrapper = document.querySelector('.cloud-group .tags-wrapper');
+    if (!groupsWrapper) return;
+
+    // Find all server-rendered group elements
+    const groupElements = groupsWrapper.querySelectorAll('.tag-group');
+
+    groupElements.forEach(element => {
+        const groupId = element.dataset.groupId || element.dataset.group;
+        const group = GroupUIState.groups.get(groupId);
+
+        if (group) {
+            // Add event listeners to existing server-rendered element
+            setupGroupElementListeners(element, group);
+        }
+    });
+
+    // Update count (in case groups were added/removed)
+    const countElement = document.querySelector('.cloud-group .tag-count');
+    if (countElement) {
+        countElement.textContent = `(${GroupUIState.groups.size})`;
+    }
+
+    console.log(`🔧 Hydrated ${groupElements.length} server-rendered group elements`);
+}
+
+/**
+ * Render groups in the tag cloud (used for dynamically created groups only)
  */
 function renderGroupsCloud() {
     const groupsWrapper = document.querySelector('.cloud-group .tags-wrapper');

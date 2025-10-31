@@ -582,19 +582,12 @@ function initializeColumnResize() {
   let startLeftWidth = 0;
   let startRightWidth = 0;
 
-  // Load saved widths and preferences
+  // Load preferences (column widths already applied server-side)
   fetch('/api/user/preferences')
     .then(res => res.json())
     .then(prefs => {
-      const leftWidth = prefs.leftControlWidth || 120;
-      const rightWidth = prefs.rightControlWidth || 120;
-
-      // Only set grid columns if not already set server-side (to avoid layout shift)
-      const currentColumns = grid.style.gridTemplateColumns;
-      const targetColumns = `${leftWidth}px 1fr ${rightWidth}px`;
-      if (currentColumns !== targetColumns) {
-        grid.style.gridTemplateColumns = targetColumns;
-      }
+      // Column widths are pre-rendered server-side to avoid layout shift
+      // This fetch is only needed for other preferences
 
       // Apply advancedView preference
       const advancedViewCheckbox = document.getElementById('advancedView');
