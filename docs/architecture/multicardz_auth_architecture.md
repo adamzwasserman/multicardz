@@ -1,5 +1,14 @@
 # multicardz Authentication, Authorization & Access Architecture
 
+
+---
+**IMPLEMENTATION STATUS**: SUPERSEDED
+**LAST VERIFIED**: 2025-11-06
+**IMPLEMENTATION EVIDENCE**: Consolidated into doc 039-2025-11-06-Authentication-Architecture-and-Plan.md
+**SUPERSEDED BY**: docs/architecture/039-2025-11-06-Authentication-Architecture-and-Plan.md
+---
+
+
 ## Overview
 
 multicardz uses Auth0 as its primary authentication provider with a secure cookie-based authentication system. This approach enhances security and user experience by:

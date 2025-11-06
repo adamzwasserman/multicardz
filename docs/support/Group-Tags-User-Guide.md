@@ -6,6 +6,14 @@
 
 ---
 
+---
+**IMPLEMENTATION STATUS**: PLANNED
+**LAST VERIFIED**: 2025-11-06
+**IMPLEMENTATION EVIDENCE**: Not implemented.
+---
+
+
+
 ## What Are Group Tags?
 
 Group Tags are semantic collections of related tags that help you organize and manipulate multiple tags as a single unit. Think of them as folders for your tags, but with powerful polymorphic behavior - they expand or collapse based on where you use them.

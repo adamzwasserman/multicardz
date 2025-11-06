@@ -1,5 +1,14 @@
 # multicardz Authentication, Subscription & User Management Requirements
 
+
+---
+**IMPLEMENTATION STATUS**: SUPERSEDED
+**LAST VERIFIED**: 2025-11-06
+**IMPLEMENTATION EVIDENCE**: Consolidated into doc 039-2025-11-06-Authentication-Architecture-and-Plan.md
+**SUPERSEDED BY**: docs/architecture/039-2025-11-06-Authentication-Architecture-and-Plan.md
+---
+
+
 ## Plain Language Summary
 
 **What This Document Is:**
