@@ -166,6 +166,7 @@ def create_app():
         theme = "system"  # Default theme
         left_width = 120  # Default left column width
         right_width = 120  # Default right column width
+        start_with_all_cards = True  # Default: show all cards when no tags selected
 
         # Map font classes to their self-hosted woff2 files
         FONT_PRELOAD_MAP = {
@@ -212,6 +213,10 @@ def create_app():
                     # Load column widths
                     left_width = prefs.get("leftControlWidth", 120)
                     right_width = prefs.get("rightControlWidth", 120)
+
+                    # Load startWithAllCards preference
+                    view_settings = prefs.get("view_settings", {})
+                    start_with_all_cards = view_settings.get("cards_start_visible", True)
         except Exception as e:
             logger.warning(f"Could not load user preferences: {e}. Using defaults.")
 
@@ -227,6 +232,7 @@ def create_app():
                 "theme": theme,
                 "left_width": left_width,
                 "right_width": right_width,
+                "startWithAllCards": start_with_all_cards,
                 "show_settings": True,
             },
         )

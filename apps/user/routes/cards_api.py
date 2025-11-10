@@ -179,7 +179,7 @@ def compute_card_sets(
 
         # Load cards from new schema (zero-trust)
         cards_query = """
-            SELECT card_id, name, tags, created, modified
+            SELECT card_id, name, description, tags, created, modified
             FROM cards
             WHERE user_id = ? AND workspace_id = ? AND deleted IS NULL
         """
@@ -188,9 +188,7 @@ def compute_card_sets(
         lesson_cards = []
 
         for row in cursor.fetchall():
-            card_id, name, tags_inverted_index, created, modified = row
-
-            logger.info(f"DB READ: card_id={card_id}, name={name}")
+            card_id, name, description, tags_inverted_index, created, modified = row
 
             # Parse tags from inverted index and lookup tag names
             tag_names = []
@@ -207,12 +205,12 @@ def compute_card_sets(
             card = type('CardSummary', (), {
                 'id': card_id,
                 'title': name,
+                'description': description or '',
                 'tags': frozenset(tag_names),
                 'created_at': created,
                 'modified_at': modified,
                 'has_attachments': False
             })()
-            logger.info(f"CARD OBJECT: id={card.id}, title={card.title}, tags={card.tags}")
             lesson_cards.append(card)
 
         all_cards = lesson_cards
@@ -998,6 +996,35 @@ async def update_card_content(request: Request):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("/cards/update-description")
+async def update_card_description(request: Request):
+    """Update a card's description."""
+    from pydantic import BaseModel
+    from apps.shared.repositories import CardRepository
+
+    class UpdateDescriptionRequest(BaseModel):
+        card_id: str
+        description: str
+        workspace_id: str = "default-workspace"  # TODO: Get from session
+
+    try:
+        data = await request.json()
+        req = UpdateDescriptionRequest(**data)
+
+        card_repo = CardRepository()
+        success = card_repo.update_description(req.card_id, req.workspace_id, req.description)
+
+        if success:
+            return {"success": True, "message": "Description updated"}
+        else:
+            raise HTTPException(status_code=404, detail="Card not found")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating card description: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.post("/cards/add-tag")
 async def add_tag_to_card(request: Request):
     """Add a tag to a card (using zero-trust inverted index)."""
@@ -1049,6 +1076,64 @@ async def remove_tag_from_card(request: Request):
             return {"success": False, "message": "Card not found or tag not on card"}
     except Exception as e:
         logger.error(f"Error removing tag from card: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/cards/update-cell-tags")
+async def update_card_cell_tags(request: Request):
+    """Update card tags based on cell position (row/col tags)."""
+    from pydantic import BaseModel
+    from apps.shared.repositories.tag_repository import get_tag_by_name
+    import sqlite3
+
+    class UpdateCellTagsRequest(BaseModel):
+        card_id: str  # UUID
+        row_tag: str | None  # Tag name for row (or "other"/"all")
+        col_tag: str | None  # Tag name for column (or "other"/"all")
+        workspace_id: str = "default-workspace"  # TODO: Get from session
+
+    try:
+        data = await request.json()
+        req = UpdateCellTagsRequest(**data)
+
+        # Get tag IDs for row and col tag names
+        new_tag_ids = []
+
+        if req.row_tag and req.row_tag not in ("other", "all"):
+            row_tag = get_tag_by_name(req.row_tag, req.workspace_id)
+            if row_tag:
+                new_tag_ids.append(row_tag['tag_id'])
+
+        if req.col_tag and req.col_tag not in ("other", "all"):
+            col_tag = get_tag_by_name(req.col_tag, req.workspace_id)
+            if col_tag:
+                new_tag_ids.append(col_tag['tag_id'])
+
+        # Update tags directly in database (replace all tags)
+        with get_card_db_connection(DATABASE_PATH) as conn:
+            cursor = conn.cursor()
+            new_tags_csv = ",".join(new_tag_ids) if new_tag_ids else ""
+            cursor.execute(
+                """
+                UPDATE cards
+                SET tags = ?
+                WHERE card_id = ? AND workspace_id = ? AND deleted IS NULL
+                """,
+                (new_tags_csv, req.card_id, req.workspace_id)
+            )
+            conn.commit()
+            success = cursor.rowcount > 0
+
+        if success:
+            return {
+                "success": True,
+                "message": "Card tags updated based on cell position",
+                "tag_ids": new_tag_ids
+            }
+        else:
+            return {"success": False, "message": "Card not found"}
+    except Exception as e:
+        logger.error(f"Error updating card cell tags: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

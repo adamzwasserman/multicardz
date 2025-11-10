@@ -300,7 +300,7 @@
                 <h4 class="settings-section-title">card options</h4>
                 <div class="settings-item">
                     <div class="settings-checkbox">
-                        <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" onchange="if(typeof window.settingsManager !== 'undefined') window.settingsManager.savePreference('startWithAllCards', this.checked); if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
+                        <input type="checkbox" id="startWithAllCards" data-affects-rendering="true" {% if startWithAllCards %}checked{% endif %} onchange="if(typeof window.settingsManager !== 'undefined') window.settingsManager.savePreference('startWithAllCards', this.checked); if(typeof window.dragDropSystem !== 'undefined') window.dragDropSystem.updateStateAndRender()">
                         <label for="startWithAllCards">show all cards when no tags selected</label>
                     </div>
                 </div>
@@ -474,6 +474,36 @@
                 }
             } catch (error) {
                 console.error('Error updating card title:', error);
+            }
+        }
+
+        // Update card description on blur
+        async function updateCardDescription(element) {
+            const cardId = element.dataset.cardId;
+            const newDescription = element.textContent.trim();
+
+            console.log('updateCardDescription called:', {cardId, newDescription});
+
+            try {
+                console.log('Sending update request to /api/cards/update-description');
+                const response = await fetch('/api/cards/update-description', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        card_id: cardId,
+                        description: newDescription,
+                        workspace_id: 'default-workspace'
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    console.error('Failed to update card description', await response.text());
+                } else {
+                    console.log('Card description updated successfully:', cardId);
+                }
+            } catch (error) {
+                console.error('Error updating card description:', error);
             }
         }
 

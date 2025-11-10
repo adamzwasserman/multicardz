@@ -94,35 +94,50 @@ python -m pytest tests --cov=apps --cov-fail-under=85
 
 ## Testing Guidelines
 
+### **MANDATORY BDD-FIRST WORKFLOW**
+
+**ALL features and tasks MUST follow this workflow WITHOUT EXCEPTION:**
+
+1. **Write Gherkin scenarios** in `tests/features/*.feature`
+2. **Write step definitions** in `tests/step_definitions/`
+3. **Run tests (RED phase)** - tests must fail initially
+4. **Implement code** - write minimum code to pass tests
+5. **Run tests (GREEN phase)** - all tests must pass
+
+**NO CODE MAY BE WRITTEN BEFORE BDD TESTS EXIST.**
+
 ### Test Structure
 ```
 tests/
 ├── api/                    # API endpoint tests
 ├── integration/            # Integration tests
 ├── playwright/             # Browser automation tests
-├── features/               # BDD feature files
+├── features/               # BDD feature files (Gherkin scenarios)
 └── step_definitions/       # BDD step implementations
 ```
 
 ### Running Tests
 ```bash
+# BDD tests (must run BEFORE and AFTER implementation)
+uv run pytest tests/features -v
+
 # All tests
-python -m pytest tests -v
+uv run pytest tests -v
 
 # Specific test categories
-python -m pytest tests/api -v                    # API tests
-python -m pytest tests/integration -v            # Integration tests
-python -m pytest tests -m performance -v         # Performance tests
+uv run pytest tests/api -v                    # API tests
+uv run pytest tests/integration -v            # Integration tests
+uv run pytest tests -m performance -v         # Performance tests
 
 # With coverage
-python -m pytest tests --cov=apps --cov-report=html
+uv run pytest tests --cov=apps --cov-report=html
 ```
 
 ### Coverage Requirements
 - >85% test coverage for all production code
 - 100% pass rate required (no exceptions)
 - Performance tests for all set operations
-- BDD scenarios for all user-facing features
+- **BDD scenarios MUST be written BEFORE implementation for ALL user-facing features**
 
 ## Performance Requirements
 

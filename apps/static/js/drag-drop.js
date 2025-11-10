@@ -576,16 +576,51 @@ class CardToCellHandler extends DropHandler {
 
     const card = draggedElements[0];
     const sourceCell = card.closest('.grid-cell');
+    const cardId = card.dataset.cardId;
+    const destRow = dropElement.dataset.row;
+    const destCol = dropElement.dataset.col;
 
-    window.dispatchEvent(new CustomEvent('cardCellMove', {
-      detail: {
-        cardId: card.dataset.cardId,
-        sourceRow: sourceCell?.dataset.row,
-        sourceCol: sourceCell?.dataset.col,
-        destRow: dropElement.dataset.row,
-        destCol: dropElement.dataset.col
+    // Update card tags based on destination cell position
+    try {
+      const response = await fetch('/api/cards/update-cell-tags', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          card_id: cardId,
+          row_tag: destRow,
+          col_tag: destCol,
+          workspace_id: 'default-workspace'
+        })
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        console.error('Failed to update card tags:', result.message);
+        throw new Error(result.message);
       }
-    }));
+
+      // Dispatch event for successful cell move
+      window.dispatchEvent(new CustomEvent('cardCellMove', {
+        detail: {
+          cardId: cardId,
+          sourceRow: sourceCell?.dataset.row,
+          sourceCol: sourceCell?.dataset.col,
+          destRow: destRow,
+          destCol: destCol,
+          tagIds: result.tag_ids
+        }
+      }));
+
+    } catch (error) {
+      console.error('Error updating card cell tags:', error);
+      // Show error to user
+      alert(`Failed to move card: ${error.message}`);
+      // Re-throw to mark operation as failed
+      throw error;
+    }
   }
 
   mutatesTagsInPlay() {
@@ -1361,8 +1396,13 @@ class SpatialDragDrop {
         const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
 
         if (handler && handler.validate(this.draggedElements[0], dropTarget)) {
-          await handler.handleDrop(e, dropTarget, this.draggedElements);
-          result = { success: true };
+          try {
+            await handler.handleDrop(e, dropTarget, this.draggedElements);
+            result = { success: true };
+          } catch (error) {
+            console.error('[handleDrop] Error in handler.handleDrop:', error);
+            result = { success: false, error: error.message };
+          }
         } else {
           result = { success: false };
         }
@@ -2233,6 +2273,7 @@ class SpatialDragDrop {
 
   // Update state and render with debouncing
   async updateStateAndRender() {
+    console.log('[updateStateAndRender] CALLED');
     // Clear existing timer
     if (this.renderDebounceTimer) {
       clearTimeout(this.renderDebounceTimer);
@@ -2240,7 +2281,9 @@ class SpatialDragDrop {
 
     // Set new timer
     this.renderDebounceTimer = setTimeout(async () => {
+      console.log('[updateStateAndRender] Debounce timer fired');
       const tagsInPlay = this.deriveStateFromDOM();
+      console.log('[updateStateAndRender] Derived state:', tagsInPlay);
 
       // Update display
       const tagsField = document.getElementById('tagsInPlay');
@@ -2249,9 +2292,12 @@ class SpatialDragDrop {
       }
 
       // Send to backend
+      console.log('[updateStateAndRender] Calling renderCards...');
       await this.renderCards(tagsInPlay);
 
+      console.log('[updateStateAndRender] Calling updateLessonHint...');
       await this.updateLessonHint(tagsInPlay);
+      console.log('[updateStateAndRender] COMPLETE');
     }, this.DEBOUNCE_DELAY);
   }
 
@@ -2333,6 +2379,7 @@ class SpatialDragDrop {
 
   // Send to backend
   async renderCards(tagsInPlay) {
+    console.log('[renderCards] CALLED with tagsInPlay:', tagsInPlay);
     try {
       // Get workspace context from DOM
       const workspaceId = this.getWorkspaceContext();
@@ -2342,26 +2389,34 @@ class SpatialDragDrop {
         headers['X-Workspace-Id'] = workspaceId;
       }
 
+      console.log('[renderCards] Fetching /api/render/cards...');
       const response = await fetch('/api/render/cards', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ tagsInPlay })
       });
 
+      console.log('[renderCards] Response status:', response.status);
       if (response.ok) {
         const html = await response.text();
+        console.log('[renderCards] Received HTML length:', html.length);
         const container = document.getElementById('cardContainer');
         if (container) {
+          console.log('[renderCards] Updating container innerHTML');
           container.innerHTML = html;
 
           // Apply pending collapsed rows/columns after grid is rendered
           if (window.settingsManager) {
             window.settingsManager.applyPendingGridState();
           }
+        } else {
+          console.error('[renderCards] cardContainer not found!');
         }
+      } else {
+        console.error('[renderCards] Response not OK:', response.status);
       }
     } catch (error) {
-      console.error('Failed to render cards:', error);
+      console.error('[renderCards] Failed to render cards:', error);
     }
   }
 
@@ -2674,14 +2729,23 @@ class SpatialDragDrop {
 // Global function wrappers for HTML onclick handlers
 window.removeTagFromCard = function(cardId, tagName, removeButton) {
   if (window.dragDropSystem) {
-    // Look up tag ID from the tag cloud
-    const tagInCloud = document.querySelector(`[data-tag="${tagName}"][data-tag-id]`);
-    const tagId = tagInCloud?.dataset.tagId;
+    // Look up tag ID from anywhere in the document (tag cloud or drop zones)
+    console.log(`[removeTagFromCard] Looking for tag: ${tagName}`);
+    let tagElement = document.querySelector(`[data-tag="${tagName}"][data-tag-id]`);
+
+    // If not found with data-tag-id, try finding any element with data-tag and data-tag-uuid
+    if (!tagElement) {
+      tagElement = document.querySelector(`[data-tag="${tagName}"][data-tag-uuid]`);
+    }
+
+    const tagId = tagElement?.dataset.tagId || tagElement?.dataset.tagUuid;
+    console.log(`[removeTagFromCard] Found tag element:`, tagElement);
+    console.log(`[removeTagFromCard] Tag ID: ${tagId}`);
 
     if (tagId) {
       window.dragDropSystem.removeTagFromCard(cardId, tagId, removeButton);
     } else {
-      console.error('Could not find tag ID for tag:', tagName);
+      console.error(`Could not find tag ID for tag: ${tagName}. Checked data-tag-id and data-tag-uuid attributes.`);
     }
   }
 };

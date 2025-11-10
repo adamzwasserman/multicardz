@@ -808,7 +808,7 @@ body {
 /* Base Grid Container */
 .spatial-grid {
     display: grid;
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto auto auto auto;
     grid-template-columns: 120px 1fr 120px;
     grid-template-areas:
         "tag-management tag-management tag-management"
@@ -817,7 +817,7 @@ body {
         ". bottom-control .";
     gap: 1rem;
     width: 100%;
-    height: calc(100vh - 76px - 2rem);
+    min-height: calc(100vh - 76px - 2rem);
     padding: 1rem;
     box-sizing: border-box;
 }
@@ -1223,31 +1223,31 @@ body {
 
 /* Grid adjustments when rows/columns are collapsed */
 .spatial-grid.row-1-collapsed {
-    grid-template-rows: 0 auto 1fr auto;
+    grid-template-rows: 0 auto auto auto;
 }
 
 .spatial-grid.row-2-collapsed {
-    grid-template-rows: auto 0 1fr auto;
+    grid-template-rows: auto 0 auto auto;
 }
 
 .spatial-grid.row-4-collapsed {
-    grid-template-rows: auto auto 1fr 0;
+    grid-template-rows: auto auto auto 0;
 }
 
 .spatial-grid.row-1-collapsed.row-2-collapsed {
-    grid-template-rows: 0 0 1fr auto;
+    grid-template-rows: 0 0 auto auto;
 }
 
 .spatial-grid.row-1-collapsed.row-4-collapsed {
-    grid-template-rows: 0 auto 1fr 0;
+    grid-template-rows: 0 auto auto 0;
 }
 
 .spatial-grid.row-2-collapsed.row-4-collapsed {
-    grid-template-rows: auto 0 1fr 0;
+    grid-template-rows: auto 0 auto 0;
 }
 
 .spatial-grid.row-1-collapsed.row-2-collapsed.row-4-collapsed {
-    grid-template-rows: 0 0 1fr 0;
+    grid-template-rows: 0 0 auto 0;
 }
 
 .spatial-grid.col-1-collapsed {
@@ -1369,11 +1369,7 @@ body {
     padding: 2rem;
     color: var(--color-text-secondary);
     min-height: 300px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    flex-direction: row;
-    flex-wrap: wrap;
+    overflow: visible;
 }
 
 .card-display p {
@@ -2420,11 +2416,40 @@ body {
     border-radius: 2px;
 }
 
+/* Card Description Styling */
+.card-description {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    min-height: 20px;
+    padding: 4px;
+    cursor: text;
+}
+
+.card-description:empty::before {
+    content: attr(placeholder);
+    color: #999;
+    font-style: italic;
+}
+
+.card-description:hover {
+    background: var(--color-muji-hover);
+    border-radius: 2px;
+}
+
+.card-description:focus {
+    outline: 1px solid #4CAF50;
+    background: #f9f9f9;
+    border-radius: 3px;
+}
+
 .card-description {
     color: var(--color-text-secondary); /* Adaptive secondary text */
     font-size: 12px; /* Even smaller for descriptions */
     font-weight: 400;
-    margin: 0 0 12px 0; /* Add margin for accordion separator */
+    margin: 0 0 2px 0; /* Add margin for accordion separator */
     outline: none; /* Remove default outline */
     cursor: text;
     min-height: 40px; /* Ensure clickable area even when empty */
@@ -3735,6 +3760,8 @@ body.font-berkeley-mono {
 .card-content {
     position: relative;
     margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Tag delete button */
@@ -3801,10 +3828,14 @@ body.font-berkeley-mono {
     margin: 6px 0;
 }
 
+.card-footer {
+    display: flex;
+    flex-direction: column;
+}
+
 .card-item .card-tags-section {
-    margin-top: 8px;
-    padding-top: 6px;
-    border-top: 1px solid var(--color-neutral-300);
+    padding: 0;
+    margin: 8px 0;
 }
 
 .card-item .card-tag {

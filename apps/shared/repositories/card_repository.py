@@ -340,6 +340,10 @@ class CardRepository:
     def update_content(self, card_id: str, workspace_id: str, content: str) -> bool:
         return update_card_content(card_id, workspace_id, content, self.db_path)
 
+    def update_description(self, card_id: str, workspace_id: str, description: str) -> bool:
+        """Alias for update_content - updates the description field."""
+        return update_card_content(card_id, workspace_id, description, self.db_path)
+
     def add_tag(self, card_id: str, workspace_id: str, tag_id: str) -> bool:
         return add_tag_to_card(card_id, workspace_id, tag_id, self.db_path)
 
