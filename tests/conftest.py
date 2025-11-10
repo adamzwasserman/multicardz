@@ -294,7 +294,8 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         # Skip all tests from step_definitions directory - they have database
         # state issues when running in parallel with xdist
-        if "step_definitions" in str(item.fspath):
+        # EXCEPTION: DATAOS tests don't use database, allow them to run
+        if "step_definitions" in str(item.fspath) and "dataos" not in str(item.fspath).lower():
             item.add_marker(
                 pytest.mark.skip(
                     reason="BDD tests use global database state - run with -n0 flag"
