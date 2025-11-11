@@ -751,32 +751,11 @@ class GroupToCardHandler extends DropHandler {
 
 class SpatialDragDrop {
   constructor() {
-    this.selectedTags = new Set();
-    this.draggedElements = [];
-    this.stateCache = null;
-    this.stateCacheTime = 0;
-    this.CACHE_DURATION = 1000; // 1 second cache
+    // DATAOS Compliance: No state duplication - all state derived from DOM
     this.listeners = new WeakMap();
     this.renderDebounceTimer = null;
     this.DEBOUNCE_DELAY = 100;
     this.registry = new DropTargetRegistry(this); // Polymorphic handler registry
-
-    // Multi-selection state management
-    this.selectionState = {
-      selectedTags: new Set(), // Set of tag element references for O(1) operations
-      selectionMode: 'single', // 'single' | 'range' | 'toggle'
-      anchorTag: null, // For shift-selection range operations
-      lastSelectedTag: null, // For range operations
-      lastShiftClickedTag: null, // Track last Shift+clicked tag for toggle detection
-      selectionBounds: null, // For lasso selection (future)
-      isDragging: false, // Selection lock during drag operations
-      selectionMetadata: {
-        selectionStartTime: null,
-        selectionMethod: 'click', // 'click' | 'keyboard' | 'lasso'
-        selectionCount: 0,
-        selectionSequence: [] // Order of selection for undo
-      }
-    };
 
     // Ghost image configuration
     this.ghostImageConfig = {
@@ -801,6 +780,176 @@ class SpatialDragDrop {
   }
 
   // ============================================================
+  // DATAOS-COMPLIANT DOM STATE HELPERS
+  // All state derived from DOM - no JavaScript duplication
+  // ============================================================
+
+  /**
+   * Get all selected tags from DOM (DATAOS compliant)
+   * @returns {NodeList} Selected tag elements
+   */
+  getSelectedTags() {
+    return document.querySelectorAll('[data-tag].tag-selected');
+  }
+
+  /**
+   * Get currently dragged elements from DOM (DATAOS compliant)
+   * @returns {Array<Element>} Elements marked as being dragged
+   */
+  getDraggedElements() {
+    return Array.from(document.querySelectorAll('[data-dragging="true"]'));
+  }
+
+  /**
+   * Set dragged elements in DOM (DATAOS compliant)
+   * @param {Array<Element>} elements Elements to mark as dragged
+   */
+  setDraggedElements(elements) {
+    // Clear previous dragged state
+    document.querySelectorAll('[data-dragging="true"]').forEach(el => {
+      el.removeAttribute('data-dragging');
+    });
+
+    // Mark new dragged elements
+    elements.forEach(el => {
+      el.setAttribute('data-dragging', 'true');
+    });
+  }
+
+  /**
+   * Clear dragged elements from DOM (DATAOS compliant)
+   */
+  clearDraggedElements() {
+    document.querySelectorAll('[data-dragging="true"]').forEach(el => {
+      el.removeAttribute('data-dragging');
+    });
+  }
+
+  /**
+   * Get anchor tag for shift-selection from DOM (DATAOS compliant)
+   * @returns {Element|null} The anchor tag element
+   */
+  getAnchorTag() {
+    return document.querySelector('[data-selection-anchor="true"]');
+  }
+
+  /**
+   * Set anchor tag in DOM (DATAOS compliant)
+   * @param {Element} tag The tag to set as anchor
+   */
+  setAnchorTag(tag) {
+    // Clear previous anchor
+    const prevAnchor = this.getAnchorTag();
+    if (prevAnchor) {
+      prevAnchor.removeAttribute('data-selection-anchor');
+    }
+
+    // Set new anchor
+    if (tag) {
+      tag.setAttribute('data-selection-anchor', 'true');
+    }
+  }
+
+  /**
+   * Get last selected tag from DOM (DATAOS compliant)
+   * @returns {Element|null} The last selected tag
+   */
+  getLastSelectedTag() {
+    return document.querySelector('[data-last-selected="true"]');
+  }
+
+  /**
+   * Set last selected tag in DOM (DATAOS compliant)
+   * @param {Element} tag The tag to mark as last selected
+   */
+  setLastSelectedTag(tag) {
+    // Clear previous last-selected
+    const prevLast = this.getLastSelectedTag();
+    if (prevLast) {
+      prevLast.removeAttribute('data-last-selected');
+    }
+
+    // Set new last-selected
+    if (tag) {
+      tag.setAttribute('data-last-selected', 'true');
+    }
+  }
+
+  /**
+   * Check if tag is selected from DOM (DATAOS compliant)
+   * @param {Element} tag The tag to check
+   * @returns {boolean} True if tag is selected
+   */
+  isTagSelected(tag) {
+    return tag && tag.classList.contains('tag-selected');
+  }
+
+  /**
+   * Get selection sequence from DOM (DATAOS compliant)
+   * @returns {Array<string>} Array of tag IDs in selection order
+   */
+  getSelectionSequence() {
+    const container = document.querySelector('[data-zone-type]') || document.body;
+    const sequence = container.getAttribute('data-selection-sequence');
+    return sequence ? JSON.parse(sequence) : [];
+  }
+
+  /**
+   * Set selection sequence in DOM (DATAOS compliant)
+   * @param {Array<string>} sequence Array of tag IDs in selection order
+   */
+  setSelectionSequence(sequence) {
+    const container = document.querySelector('[data-zone-type]') || document.body;
+    container.setAttribute('data-selection-sequence', JSON.stringify(sequence));
+  }
+
+  /**
+   * Get selection count from DOM (DATAOS compliant)
+   * @returns {number} Number of selected tags
+   */
+  getSelectionCount() {
+    return this.getSelectedTags().length;
+  }
+
+  /**
+   * Get last shift-clicked tag from DOM (DATAOS compliant)
+   * @returns {Element|null} The last shift-clicked tag
+   */
+  getLastShiftClickedTag() {
+    return document.querySelector('[data-last-shift-click="true"]');
+  }
+
+  /**
+   * Set last shift-clicked tag in DOM (DATAOS compliant)
+   * @param {Element} tag The tag to mark as last shift-clicked
+   */
+  setLastShiftClickedTag(tag) {
+    // Clear previous
+    const prev = this.getLastShiftClickedTag();
+    if (prev) {
+      prev.removeAttribute('data-last-shift-click');
+    }
+
+    // Set new
+    if (tag) {
+      tag.setAttribute('data-last-shift-click', 'true');
+    }
+  }
+
+  /**
+   * Get/set isDragging flag in DOM (DATAOS compliant)
+   */
+  getIsDragging() {
+    const container = document.querySelector('[data-zone-type]') || document.body;
+    return container.getAttribute('data-is-dragging') === 'true';
+  }
+
+  setIsDragging(isDragging) {
+    const container = document.querySelector('[data-zone-type]') || document.body;
+    container.setAttribute('data-is-dragging', isDragging ? 'true' : 'false');
+  }
+
+  // ============================================================
   // MULTI-SELECTION STATE MANAGEMENT
   // Set-based O(1) operations for selection management
   // ============================================================
@@ -808,20 +957,24 @@ class SpatialDragDrop {
   /**
    * Add tag to current selection with O(1) performance
    * Updates visual state and maintains selection metadata
+   * DATAOS compliant - stores state in DOM only
    */
   addToSelection(tag) {
     if (!tag || !tag.dataset || !tag.dataset.tag) {
       return;
     }
 
-    this.selectionState.selectedTags.add(tag);
+    // Add visual state to DOM
     tag.classList.add('tag-selected');
     tag.setAttribute('aria-selected', 'true');
 
-    // Update metadata
-    this.selectionState.selectionMetadata.selectionCount++;
-    this.selectionState.selectionMetadata.selectionSequence.push(tag);
-    this.selectionState.lastSelectedTag = tag;
+    // Store in DOM metadata
+    const selectionSequence = this.getSelectionSequence();
+    selectionSequence.push(tag.dataset.tagId || tag.dataset.tag);
+    this.setSelectionSequence(selectionSequence);
+
+    // Mark as last selected
+    this.setLastSelectedTag(tag);
 
     // Dispatch event for group UI integration
     document.dispatchEvent(new CustomEvent('tag-selected', {
@@ -837,21 +990,24 @@ class SpatialDragDrop {
 
   /**
    * Remove tag from selection with O(1) performance
+   * DATAOS compliant - updates DOM only
    */
   removeFromSelection(tag) {
-    if (!tag || !this.selectionState.selectedTags.has(tag)) {
+    if (!tag || !this.isTagSelected(tag)) {
       return;
     }
 
-    this.selectionState.selectedTags.delete(tag);
+    // Remove visual state from DOM
     tag.classList.remove('tag-selected');
     tag.setAttribute('aria-selected', 'false');
 
-    // Update metadata
-    this.selectionState.selectionMetadata.selectionCount--;
-    const sequenceIndex = this.selectionState.selectionMetadata.selectionSequence.indexOf(tag);
+    // Update metadata in DOM
+    const sequence = this.getSelectionSequence();
+    const tagId = tag.dataset.tagId || tag.dataset.tag;
+    const sequenceIndex = sequence.indexOf(tagId);
     if (sequenceIndex > -1) {
-      this.selectionState.selectionMetadata.selectionSequence.splice(sequenceIndex, 1);
+      sequence.splice(sequenceIndex, 1);
+      this.setSelectionSequence(sequence);
     }
 
     // Dispatch event for group UI integration
@@ -868,21 +1024,19 @@ class SpatialDragDrop {
 
   /**
    * Clear entire selection and reset state
+   * DATAOS compliant - clears DOM state only
    */
   clearSelection() {
-    this.selectionState.selectedTags.forEach(tag => {
+    // Clear visual state from all selected tags in DOM
+    this.getSelectedTags().forEach(tag => {
       tag.classList.remove('tag-selected');
       tag.setAttribute('aria-selected', 'false');
     });
 
-    this.selectionState.selectedTags.clear();
-    this.selectionState.selectionMetadata.selectionCount = 0;
-    this.selectionState.selectionMetadata.selectionSequence = [];
-    this.selectionState.lastSelectedTag = null;
-    this.selectionState.anchorTag = null;
-
-    // Legacy compatibility - also clear old selectedTags set
-    this.selectedTags.clear();
+    // Clear DOM metadata
+    this.setSelectionSequence([]);
+    this.setLastSelectedTag(null);
+    this.setAnchorTag(null);
 
     // Dispatch event for group UI integration
     document.dispatchEvent(new CustomEvent('selection-cleared'));
@@ -890,11 +1044,12 @@ class SpatialDragDrop {
 
   /**
    * Toggle tag selection state (XOR operation)
+   * DATAOS compliant - checks DOM state
    */
   toggleTagSelection(tag) {
     if (!tag) return;
 
-    if (this.selectionState.selectedTags.has(tag)) {
+    if (this.isTagSelected(tag)) {
       this.removeFromSelection(tag);
     } else {
       this.addToSelection(tag);
@@ -929,6 +1084,7 @@ class SpatialDragDrop {
   /**
    * Handle tag selection based on click modifiers
    * Implements single, range (Shift), and toggle (Ctrl/Cmd) selection
+   * DATAOS compliant - reads/writes DOM state only
    */
   handleSelectionClick(event, tag) {
     if (!tag) return;
@@ -939,30 +1095,30 @@ class SpatialDragDrop {
     if (event.shiftKey) {
       // Shift+click: Range selection
       // Special case: if clicking the same tag twice in a row, toggle it off
-      const lastTag = this.selectionState.lastShiftClickedTag;
+      const lastTag = this.getLastShiftClickedTag();
       const isConsecutiveClick = lastTag && lastTag.dataset.tag === tag.dataset.tag;
-      const isSelected = this.selectionState.selectedTags.has(tag);
+      const isSelected = this.isTagSelected(tag);
 
       if (isConsecutiveClick && isSelected) {
         this.toggleTagSelection(tag);
       } else {
-        const anchor = this.selectionState.anchorTag || tag;
+        const anchor = this.getAnchorTag() || tag;
         this.selectRange(anchor, tag);
       }
-      this.selectionState.lastShiftClickedTag = tag;
+      this.setLastShiftClickedTag(tag);
     } else if (event.ctrlKey || event.metaKey) {
       // Ctrl/Cmd+click: Toggle selection
       this.toggleTagSelection(tag);
-      if (!this.selectionState.anchorTag) {
-        this.selectionState.anchorTag = tag;
+      if (!this.getAnchorTag()) {
+        this.setAnchorTag(tag);
       }
-      this.selectionState.lastShiftClickedTag = null; // Clear on non-Shift click
+      this.setLastShiftClickedTag(null); // Clear on non-Shift click
     } else {
       // Regular click: Clear and select single
       this.clearSelection();
       this.addToSelection(tag);
-      this.selectionState.anchorTag = tag;
-      this.selectionState.lastShiftClickedTag = null; // Clear on non-Shift click
+      this.setAnchorTag(tag);
+      this.setLastShiftClickedTag(null); // Clear on non-Shift click
     }
 
     // Update ARIA states for all tags
@@ -978,10 +1134,11 @@ class SpatialDragDrop {
   /**
    * Update ARIA attributes for all tags based on selection
    * Maintains proper ARIA attributes for accessibility tools
+   * DATAOS compliant - reads from DOM
    */
   updateARIAStates() {
     document.querySelectorAll('[data-tag]').forEach(tag => {
-      const isSelected = this.selectionState.selectedTags.has(tag);
+      const isSelected = this.isTagSelected(tag);
       tag.setAttribute('aria-selected', isSelected.toString());
 
       if (isSelected) {
@@ -992,7 +1149,7 @@ class SpatialDragDrop {
     });
 
     // Announce selection summary
-    const count = this.selectionState.selectedTags.size;
+    const count = this.getSelectionCount();
     if (count > 0) {
       this.announceSelection(`${count} tag${count > 1 ? 's' : ''} selected`);
     }
@@ -1111,17 +1268,17 @@ class SpatialDragDrop {
         if (event.ctrlKey || event.metaKey) {
           // Ctrl/Cmd+Space/Enter: Toggle selection
           this.toggleTagSelection(tag);
-          const action = this.selectionState.selectedTags.has(tag) ? 'added' : 'removed';
+          const action = this.isTagSelected(tag) ? 'added' : 'removed';
           this.announceSelectionChange(action, tag);
         } else if (event.shiftKey) {
           // Shift+Space/Enter: Range selection
-          const anchor = this.selectionState.anchorTag || tag;
+          const anchor = this.getAnchorTag() || tag;
           this.selectRange(anchor, tag);
         } else {
           // Regular Space/Enter: Clear and select
           this.clearSelection();
           this.addToSelection(tag);
-          this.selectionState.anchorTag = tag;
+          this.setAnchorTag(tag);
           this.announceSelectionChange('selected', tag);
         }
 
@@ -1230,25 +1387,13 @@ class SpatialDragDrop {
     this.updateStateAndRender();
   }
 
-  // Derive state with caching
+  // Derive state from DOM - DATAOS compliant: always returns fresh DOM data
   deriveStateFromDOM() {
-    // Check cache
-    const now = Date.now();
-    if (this.stateCache && (now - this.stateCacheTime) < this.CACHE_DURATION) {
-      return this.stateCache;
-    }
-
-    const state = {
+    return {
       zones: this.discoverZones(),
       controls: this.getRenderingControls(),
       currentLesson: this.getCurrentLesson()
     };
-
-    // Update cache
-    this.stateCache = state;
-    this.stateCacheTime = now;
-
-    return state;
   }
 
   // Get current lesson from URL parameters or localStorage
@@ -1375,7 +1520,10 @@ class SpatialDragDrop {
       e.preventDefault();
       e.stopPropagation();
 
-      if (!this.draggedElements || this.draggedElements.length === 0) {
+      // Get dragged elements from DOM (DATAOS compliant)
+      const draggedElements = this.getDraggedElements();
+
+      if (!draggedElements || draggedElements.length === 0) {
         console.log('[handleDrop] No dragged elements, returning');
         return;
       }
@@ -1389,15 +1537,15 @@ class SpatialDragDrop {
 
       // Use batch dispatch for multi-element operations
       let result;
-      if (this.draggedElements.length > 1) {
-        result = await this.dispatchBatchOperation(this.draggedElements, dropTarget, e);
+      if (draggedElements.length > 1) {
+        result = await this.dispatchBatchOperation(draggedElements, dropTarget, e);
       } else {
         // Single element - use direct handler
-        const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
+        const handler = this.registry.findHandler(draggedElements[0], dropTarget);
 
-        if (handler && handler.validate(this.draggedElements[0], dropTarget)) {
+        if (handler && handler.validate(draggedElements[0], dropTarget)) {
           try {
-            await handler.handleDrop(e, dropTarget, this.draggedElements);
+            await handler.handleDrop(e, dropTarget, draggedElements);
             result = { success: true };
           } catch (error) {
             console.error('[handleDrop] Error in handler.handleDrop:', error);
@@ -1409,13 +1557,15 @@ class SpatialDragDrop {
       }
 
       // Cleanup dragged elements
-      this.draggedElements.forEach(el => {
+      draggedElements.forEach(el => {
         el.classList.remove('dragging');
         el.setAttribute('aria-grabbed', 'false');
       });
 
-      const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
-      this.draggedElements = [];
+      const handler = this.registry.findHandler(draggedElements[0], dropTarget);
+
+      // Clear dragged elements from DOM (DATAOS compliant)
+      this.clearDraggedElements();
 
       // Clear selection after successful drop
       if (result.success) {
@@ -1423,7 +1573,6 @@ class SpatialDragDrop {
 
         // Update state if handler mutates tagsInPlay
         if (handler && (handler.mutatesTagsInPlay() || handler.requiresRerender())) {
-          this.invalidateCache();
           this.updateStateAndRender();
         }
       }
@@ -1434,15 +1583,17 @@ class SpatialDragDrop {
 
     // Dragover event - polymorphic dispatch
     container.addEventListener('dragover', (e) => {
-      if (!this.draggedElements || this.draggedElements.length === 0) return;
+      // Get dragged elements from DOM (DATAOS compliant)
+      const draggedElements = this.getDraggedElements();
+      if (!draggedElements || draggedElements.length === 0) return;
 
       const dropTarget = this.findDropTarget(e.target);
       if (!dropTarget) return;
 
-      const handler = this.registry.findHandler(this.draggedElements[0], dropTarget);
+      const handler = this.registry.findHandler(draggedElements[0], dropTarget);
 
       if (handler) {
-        const isValid = handler.validate(this.draggedElements[0], dropTarget);
+        const isValid = handler.validate(draggedElements[0], dropTarget);
         if (isValid) {
           e.preventDefault();
           e.stopPropagation();
@@ -1459,13 +1610,17 @@ class SpatialDragDrop {
       const dropTarget = this.findDropTarget(e.target);
       if (!dropTarget) return;
 
+      // Get dragged elements from DOM (DATAOS compliant)
+      const draggedElements = this.getDraggedElements();
+      if (!draggedElements || draggedElements.length === 0) return;
+
       const handler = this.registry.findHandler(
-        this.draggedElements[0],
+        draggedElements[0],
         dropTarget
       );
 
       if (handler) {
-        handler.handleDragLeave(e, dropTarget, this.draggedElements);
+        handler.handleDragLeave(e, dropTarget, draggedElements);
       }
     });
   }
@@ -2141,57 +2296,66 @@ class SpatialDragDrop {
     // Stop event from bubbling to zone's dragstart handler
     event.stopPropagation();
 
-    // Lock selection during drag
-    this.selectionState.isDragging = true;
+    // Lock selection during drag (DATAOS: store in DOM)
+    this.setIsDragging(true);
 
     // Determine what's being dragged
+    let draggedElements;
     if (draggedTag.dataset.type === 'group-tag') {
       console.log('[handleTagDragStart] Dragging group tag');
-      this.draggedElements = this.expandGroupTag(draggedTag);
-      console.log('[handleTagDragStart] After expandGroupTag, draggedElements.length:', this.draggedElements.length);
-    } else if (this.selectionState.selectedTags.has(draggedTag)) {
+      draggedElements = this.expandGroupTag(draggedTag);
+      console.log('[handleTagDragStart] After expandGroupTag, draggedElements.length:', draggedElements.length);
+    } else if (this.isTagSelected(draggedTag)) {
       // If dragged tag is part of selection, drag all selected tags
-      this.draggedElements = Array.from(this.selectionState.selectedTags);
+      draggedElements = Array.from(this.getSelectedTags());
     } else {
       // If dragged tag not selected, drag only it and clear selection
-      this.draggedElements = [draggedTag];
+      draggedElements = [draggedTag];
       this.clearSelection();
     }
 
+    // Store in DOM (DATAOS compliant)
+    this.setDraggedElements(draggedElements);
+
     // Visual feedback
-    this.draggedElements.forEach(el => {
+    draggedElements.forEach(el => {
       el.classList.add('dragging');
       el.setAttribute('aria-grabbed', 'true');
     });
 
     // Generate and attach ghost image for multi-tag selections
-    console.log('[handleTagDragStart] Checking ghost image condition: draggedElements.length =', this.draggedElements.length);
-    if (this.draggedElements.length > 1) {
-      console.log('[handleTagDragStart] Generating ghost image for', this.draggedElements.length, 'tags');
-      const draggedSet = new Set(this.draggedElements);
+    console.log('[handleTagDragStart] Checking ghost image condition: draggedElements.length =', draggedElements.length);
+    if (draggedElements.length > 1) {
+      console.log('[handleTagDragStart] Generating ghost image for', draggedElements.length, 'tags');
+      const draggedSet = new Set(draggedElements);
       this.attachGhostImage(event, draggedSet);
     } else {
-      console.log('[handleTagDragStart] NOT generating ghost image - only', this.draggedElements.length, 'tag(s)');
+      console.log('[handleTagDragStart] NOT generating ghost image - only', draggedElements.length, 'tag(s)');
     }
 
     // Set transfer data
     event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', this.draggedElements.length.toString());
+    event.dataTransfer.setData('text/plain', draggedElements.length.toString());
   }
 
   // Handle tag drag end
   handleTagDragEnd(event) {
-    this.draggedElements.forEach(el => {
+    // Get dragged elements from DOM (DATAOS compliant)
+    const draggedElements = this.getDraggedElements();
+
+    draggedElements.forEach(el => {
       el.classList.remove('dragging');
       el.setAttribute('aria-grabbed', 'false');
     });
-    this.draggedElements = [];
+
+    // Clear dragged elements from DOM (DATAOS compliant)
+    this.clearDraggedElements();
 
     // Clean up ghost image
     this.cleanupGhostImage();
 
-    // Unlock selection after drag
-    this.selectionState.isDragging = false;
+    // Unlock selection after drag (DATAOS: store in DOM)
+    this.setIsDragging(false);
   }
 
   // Handle card drag start
@@ -2200,7 +2364,9 @@ class SpatialDragDrop {
     if (!card) return;
 
     card.classList.add('dragging');
-    this.draggedElements = [card];
+
+    // Store in DOM (DATAOS compliant)
+    this.setDraggedElements([card]);
 
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
@@ -2265,11 +2431,6 @@ class SpatialDragDrop {
     return tagElements;
   }
 
-  // Invalidate cache
-  invalidateCache() {
-    this.stateCache = null;
-    this.stateCacheTime = 0;
-  }
 
   // Update state and render with debouncing
   async updateStateAndRender() {
@@ -2466,7 +2627,6 @@ class SpatialDragDrop {
                        'input';
 
       control.addEventListener(eventType, () => {
-        this.invalidateCache();
         this.updateStateAndRender();
       });
 

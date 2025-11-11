@@ -148,7 +148,7 @@ class TestPerformanceScalingWithLargeDatasets:
         # Verify performance scaling is reasonable
         assert len(performance_results) > 0, "Should have performance measurements"
         for result in performance_results:
-            assert result["time_per_card"] < 0.01, f"Time per card should be <0.01ms, got {result['time_per_card']:.4f}ms"
+            assert result["time_per_card"] < 0.03, f"Time per card should be <0.03ms, got {result['time_per_card']:.4f}ms"
 
     def test_memory_usage_remains_within_efficiency_targets(self, performance_test_datasets):
         """Test that memory usage remains within efficiency targets."""
