@@ -467,6 +467,7 @@ def render_dimensional_grid(cards, row_tags=None, column_tags=None, **kwargs):
         template_card = {
             'id': card_id,
             'title': card_title,
+            'description': getattr(card, 'description', ''),
             'tags': tags,
             'created_at': getattr(card, 'created_at', ''),
             'modified_at': getattr(card, 'modified_at', ''),
